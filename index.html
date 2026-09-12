@@ -64,8 +64,8 @@ button,a,select,input{min-height:44px}
 </div>
 <div class="space-y-3">
 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-<div class="md:col-span-6"><input id="quickLink" placeholder="Paste Instagram / X / Facebook link..." class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
-<div class="md:col-span-4"><input id="quickTakeaway" placeholder="Post Description / Caption..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
+<div class="md:col-span-5"><input id="quickLink" placeholder="Paste Instagram / X / Facebook link..." class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
+<div class="md:col-span-5 flex gap-2"><input id="quickTakeaway" placeholder="Post Description / Caption..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"><button type="button" id="autoDetectCaptionBtn" class="px-3 py-3 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer" title="Auto-detect description from post link"><i id="autoDetectIcon" class="fas fa-magic"></i><span id="autoDetectText" class="hidden sm:inline">Auto Detect</span></button></div>
 <div class="md:col-span-2"><button id="quickAddBtn" class="w-full py-3 gold text-black rounded-xl font-bold text-sm"><i class="fas fa-plus mr-2"></i>Add Now</button></div>
 </div>
 <div>
@@ -380,7 +380,31 @@ function renderGrid(){
   shown+=slice.length;
 }
 
-window.editTakeaway=function(no){const rec=records.find(r=>r['No.']===no);if(!rec)return;const currentText=rec['Core Idea / 1-Line Takeaway']||'';const newText=prompt(`Edit Description / Caption for Post #${no}:`, currentText);if(newText!==null&&newText.trim()!==''){rec['Core Idea / 1-Line Takeaway']=newText.trim();saveAll();document.getElementById('grid').innerHTML='';shown=0;renderGrid();}};
+window.editTakeaway=async function(no){
+  const rec=records.find(r=>r['No.']===no);
+  if(!rec) return;
+  const currentText=rec['Core Idea / 1-Line Takeaway']||'';
+  const choice = prompt(`Edit Description / Caption for Post #${no}:\n(Tip: Type AUTO to auto-detect caption from post link)`, currentText);
+  if(choice === null) return;
+  let finalDesc = choice.trim();
+  if(finalDesc.toUpperCase() === 'AUTO') {
+    const detected = await fetchCaptionFromUrl(rec['Original Post Link']);
+    if(detected) {
+      finalDesc = detected;
+      alert('Caption auto-detected successfully!');
+    } else {
+      alert('Could not auto-detect caption from link.');
+      return;
+    }
+  }
+  if(finalDesc !== '') {
+    rec['Core Idea / 1-Line Takeaway'] = finalDesc;
+    saveAll();
+    document.getElementById('grid').innerHTML = '';
+    shown = 0;
+    renderGrid();
+  }
+};
 window.openThumb=function(no){editingNo=no;document.getElementById('thumbModalNo').textContent='#'+no;document.getElementById('thumbUrl').value=realThumbs[no]||'';const preview=document.getElementById('thumbPreview');if(realThumbs[no]){preview.src=realThumbs[no];preview.classList.remove('hidden');document.getElementById('removeThumb').classList.remove('hidden');}else{preview.classList.add('hidden');document.getElementById('removeThumb').classList.add('hidden');}document.getElementById('thumbModal').classList.remove('hidden');}
 window.deleteContent=function(no){if(!confirm('Delete post #'+no+'?'))return;if(!deletedPostNos.includes(no))deletedPostNos.push(no);records=records.filter(r=>r['No.']!==no);delete realThumbs[no];saveAll();document.getElementById('search').dispatchEvent(new Event('input'));}
 
@@ -397,6 +421,55 @@ function addCategory(name, color, desc) {
   renderQuickCatFilters();
   document.getElementById('search').dispatchEvent(new Event('input'));
   return true;
+}
+
+
+async function fetchCaptionFromUrl(url) {
+  if (!url || typeof url !== 'string' || !url.startsWith('http')) return null;
+  try {
+    const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+    const res = await fetch(api);
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (json.status === 'success' && json.data) {
+      let desc = json.data.description || json.data.title || '';
+      if (!desc) return null;
+      desc = desc.replace(/^[\w\.\_]+\s+on\s+[^:]+:\s*["”’`]?/i, '');
+      desc = desc.replace(/^["”’`\s\u2700-\u27bf\u2600-\u26ff]+/u, '').trim();
+      return desc;
+    }
+  } catch (err) {
+    console.warn('Caption fetch error:', err);
+  }
+  return null;
+}
+
+async function triggerAutoDetectCaption() {
+  const linkEl = document.getElementById('quickLink');
+  const takeawayEl = document.getElementById('quickTakeaway');
+  const icon = document.getElementById('autoDetectIcon');
+  const text = document.getElementById('autoDetectText');
+  
+  if (!linkEl || !takeawayEl) return;
+  const link = linkEl.value.trim();
+  if (!link) {
+    alert('Please paste a post link first');
+    return;
+  }
+
+  if (icon) icon.className = 'fas fa-spinner fa-spin';
+  if (text) text.textContent = 'Detecting...';
+
+  const caption = await fetchCaptionFromUrl(link);
+
+  if (icon) icon.className = 'fas fa-magic';
+  if (text) text.textContent = 'Auto Detect';
+
+  if (caption) {
+    takeawayEl.value = caption;
+  } else {
+    alert('Could not auto-detect caption for this link. You can type or edit the description manually.');
+  }
 }
 
 function quickAdd(link, categories, takeaway, platform, postType) {
@@ -444,6 +517,17 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     'Category': cats
   };
   records.unshift(newRec);
+  if(!takeaway || takeaway === 'Added via easy add' || takeaway === 'Click to add description...') {
+    fetchCaptionFromUrl(link).then(caption => {
+      if(caption) {
+        newRec['Core Idea / 1-Line Takeaway'] = caption;
+        saveAll();
+        document.getElementById('grid').innerHTML = '';
+        shown = 0;
+        renderGrid();
+      }
+    });
+  }
   syncCategoriesFromRecords();
   saveAll();
   document.getElementById('quickLink').value = ''; const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
@@ -669,6 +753,18 @@ function init(){
   bindColorPicker('newCatColor', 'newCatColorHex', 'newCatColorPreview', 'color-preset');
   bindColorPicker('catModalColor', 'catModalColorHex', 'catModalColorPreview', 'cat-modal-preset');
   setupCategoryToggles();
+  const autoBtn = document.getElementById('autoDetectCaptionBtn');
+  if(autoBtn) autoBtn.addEventListener('click', triggerAutoDetectCaption);
+  const qlink = document.getElementById('quickLink');
+  if(qlink) {
+    qlink.addEventListener('blur', () => {
+      const link = qlink.value.trim();
+      const qtk = document.getElementById('quickTakeaway');
+      if(link && qtk && !qtk.value.trim()) {
+        triggerAutoDetectCaption();
+      }
+    });
+  }
 }
 
 document.getElementById('mobileMenuBtn').addEventListener('click',()=>document.getElementById('mobileDrawer').classList.remove('hidden'));
