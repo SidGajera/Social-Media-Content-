@@ -44,11 +44,19 @@ button,a,select,input{min-height:44px}
 <div id="mobileDrawer" class="lg:hidden fixed inset-0 z-[60] hidden"><div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="drawerBackdrop"></div><div class="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-zinc-900 border-l border-yellow-500/20 p-6 overflow-y-auto"><div class="flex justify-between items-center mb-6"><h2 class="font-bold">Menu</h2><button id="closeDrawer" class="w-10 h-10 glass rounded-xl"><i class="fas fa-times"></i></button></div><div class="space-y-4"><button id="drawerAddCat" class="w-full py-4 bg-green-500 text-black rounded-xl font-bold"><i class="fas fa-folder-plus mr-2"></i>Add New Category</button><button id="drawerAdd" class="w-full py-4 gold text-black rounded-xl font-bold"><i class="fas fa-plus mr-2"></i>Add Content</button><button id="drawerExport" class="w-full py-4 glass rounded-xl"><i class="fas fa-download mr-2"></i>Export Excel</button><div class="pt-4 border-t border-white/10"><h3 class="text-xs text-gray-400 uppercase mb-3">Categories</h3><div id="mobileExistingCats" class="flex flex-wrap gap-2"></div></div></div></div></div>
 
 <div class="max-w-[1800px] mx-auto px-4 lg:px-6 py-4 lg:py-6">
-<div class="glass rounded-2xl p-4 lg:p-5 mb-4 lg:mb-6 border border-green-500/20"><h3 class="font-bold text-green-400 mb-3 text-sm lg:text-base"><i class="fas fa-folder-plus mr-2"></i>Add New Category</h3><div class="grid grid-cols-1 sm:grid-cols-12 gap-3"><div class="sm:col-span-5"><input id="newCatName" placeholder="Category name e.g., SEO" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm focus:border-green-500 outline-none"></div><div class="sm:col-span-2"><input id="newCatColor" type="color" value="#FFD700" class="w-full h-[48px] bg-zinc-900 border border-white/10 rounded-xl p-1"></div><div class="sm:col-span-3"><input id="newCatDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></div><div class="sm:col-span-2"><button id="saveNewCatBtn" class="w-full py-3 bg-green-500 text-black rounded-xl font-bold text-sm">Create</button></div></div><div id="existingCats" class="flex flex-wrap gap-2 mt-4"></div></div>
+<div class="glass rounded-2xl p-4 lg:p-5 mb-4 lg:mb-6 border border-green-500/20"><h3 class="font-bold text-green-400 mb-3 text-sm lg:text-base"><i class="fas fa-folder-plus mr-2"></i>Add New Category</h3><div class="grid grid-cols-1 sm:grid-cols-12 gap-3"><div class="sm:col-span-4"><input id="newCatName" placeholder="Category name e.g., SEO" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm focus:border-green-500 outline-none"></div><div class="sm:col-span-3 flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-1.5 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-10 h-10 rounded-lg overflow-hidden shrink-0 cursor-pointer shadow-inner group" title="Click to pick color"><div id="newCatColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="newCatColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="newCatColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-20 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-1"><div class="flex items-center gap-1 border-l border-white/10 pl-2 shrink-0"><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#A855F7" data-color="#A855F7" title="Purple"></button></div></div><div class="sm:col-span-3"><input id="newCatDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></div><div class="sm:col-span-2"><button id="saveNewCatBtn" class="w-full py-3 bg-green-500 text-black rounded-xl font-bold text-sm">Create</button></div></div><div id="existingCats" class="flex flex-wrap gap-2 mt-4"></div></div>
 
 <div class="glass rounded-2xl p-4 lg:p-5 mb-4 lg:mb-6 border border-yellow-500/20"><h3 class="font-bold text-yellow-400 mb-3 text-sm lg:text-base"><i class="fas fa-bolt mr-2"></i>Easy Add Content - Embed ON Default</h3><div class="grid grid-cols-1 md:grid-cols-12 gap-3"><div class="md:col-span-6"><input id="quickLink" placeholder="Paste Instagram / X / Facebook link..." class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm focus:border-yellow-500 outline-none"></div><div class="md:col-span-3"><select id="quickCat" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"></select></div><div class="md:col-span-3"><button id="quickAddBtn" class="w-full py-3 gold text-black rounded-xl font-bold text-sm"><i class="fas fa-plus mr-2"></i>Add Now</button></div></div></div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6"><input id="search" placeholder="Search posts..." class="sm:col-span-2 lg:col-span-2 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><select id="catFilter" class="px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option value="">All Categories</option></select><select id="filterThumb" class="px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option value="">All Posts (Embed ON)</option><option value="withThumb">With Custom Thumb</option></select></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4"><input id="search" placeholder="Search posts..." class="sm:col-span-2 lg:col-span-2 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><select id="catFilter" class="px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option value="">All Categories</option></select><select id="filterThumb" class="px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option value="">All Posts (Embed ON)</option><option value="withThumb">With Custom Thumb</option></select></div>
+
+<div class="mb-6 glass rounded-2xl p-4 border border-white/10">
+<div class="flex items-center justify-between mb-3 px-1">
+<div class="flex items-center gap-2"><i class="fas fa-tags text-yellow-400 text-xs"></i><span class="text-xs font-bold uppercase tracking-wider text-gray-300">Quick Category Options</span></div>
+<span id="activeCatFilterName" class="text-xs font-bold text-yellow-400">All Categories</span>
+</div>
+<div id="searchCategoryButtons" class="flex flex-wrap items-center gap-2"></div>
+</div>
 
 <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-6"></div>
 <div class="mt-8 flex justify-center px-4"><button id="loadMore" class="w-full sm:w-auto px-8 py-4 gold text-black rounded-xl font-bold text-sm">Load More 30</button></div>
@@ -56,7 +64,7 @@ button,a,select,input{min-height:44px}
 
 <div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold text-lg mb-4">Add New Content - Embed ON</h3><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><select id="modalCat" class="px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"></select><select id="modalPlatform" class="px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select></div><input id="modalType" placeholder="Post Type" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save - Embed ON</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
-<div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold text-lg mb-4 text-green-400">Create New Category</h3><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex gap-3"><input id="catModalColor" type="color" value="#FFD700" class="w-16 h-[50px] bg-zinc-900 border border-white/10 rounded-xl"><input id="catModalDesc" placeholder="Description" class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></div><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold text-lg mb-4 text-green-400">Create New Category</h3><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
 <div id="thumbModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold mb-2">Real Thumb for <span id="thumbModalNo"></span></h3><input id="thumbUrl" placeholder="Paste image URL or upload" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><input type="file" id="thumbFile" accept="image/*" class="w-full mt-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><img id="thumbPreview" class="w-full aspect-square object-cover rounded-xl mt-4 hidden"><div class="flex gap-3 mt-4"><button id="saveThumb" class="flex-1 py-4 gold text-black rounded-xl font-bold text-sm">Save Real Thumb</button><button id="closeThumb" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div><button id="removeThumb" class="w-full mt-3 py-3 bg-red-500/20 border border-red-500/30 rounded-xl text-xs text-red-400 hidden">Remove Custom - Back to Embed ON</button></div></div>
 
@@ -83,12 +91,106 @@ function saveAll(){localStorage.setItem('i3d_vault_saved_again', JSON.stringify(
 function updateCounts(){const t=records.length;const c=customCategories.length;document.getElementById('postCountTop').textContent=t;document.getElementById('postCountMobile').textContent=t+' posts';document.getElementById('postCountMobile2').textContent=t;document.getElementById('catCountTop').textContent=c;document.getElementById('catCountMobile').textContent=c;}
 function getCode(link){try{const u=new URL(link);const p=u.pathname.split('/').filter(Boolean);if(p.includes('p'))return p[p.indexOf('p')+1];if(p.includes('reel'))return p[p.indexOf('reel')+1];if(p.includes('r'))return p[p.indexOf('r')+1];if(p.includes('status'))return p[p.indexOf('status')+1];return p.pop();}catch{return null;}}
 function getEmbedUrl(link){try{const code=getCode(link);if(!code)return null;if(link.includes('instagram.com'))return `https://www.instagram.com/p/${code}/embed/captioned/`;if(link.includes('facebook.com'))return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(link)}&show_text=true&width=400`;if(link.includes('x.com')||link.includes('twitter.com'))return `https://platform.twitter.com/embed/Tweet.html?id=${code}`;return null;}catch{return null;}}
-function renderCatDropdowns(){const selects=[document.getElementById('quickCat'),document.getElementById('modalCat'),document.getElementById('catFilter')];selects.forEach(sel=>{const cur=sel.value;sel.innerHTML=sel.id==='catFilter'?'<option value="">All Categories</option>':'';customCategories.forEach(cat=>{const o=document.createElement('option');o.value=cat.name;o.textContent=cat.name;sel.appendChild(o);});if(cur)sel.value=cur;});const containers=[document.getElementById('mobileExistingCats'),document.getElementById('existingCats')];containers.forEach(container=>{if(!container)return;container.innerHTML='';customCategories.forEach(cat=>{const div=document.createElement('div');div.className='flex items-center gap-2 px-3 py-2 glass rounded-full text-xs';div.innerHTML=`<div class="w-3 h-3 rounded-full" style="background:${cat.color}"></div><span class="truncate">${cat.name}</span>`;container.appendChild(div);});});}
-function init(){filtered=[...records];renderCatDropdowns();renderGrid();updateCounts();}
+function renderQuickCatFilters() {
+  const container = document.getElementById('searchCategoryButtons');
+  if(!container) return;
+  container.innerHTML = '';
+
+  const activeCat = document.getElementById('catFilter').value;
+  const activeLabel = document.getElementById('activeCatFilterName');
+
+  const allCount = records.length;
+  const isAllActive = !activeCat;
+  
+  if(activeLabel) {
+    activeLabel.textContent = isAllActive ? `All Categories (${allCount})` : `${activeCat} (${records.filter(r => r.Category === activeCat).length})`;
+  }
+
+  const allBtn = document.createElement('button');
+  allBtn.type = 'button';
+  allBtn.className = `px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+    isAllActive
+      ? 'bg-yellow-400 text-black border border-yellow-400 scale-[1.02] shadow-lg'
+      : 'glass text-gray-300 hover:text-white hover:border-yellow-400/50'
+  }`;
+  allBtn.innerHTML = `<i class="fas fa-th-large text-[10px]"></i><span>All Categories</span><span class="px-1.5 py-0.5 rounded-md text-[10px] ${isAllActive ? 'bg-black/20 text-black font-extrabold' : 'bg-white/10 text-gray-400'}">${allCount}</span>`;
+  allBtn.addEventListener('click', () => {
+    document.getElementById('catFilter').value = '';
+    document.getElementById('search').dispatchEvent(new Event('input'));
+  });
+  container.appendChild(allBtn);
+
+  customCategories.forEach(cat => {
+    const count = records.filter(r => r.Category === cat.name).length;
+    const isActive = activeCat === cat.name;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+      isActive
+        ? 'text-black border scale-[1.02] shadow-lg'
+        : 'glass text-gray-300 hover:text-white hover:border-white/20'
+    }`;
+    if(isActive) {
+      btn.style.backgroundColor = cat.color;
+      btn.style.borderColor = cat.color;
+    }
+
+    btn.innerHTML = `<div class="w-2.5 h-2.5 rounded-full shrink-0 ${isActive ? 'bg-black/60' : ''}" style="${isActive ? '' : 'background:' + cat.color}"></div><span>${cat.name}</span><span class="px-1.5 py-0.5 rounded-md text-[10px] ${isActive ? 'bg-black/20 text-black font-extrabold' : 'bg-white/10 text-gray-400'}">${count}</span>`;
+    
+    btn.addEventListener('click', () => {
+      document.getElementById('catFilter').value = cat.name;
+      document.getElementById('search').dispatchEvent(new Event('input'));
+    });
+    container.appendChild(btn);
+  });
+}
+
+function renderCatDropdowns(){const selects=[document.getElementById('quickCat'),document.getElementById('modalCat'),document.getElementById('catFilter')];selects.forEach(sel=>{const cur=sel.value;sel.innerHTML=sel.id==='catFilter'?'<option value="">All Categories</option>':'';customCategories.forEach(cat=>{const o=document.createElement('option');o.value=cat.name;o.textContent=cat.name;sel.appendChild(o);});if(cur)sel.value=cur;});const containers=[document.getElementById('mobileExistingCats'),document.getElementById('existingCats')];containers.forEach(container=>{if(!container)return;container.innerHTML='';customCategories.forEach(cat=>{const div=document.createElement('div');div.className='flex items-center gap-2 px-3 py-2 glass rounded-full text-xs';div.innerHTML=`<div class="w-3 h-3 rounded-full" style="background:${cat.color}"></div><span class="truncate">${cat.name}</span>`;container.appendChild(div);});});renderQuickCatFilters();}
+
 function renderGrid(){const grid=document.getElementById('grid');const slice=filtered.slice(shown, shown+perPage);slice.forEach(r=>{const custom=realThumbs[r['No.']];const embedUrl=getEmbedUrl(r['Original Post Link']);const catInfo=customCategories.find(c=>c.name===r.Category);const catColor=catInfo?catInfo.color:'#FFD700';const div=document.createElement('div');div.className='card glass rounded-2xl overflow-hidden';div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden" style="height:clamp(360px, 50vw, 440px)">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex items-center justify-center bg-zinc-800"><p class="text-xs text-gray-500">No embed</p></div>`}<div class="absolute top-2 left-2 px-2 py-1 bg-black/80 rounded-full text-[9px] font-bold">${r.Platform||'IG'}</div><div class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-11 h-11 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex gap-1"><span class="px-2 py-1 rounded-full text-[8px] font-bold truncate max-w-[100px]" style="background:${catColor};color:black">${(r.Category||'').substring(0,15)}</span><span class="px-2 py-1 ${custom?'bg-green-500':'bg-yellow-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':'EMBED ON'}</span></div></div><div class="p-4"><p class="text-[10px] text-gray-400 truncate">${(r['Post Type']||'').substring(0,40)}</p><p class="text-sm font-semibold mt-1 line-clamp-2 leading-snug">${(r['Core Idea / 1-Line Takeaway']||'').substring(0,100)}</p><div class="flex gap-2 mt-3"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 py-3 gold text-black rounded-xl text-xs font-bold text-center">Open Post</a><button onclick="openThumb(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center"><i class="fas fa-image text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`;grid.appendChild(div);});shown+=slice.length;}
 window.openThumb=function(no){editingNo=no;document.getElementById('thumbModalNo').textContent='#'+no;document.getElementById('thumbUrl').value=realThumbs[no]||'';const preview=document.getElementById('thumbPreview');if(realThumbs[no]){preview.src=realThumbs[no];preview.classList.remove('hidden');document.getElementById('removeThumb').classList.remove('hidden');}else{preview.classList.add('hidden');document.getElementById('removeThumb').classList.add('hidden');}document.getElementById('thumbModal').classList.remove('hidden');}
-window.deleteContent=function(no){if(!confirm('Delete post #'+no+'?'))return;records=records.filter(r=>r['No.']!==no);delete realThumbs[no];saveAll();filtered=[...records];document.getElementById('grid').innerHTML='';shown=0;renderGrid();}
-function quickAdd(link,cat,takeaway){if(!link){alert('Paste link');return;}if(records.some(r=>r['Original Post Link']===link)){alert('Already exists');return;}const maxNo=Math.max(...records.map(r=>r['No.']),0);let platform='Instagram';if(link.includes('facebook.com'))platform='Facebook';if(link.includes('x.com')||link.includes('twitter.com'))platform='X (Twitter)';const newRec={'No.':maxNo+1,'Platform':platform,'Original Post Link':link,'Post Type':cat||'New Content','Core Idea / 1-Line Takeaway':takeaway||'Added via easy add','Status':'Not Used','Date Saved':new Date().toISOString().slice(0,10),'Category':cat||'Content Creation'};records.unshift(newRec);saveAll();filtered=[...records];document.getElementById('grid').innerHTML='';shown=0;renderGrid();document.getElementById('quickLink').value='';}
+window.deleteContent=function(no){if(!confirm('Delete post #'+no+'?'))return;records=records.filter(r=>r['No.']!==no);delete realThumbs[no];saveAll();filtered=[...records];document.getElementById('grid').innerHTML='';shown=0;renderGrid();renderQuickCatFilters();}
+function quickAdd(link,cat,takeaway){if(!link){alert('Paste link');return;}if(records.some(r=>r['Original Post Link']===link)){alert('Already exists');return;}const maxNo=Math.max(...records.map(r=>r['No.']),0);let platform='Instagram';if(link.includes('facebook.com'))platform='Facebook';if(link.includes('x.com')||link.includes('twitter.com'))platform='X (Twitter)';const newRec={'No.':maxNo+1,'Platform':platform,'Original Post Link':link,'Post Type':cat||'New Content','Core Idea / 1-Line Takeaway':takeaway||'Added via easy add','Status':'Not Used','Date Saved':new Date().toISOString().slice(0,10),'Category':cat||'Content Creation'};records.unshift(newRec);saveAll();filtered=[...records];document.getElementById('grid').innerHTML='';shown=0;renderGrid();renderQuickCatFilters();document.getElementById('quickLink').value='';}
+
+function bindColorPicker(pickerId, hexId, previewId, presetClass) {
+  const picker = document.getElementById(pickerId);
+  const hex = document.getElementById(hexId);
+  const preview = document.getElementById(previewId);
+  if(!picker || !hex || !preview) return;
+
+  function update(val) {
+    if(!val) return;
+    if(!val.startsWith('#')) val = '#' + val;
+    picker.value = val;
+    hex.value = val.toUpperCase();
+    preview.style.backgroundColor = val;
+  }
+
+  picker.addEventListener('input', e => update(e.target.value));
+  hex.addEventListener('input', e => {
+    let val = e.target.value.trim();
+    if(!val.startsWith('#')) val = '#' + val;
+    if(/^#[0-9A-Fa-f]{6}$/.test(val)) update(val);
+  });
+
+  document.querySelectorAll('.' + presetClass).forEach(btn => {
+    btn.addEventListener('click', () => {
+      const col = btn.getAttribute('data-color');
+      if(col) update(col);
+    });
+  });
+}
+
+function init(){
+  filtered=[...records];
+  renderCatDropdowns();
+  renderGrid();
+  updateCounts();
+  bindColorPicker('newCatColor', 'newCatColorHex', 'newCatColorPreview', 'color-preset');
+  bindColorPicker('catModalColor', 'catModalColorHex', 'catModalColorPreview', 'cat-modal-preset');
+}
+
 document.getElementById('mobileMenuBtn').addEventListener('click',()=>document.getElementById('mobileDrawer').classList.remove('hidden'));
 document.getElementById('closeDrawer').addEventListener('click',()=>document.getElementById('mobileDrawer').classList.add('hidden'));
 document.getElementById('drawerBackdrop').addEventListener('click',()=>document.getElementById('mobileDrawer').classList.add('hidden'));
@@ -104,7 +206,7 @@ document.getElementById('modalSave').addEventListener('click',()=>{const link=do
 document.getElementById('catModalClose').addEventListener('click',()=>document.getElementById('catModal').classList.add('hidden'));
 document.getElementById('catModalSave').addEventListener('click',()=>{const name=document.getElementById('catModalName').value.trim();const color=document.getElementById('catModalColor').value;if(!name){alert('Name required');return;}if(customCategories.some(c=>c.name.toLowerCase()===name.toLowerCase())){alert('Already exists');return;}customCategories.push({name,color,desc:document.getElementById('catModalDesc').value.trim()});saveAll();document.getElementById('catModal').classList.add('hidden');document.getElementById('catModalName').value='';});
 document.getElementById('saveNewCatBtn').addEventListener('click',()=>{const name=document.getElementById('newCatName').value.trim();const color=document.getElementById('newCatColor').value;if(!name){alert('Name required');return;}if(customCategories.some(c=>c.name.toLowerCase()===name.toLowerCase())){alert('Already exists');return;}customCategories.push({name,color,desc:document.getElementById('newCatDesc').value.trim()});saveAll();document.getElementById('newCatName').value='';});
-document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase();const cat=document.getElementById('catFilter').value;const ft=document.getElementById('filterThumb').value;filtered=records.filter(r=>{const mq=!q||JSON.stringify(r).toLowerCase().includes(q);const mc=!cat||r.Category===cat;const mf=ft===''||(ft==='withThumb'&&realThumbs[r['No.']])||(ft==='embedOnly'&&!realThumbs[r['No.']]);return mq&&mc&&mf;});document.getElementById('grid').innerHTML='';shown=0;renderGrid();});
+document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase();const cat=document.getElementById('catFilter').value;const ft=document.getElementById('filterThumb').value;filtered=records.filter(r=>{const mq=!q||JSON.stringify(r).toLowerCase().includes(q);const mc=!cat||r.Category===cat;const mf=ft===''||(ft==='withThumb'&&realThumbs[r['No.']])||(ft==='embedOnly'&&!realThumbs[r['No.']]);return mq&&mc&&mf;});document.getElementById('grid').innerHTML='';shown=0;renderGrid();renderQuickCatFilters();});
 document.getElementById('catFilter').addEventListener('change',()=>document.getElementById('search').dispatchEvent(new Event('input')));
 document.getElementById('filterThumb').addEventListener('change',()=>document.getElementById('search').dispatchEvent(new Event('input')));
 document.getElementById('loadMore').addEventListener('click',renderGrid);
@@ -114,6 +216,7 @@ document.getElementById('thumbUrl').addEventListener('input',e=>{const url=e.tar
 document.getElementById('thumbFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{document.getElementById('thumbPreview').src=ev.target.result;document.getElementById('thumbPreview').classList.remove('hidden');document.getElementById('thumbUrl').value=ev.target.result;};reader.readAsDataURL(file);});
 document.getElementById('saveThumb').addEventListener('click',()=>{const url=document.getElementById('thumbUrl').value.trim();if(!url){alert('Add image');return;}realThumbs[editingNo]=url;saveAll();document.getElementById('thumbModal').classList.add('hidden');document.getElementById('grid').innerHTML='';shown=0;renderGrid();});
 document.getElementById('removeThumb').addEventListener('click',()=>{delete realThumbs[editingNo];saveAll();document.getElementById('thumbModal').classList.add('hidden');document.getElementById('grid').innerHTML='';shown=0;renderGrid();});
+
 init();
 </script>
 </body>
