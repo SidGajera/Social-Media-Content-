@@ -81,7 +81,12 @@ button,a,select,input{min-height:44px}
 </div>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-3 mb-4"><input id="search" placeholder="Search posts..." class="sm:col-span-3 lg:col-span-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><select id="catFilter" class="hidden"><option value="">All Categories</option></select><select id="filterThumb" class="px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option value="">All Posts (Embed ON)</option><option value="withThumb">With Custom Thumb</option></select></div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
+<div class="md:col-span-6"><input id="search" placeholder="Search posts..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
+<select id="catFilter" class="hidden"><option value="">All Categories</option></select>
+<div class="md:col-span-3"><select id="sortPosts" class="w-full px-4 py-3 bg-zinc-900 border border-yellow-500/30 text-yellow-400 font-bold rounded-xl text-sm outline-none cursor-pointer"><option value="newest">Latest Added First (Default)</option><option value="oldest">Oldest First (#1 → Last)</option><option value="title">Post Type (A - Z)</option></select></div>
+<div class="md:col-span-3"><select id="filterThumb" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm outline-none cursor-pointer"><option value="">All Posts (Embed ON)</option><option value="withThumb">With Custom Thumb</option></select></div>
+</div>
 
 <div class="mb-6 glass rounded-2xl p-4 border border-white/10">
 <div class="flex items-center justify-between mb-3 px-1">
@@ -783,9 +788,36 @@ document.getElementById('modalSave').addEventListener('click',()=>{const link=do
 document.getElementById('catModalClose').addEventListener('click',()=>document.getElementById('catModal').classList.add('hidden'));
 document.getElementById('catModalSave').addEventListener('click',()=>{const name=document.getElementById('catModalName').value.trim();const color=document.getElementById('catModalColor').value;const desc=document.getElementById('catModalDesc').value.trim();if(addCategory(name,color,desc)){document.getElementById('catModal').classList.add('hidden');document.getElementById('catModalName').value='';document.getElementById('catModalDesc').value='';}});
 document.getElementById('saveNewCatBtn').addEventListener('click',()=>{const name=document.getElementById('newCatName').value.trim();const color=document.getElementById('newCatColor').value;const desc=document.getElementById('newCatDesc').value.trim();if(addCategory(name,color,desc)){document.getElementById('newCatName').value='';document.getElementById('newCatDesc').value='';}});
-document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase();const cat=document.getElementById('catFilter').value;const ft=document.getElementById('filterThumb').value;filtered=records.filter(r=>{const mq=!q||JSON.stringify(r).toLowerCase().includes(q);const mc=!cat||isPostInCategory(r,cat);const mf=ft===''||(ft==='withThumb'&&realThumbs[r['No.']])||(ft==='embedOnly'&&!realThumbs[r['No.']]);return mq&&mc&&mf;});document.getElementById('grid').innerHTML='';shown=0;renderGrid();renderQuickCatFilters();});
+document.getElementById('search').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  const cat=document.getElementById('catFilter').value;
+  const ft=document.getElementById('filterThumb').value;
+  const sort=document.getElementById('sortPosts') ? document.getElementById('sortPosts').value : 'newest';
+  
+  filtered=records.filter(r=>{
+    const mq=!q||JSON.stringify(r).toLowerCase().includes(q);
+    const mc=!cat||isPostInCategory(r,cat);
+    const mf=ft===''||(ft==='withThumb'&&realThumbs[r['No.']])||(ft==='embedOnly'&&!realThumbs[r['No.']]);
+    return mq&&mc&&mf;
+  });
+
+  if (sort === 'newest') {
+    filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
+  } else if (sort === 'oldest') {
+    filtered.sort((a, b) => (a['No.'] || 0) - (b['No.'] || 0));
+  } else if (sort === 'title') {
+    filtered.sort((a, b) => (a['Post Type'] || '').localeCompare(b['Post Type'] || ''));
+  }
+
+  document.getElementById('grid').innerHTML='';
+  shown=0;
+  renderGrid();
+  renderQuickCatFilters();
+});
 document.getElementById('catFilter').addEventListener('change',()=>document.getElementById('search').dispatchEvent(new Event('input')));
 document.getElementById('filterThumb').addEventListener('change',()=>document.getElementById('search').dispatchEvent(new Event('input')));
+const sortSelect = document.getElementById('sortPosts');
+if(sortSelect) sortSelect.addEventListener('change',()=>document.getElementById('search').dispatchEvent(new Event('input')));
 document.getElementById('loadMore').addEventListener('click',renderGrid);
 document.getElementById('exportBtn').addEventListener('click',()=>{const exportRecords=records.map(r=>({...r,Category:getPostCategories(r).join(', ')}));const ws=XLSX.utils.json_to_sheet(exportRecords);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Master Vault');XLSX.writeFile(wb,`I3D-VAULT-${records.length}-SAVED-AGAIN.xlsx`);});
 document.getElementById('closeThumb').addEventListener('click',()=>document.getElementById('thumbModal').classList.add('hidden'));
