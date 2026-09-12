@@ -64,8 +64,9 @@ button,a,select,input{min-height:44px}
 </div>
 <div class="space-y-3">
 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-<div class="md:col-span-9"><input id="quickLink" placeholder="Paste Instagram / X / Facebook link..." class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
-<div class="md:col-span-3"><button id="quickAddBtn" class="w-full py-3 gold text-black rounded-xl font-bold text-sm"><i class="fas fa-plus mr-2"></i>Add Now</button></div>
+<div class="md:col-span-6"><input id="quickLink" placeholder="Paste Instagram / X / Facebook link..." class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
+<div class="md:col-span-4"><input id="quickTakeaway" placeholder="Post Description / Caption..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
+<div class="md:col-span-2"><button id="quickAddBtn" class="w-full py-3 gold text-black rounded-xl font-bold text-sm"><i class="fas fa-plus mr-2"></i>Add Now</button></div>
 </div>
 <div>
 <div class="flex items-center justify-between mb-1.5">
@@ -373,12 +374,13 @@ function renderGrid(){
 
     const div=document.createElement('div');
     div.className='card glass rounded-2xl overflow-hidden';
-    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden" style="height:clamp(360px, 50vw, 440px)">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex items-center justify-center bg-zinc-800"><p class="text-xs text-gray-500">No embed</p></div>`}<div class="absolute top-2 left-2 px-2 py-1 bg-black/80 rounded-full text-[9px] font-bold">${r.Platform||'IG'}</div><div class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-11 h-11 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':'bg-yellow-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':'EMBED ON'}</span></div></div><div class="p-4"><p class="text-[10px] text-gray-400 truncate">${(r['Post Type']||'').substring(0,40)}</p><p class="text-sm font-semibold mt-1 line-clamp-2 leading-snug">${(r['Core Idea / 1-Line Takeaway']||'').substring(0,100)}</p><div class="flex gap-2 mt-3"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 py-3 gold text-black rounded-xl text-xs font-bold text-center">Open Post</a><button onclick="openThumb(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center"><i class="fas fa-image text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`;
+    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden" style="height:clamp(360px, 50vw, 440px)">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex items-center justify-center bg-zinc-800"><p class="text-xs text-gray-500">No embed</p></div>`}<div class="absolute top-2 left-2 px-2 py-1 bg-black/80 rounded-full text-[9px] font-bold">${r.Platform||'IG'}</div><div class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-11 h-11 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':'bg-yellow-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':'EMBED ON'}</span></div></div><div class="p-4"><div class="flex items-center justify-between gap-1"><p class="text-[10px] text-gray-400 truncate">${r['Post Type']||'Content'}</p><button onclick="editTakeaway(${r['No.']})" title="Edit description / caption" class="text-xs text-yellow-400/80 hover:text-yellow-400 p-1 cursor-pointer shrink-0 transition-colors"><i class="fas fa-pen text-[11px]"></i></button></div><p onclick="editTakeaway(${r['No.']})" title="Click to edit description" class="text-sm font-semibold mt-1 line-clamp-3 leading-snug cursor-pointer hover:text-yellow-300 transition-colors">${r['Core Idea / 1-Line Takeaway']||'Click to add description...'}</p><div class="flex gap-2 mt-3"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 py-3 gold text-black rounded-xl text-xs font-bold text-center">Open Post</a><button onclick="openThumb(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center"><i class="fas fa-image text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`;
     grid.appendChild(div);
   });
   shown+=slice.length;
 }
 
+window.editTakeaway=function(no){const rec=records.find(r=>r['No.']===no);if(!rec)return;const currentText=rec['Core Idea / 1-Line Takeaway']||'';const newText=prompt(`Edit Description / Caption for Post #${no}:`, currentText);if(newText!==null&&newText.trim()!==''){rec['Core Idea / 1-Line Takeaway']=newText.trim();saveAll();document.getElementById('grid').innerHTML='';shown=0;renderGrid();}};
 window.openThumb=function(no){editingNo=no;document.getElementById('thumbModalNo').textContent='#'+no;document.getElementById('thumbUrl').value=realThumbs[no]||'';const preview=document.getElementById('thumbPreview');if(realThumbs[no]){preview.src=realThumbs[no];preview.classList.remove('hidden');document.getElementById('removeThumb').classList.remove('hidden');}else{preview.classList.add('hidden');document.getElementById('removeThumb').classList.add('hidden');}document.getElementById('thumbModal').classList.remove('hidden');}
 window.deleteContent=function(no){if(!confirm('Delete post #'+no+'?'))return;if(!deletedPostNos.includes(no))deletedPostNos.push(no);records=records.filter(r=>r['No.']!==no);delete realThumbs[no];saveAll();document.getElementById('search').dispatchEvent(new Event('input'));}
 
@@ -414,7 +416,7 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     if(platform) existingRec['Platform'] = platform;
     syncCategoriesFromRecords();
     saveAll();
-    document.getElementById('quickLink').value = '';
+    document.getElementById('quickLink').value = ''; const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
     document.getElementById('modalLink').value = '';
     document.getElementById('modalType').value = '';
     document.getElementById('modalTakeaway').value = '';
@@ -444,7 +446,7 @@ function quickAdd(link, categories, takeaway, platform, postType) {
   records.unshift(newRec);
   syncCategoriesFromRecords();
   saveAll();
-  document.getElementById('quickLink').value = '';
+  document.getElementById('quickLink').value = ''; const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
   document.getElementById('modalLink').value = '';
   document.getElementById('modalType').value = '';
   document.getElementById('modalTakeaway').value = '';
@@ -675,8 +677,9 @@ document.getElementById('drawerBackdrop').addEventListener('click',()=>document.
 document.getElementById('drawerAdd').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');document.getElementById('addModal').classList.remove('hidden');});
 document.getElementById('drawerAddCat').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');document.getElementById('catModal').classList.remove('hidden');});
 document.getElementById('drawerExport').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');document.getElementById('exportBtn').click();});
-document.getElementById('quickAddBtn').addEventListener('click',()=>quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), ''));
-document.getElementById('quickLink').addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(e.target.value.trim(), getSelectedQuickCategories(), '');});
+document.getElementById('quickAddBtn').addEventListener('click',()=>quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), document.getElementById('quickTakeaway').value.trim()));
+document.getElementById('quickLink').addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(e.target.value.trim(), getSelectedQuickCategories(), document.getElementById('quickTakeaway').value.trim());});
+const qtk=document.getElementById('quickTakeaway');if(qtk)qtk.addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), e.target.value.trim());});
 document.getElementById('addBtn').addEventListener('click',()=>document.getElementById('addModal').classList.remove('hidden'));
 document.getElementById('addCategoryBtn').addEventListener('click',()=>document.getElementById('catModal').classList.remove('hidden'));
 document.getElementById('modalClose').addEventListener('click',()=>document.getElementById('addModal').classList.add('hidden'));
