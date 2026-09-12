@@ -98,10 +98,13 @@ if(!customCategories) {
     {name: 'AI Tools', color: '#00D9FF', desc: 'AI'},
     {name: 'GitHub Repos', color: '#00FF88', desc: 'GitHub'},
     {name: 'Content Creation', color: '#00FF88', desc: 'Content'},
+    {name: '1 Content Creation', color: '#00FF88', desc: 'Content Creation'},
     {name: 'Business Ideas', color: '#FF6B00', desc: 'Business'},
     {name: 'SEO', color: '#10B981', desc: 'SEO'},
+    {name: 'Sales', color: '#EF4444', desc: 'Sales'},
+    {name: 'Entrepreneur', color: '#8B5CF6', desc: 'Entrepreneur'},
     {name: 'Jewelry Catalog', color: '#FFD700', desc: 'Catalog'},
-    {name: 'Jewelry Knowledge', color: '#F59E0B', desc: 'Knowledge'},
+    {name: 'Jewelry Knowledge', color: '#F59E0B', desc: 'Knowledge'}
   ];
 }
 let filtered=[], shown=0, perPage=30, editingNo=null;
@@ -378,11 +381,13 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     if(postType) existingRec['Post Type'] = postType;
     if(takeaway) existingRec['Core Idea / 1-Line Takeaway'] = takeaway;
     if(platform) existingRec['Platform'] = platform;
+    syncCategoriesFromRecords();
     saveAll();
     document.getElementById('quickLink').value = '';
     document.getElementById('modalLink').value = '';
     document.getElementById('modalType').value = '';
     document.getElementById('modalTakeaway').value = '';
+    renderCatDropdowns();
     resetQuickCatChips();
     resetModalCatChips();
     document.getElementById('search').dispatchEvent(new Event('input'));
@@ -406,11 +411,13 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     'Category': cats
   };
   records.unshift(newRec);
+  syncCategoriesFromRecords();
   saveAll();
   document.getElementById('quickLink').value = '';
   document.getElementById('modalLink').value = '';
   document.getElementById('modalType').value = '';
   document.getElementById('modalTakeaway').value = '';
+  renderCatDropdowns();
   resetQuickCatChips();
   resetModalCatChips();
   document.getElementById('search').dispatchEvent(new Event('input'));
@@ -445,6 +452,25 @@ function bindColorPicker(pickerId, hexId, previewId, presetClass) {
   });
 }
 
+function syncCategoriesFromRecords() {
+  if(!Array.isArray(records)) return;
+  const palette = ['#FFD700', '#00D9FF', '#00FF88', '#FF6B00', '#A855F7', '#EC4899', '#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#6366F1', '#14B8A6'];
+  let changed = false;
+  records.forEach(r => {
+    const cats = getPostCategories(r);
+    cats.forEach(cName => {
+      if(cName && !customCategories.some(c => c.name.toLowerCase() === cName.toLowerCase())) {
+        const color = palette[customCategories.length % palette.length];
+        customCategories.push({ name: cName, color: color, desc: cName });
+        changed = true;
+      }
+    });
+  });
+  if(changed) {
+    saveAll();
+  }
+}
+
 function init(){
   if(typeof defaultRecords !== 'undefined' && Array.isArray(defaultRecords)) {
     defaultRecords.forEach(def => {
@@ -456,8 +482,9 @@ function init(){
         }
       }
     });
-    saveAll();
   }
+  syncCategoriesFromRecords();
+  saveAll();
   filtered=[...records];
   renderCatDropdowns();
   renderGrid();
