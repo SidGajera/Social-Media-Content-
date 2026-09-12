@@ -391,6 +391,8 @@ function addCategory(name, color, desc) {
   customCategories.push({ name: name, color: color || '#FFD700', desc: desc || '' });
   saveAll();
   renderCatDropdowns();
+  renderQuickCatFilters();
+  document.getElementById('search').dispatchEvent(new Event('input'));
   return true;
 }
 
@@ -642,11 +644,15 @@ function migrateAndMergeCategories() {
 }
 
 function init(){
-  if(typeof defaultRecords !== 'undefined' && Array.isArray(defaultRecords)) {
+  if (!records || !Array.isArray(records) || records.length === 0) {
+    records = JSON.parse(JSON.stringify(defaultRecords));
+  } else if (typeof defaultRecords !== 'undefined' && Array.isArray(defaultRecords)) {
     defaultRecords.forEach(def => {
-      const rec = records.find(r => r['No.'] === def['No.']);
-      if(rec) {
-        if(def['Core Idea / 1-Line Takeaway'] && def['Core Idea / 1-Line Takeaway'].includes('https://github.com')) {
+      const rec = records.find(r => r && r['No.'] === def['No.']);
+      if (!rec) {
+        records.push(JSON.parse(JSON.stringify(def)));
+      } else {
+        if (def['Core Idea / 1-Line Takeaway'] && def['Core Idea / 1-Line Takeaway'].includes('https://github.com')) {
           rec['Core Idea / 1-Line Takeaway'] = def['Core Idea / 1-Line Takeaway'];
           rec['Post Type'] = def['Post Type'];
         }
