@@ -54,7 +54,7 @@ button,a,select,input{min-height:44px}
 <button type="button" id="toggleExistingCatsBtn" class="text-xs text-green-400 hover:text-green-300 font-bold flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-500/30 rounded-lg hover:bg-green-500/20 transition-all cursor-pointer"><span id="toggleExistingCatsText">Show All</span><i id="toggleExistingCatsIcon" class="fas fa-chevron-down text-[10px] transition-transform"></i></button>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3"><div class="sm:col-span-4"><input id="newCatName" placeholder="Category name e.g., SEO" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm focus:border-green-500 outline-none"></div><div class="sm:col-span-3 flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-1.5 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-10 h-10 rounded-lg overflow-hidden shrink-0 cursor-pointer shadow-inner group" title="Click to pick color"><div id="newCatColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="newCatColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="newCatColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-20 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-1"><div class="flex items-center gap-1 border-l border-white/10 pl-2 shrink-0"><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="color-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#A855F7" data-color="#A855F7" title="Purple"></button></div></div><div class="sm:col-span-3"><input id="newCatDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></div><div class="sm:col-span-2"><button id="saveNewCatBtn" class="w-full py-3 bg-green-500 text-black rounded-xl font-bold text-sm">Create</button></div></div>
-<div id="existingCats" class="flex flex-wrap gap-2 mt-4 transition-all duration-300 overflow-hidden max-h-[38px]"></div>
+<div id="existingCats" class="flex flex-nowrap items-center gap-2 mt-4 overflow-x-auto whitespace-nowrap scrollbar-thin py-2 px-1 min-h-[48px]"></div>
 </div>
 
 <div class="glass rounded-2xl p-4 lg:p-5 mb-4 lg:mb-6 border border-yellow-500/20">
@@ -75,7 +75,7 @@ button,a,select,input{min-height:44px}
 <button type="button" id="toggleQuickCatChipsBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold flex items-center gap-1.5 px-2 py-0.5 bg-yellow-400/10 border border-yellow-400/30 rounded-md hover:bg-yellow-400/20 transition-all cursor-pointer"><span id="toggleQuickCatText">Show All</span><i id="toggleQuickCatIcon" class="fas fa-chevron-down text-[9px] transition-transform"></i></button>
 </div>
 </div>
-<div id="quickCatChips" class="flex flex-wrap gap-2 p-2.5 bg-black/40 border border-white/10 rounded-xl transition-all duration-300 overflow-hidden max-h-[48px]"></div>
+<div id="quickCatChips" class="flex flex-nowrap items-center gap-2 p-2.5 bg-black/40 border border-white/10 rounded-xl overflow-x-auto whitespace-nowrap scrollbar-thin min-h-[56px]"></div>
 </div>
 </div>
 </div>
@@ -90,7 +90,7 @@ button,a,select,input{min-height:44px}
 <button type="button" id="toggleSearchCatButtonsBtn" class="text-xs text-yellow-400 hover:text-yellow-300 font-bold flex items-center gap-1.5 px-2.5 py-1 bg-yellow-400/10 border border-yellow-400/30 rounded-lg hover:bg-yellow-400/20 transition-all cursor-pointer"><span id="toggleSearchCatText">Show All</span><i id="toggleSearchCatIcon" class="fas fa-chevron-down text-[10px] transition-transform"></i></button>
 </div>
 </div>
-<div id="searchCategoryButtons" class="flex flex-wrap items-center gap-2 transition-all duration-300 overflow-hidden max-h-[40px]"></div>
+<div id="searchCategoryButtons" class="flex flex-nowrap items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-thin py-2 px-1 min-h-[52px]"></div>
 </div>
 
 <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-6"></div>
@@ -213,7 +213,7 @@ function renderQuickCatFilters() {
 
   const allBtn = document.createElement('button');
   allBtn.type = 'button';
-  allBtn.className = `px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+  allBtn.className = `px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
     isAllActive
       ? 'bg-yellow-400 text-black border border-yellow-400 scale-[1.02] shadow-lg'
       : 'glass text-gray-300 hover:text-white hover:border-yellow-400/50'
@@ -231,7 +231,7 @@ function renderQuickCatFilters() {
 
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = `px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+    btn.className = `px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
       isActive
         ? 'text-black border scale-[1.02] shadow-lg'
         : 'glass text-gray-300 hover:text-white hover:border-white/20'
@@ -275,7 +275,7 @@ function renderCatDropdowns(){
       const isSel = currentActive.includes(cat.name) || (isInitialQuick && idx === 0);
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `quick-cat-chip px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${isSel ? 'text-black active' : 'glass text-gray-300 border-white/10'}`;
+      btn.className = `quick-cat-chip px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border ${isSel ? 'text-black active' : 'glass text-gray-300 border-white/10'}`;
       if(isSel) {
         btn.style.backgroundColor = cat.color;
         btn.style.borderColor = cat.color;
@@ -313,7 +313,7 @@ function renderCatDropdowns(){
       const isSel = currentActive.includes(cat.name) || (isInitialModal && idx === 0);
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `modal-cat-chip px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${isSel ? 'text-black active' : 'glass text-gray-300 border-white/10'}`;
+      btn.className = `modal-cat-chip px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${isSel ? 'text-black active' : 'glass text-gray-300 border-white/10'}`;
       if(isSel) {
         btn.style.backgroundColor = cat.color;
         btn.style.borderColor = cat.color;
@@ -348,7 +348,7 @@ function renderCatDropdowns(){
     container.innerHTML='';
     customCategories.forEach(cat=>{
       const div=document.createElement('div');
-      div.className='flex items-center gap-2 px-3 py-1.5 glass rounded-full text-xs transition-all hover:border-white/30';
+      div.className='flex items-center gap-2 px-3.5 py-2 glass rounded-full text-xs shrink-0 transition-all hover:border-white/30';
       const escName = cat.name.replace(/'/g, "\\'");
       div.innerHTML=`<div class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${cat.color}"></div><span class="font-semibold">${cat.name}</span><button type="button" onclick="deleteCategory('${escName}')" class="text-gray-400 hover:text-red-400 text-[10px] ml-1 p-0.5 rounded transition-colors" title="Delete category"><i class="fas fa-times"></i></button>`;
       container.appendChild(div);
@@ -367,7 +367,7 @@ function renderGrid(){
     const catBadgesHtml = catList.map(cName => {
       const catInfo = customCategories.find(c => c.name === cName);
       const catColor = catInfo ? catInfo.color : '#FFD700';
-      return `<span class="px-2 py-1 rounded-full text-[8px] font-bold truncate max-w-[100px]" style="background:${catColor};color:black">${cName.substring(0,15)}</span>`;
+      return `<span class="px-2 py-1 rounded-full text-[8px] font-bold truncate max-w-[120px] inline-block shadow-sm" style="background:${catColor};color:black" title="${cName}">${cName}</span>`;
     }).join('');
 
     const div=document.createElement('div');
@@ -545,12 +545,12 @@ window.deleteCategory = function(name) {
 
 function setupCategoryToggles() {
   const toggles = [
-    { btnId: 'toggleSearchCatButtonsBtn', textId: 'toggleSearchCatText', iconId: 'toggleSearchCatIcon', containerId: 'searchCategoryButtons', collapsedClass: 'max-h-[40px]', expandedClass: 'max-h-[1000px]' },
-    { btnId: 'toggleQuickCatChipsBtn', textId: 'toggleQuickCatText', iconId: 'toggleQuickCatIcon', containerId: 'quickCatChips', collapsedClass: 'max-h-[48px]', expandedClass: 'max-h-[1000px]' },
-    { btnId: 'toggleExistingCatsBtn', textId: 'toggleExistingCatsText', iconId: 'toggleExistingCatsIcon', containerId: 'existingCats', collapsedClass: 'max-h-[38px]', expandedClass: 'max-h-[1000px]' }
+    { btnId: 'toggleSearchCatButtonsBtn', textId: 'toggleSearchCatText', iconId: 'toggleSearchCatIcon', containerId: 'searchCategoryButtons' },
+    { btnId: 'toggleQuickCatChipsBtn', textId: 'toggleQuickCatText', iconId: 'toggleQuickCatIcon', containerId: 'quickCatChips' },
+    { btnId: 'toggleExistingCatsBtn', textId: 'toggleExistingCatsText', iconId: 'toggleExistingCatsIcon', containerId: 'existingCats' }
   ];
 
-  toggles.forEach(({ btnId, textId, iconId, containerId, collapsedClass, expandedClass }) => {
+  toggles.forEach(({ btnId, textId, iconId, containerId }) => {
     const btn = document.getElementById(btnId);
     const text = document.getElementById(textId);
     const icon = document.getElementById(iconId);
@@ -558,21 +558,17 @@ function setupCategoryToggles() {
 
     if (btn && container) {
       btn.addEventListener('click', () => {
-        const isExpanded = container.classList.contains(expandedClass);
+        const isExpanded = container.classList.contains('flex-wrap');
         if (isExpanded) {
-          container.classList.remove(expandedClass);
-          container.classList.add(collapsedClass);
+          container.classList.remove('flex-wrap', 'whitespace-normal', 'overflow-visible');
+          container.classList.add('flex-nowrap', 'whitespace-nowrap', 'overflow-x-auto', 'scrollbar-thin');
           if (text) text.textContent = 'Show All';
-          if (icon) {
-            icon.classList.remove('rotate-180');
-          }
+          if (icon) icon.classList.remove('rotate-180');
         } else {
-          container.classList.remove(collapsedClass);
-          container.classList.add(expandedClass);
+          container.classList.remove('flex-nowrap', 'whitespace-nowrap', 'overflow-x-auto', 'scrollbar-thin');
+          container.classList.add('flex-wrap', 'whitespace-normal', 'overflow-visible');
           if (text) text.textContent = 'Hide';
-          if (icon) {
-            icon.classList.add('rotate-180');
-          }
+          if (icon) icon.classList.add('rotate-180');
         }
       });
     }
