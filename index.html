@@ -116,6 +116,8 @@ if(!records || !Array.isArray(records) || records.length === 0) { records = JSON
 let realThumbs = JSON.parse(localStorage.getItem('i3d_real_thumbs_saved_again')||'{}');
 let deletedCategories = JSON.parse(localStorage.getItem('i3d_deleted_categories_saved_again')||'[]');
 let deletedPostNos = JSON.parse(localStorage.getItem('i3d_deleted_post_nos_saved_again')||'[]');
+let customAddedPosts = JSON.parse(localStorage.getItem('i3d_custom_added_posts_saved_again')||'[]');
+let userUpdatedPosts = JSON.parse(localStorage.getItem('i3d_user_updated_posts_saved_again')||'{}');
 let customCategories = JSON.parse(localStorage.getItem('i3d_custom_categories_saved_again')||'null');
 if(!customCategories) {
   customCategories = [
@@ -141,7 +143,7 @@ if(!customCategories) {
   ];
 }
 let filtered=[], shown=0, perPage=30, editingNo=null;
-function saveAll(){localStorage.setItem('i3d_vault_saved_again', JSON.stringify(records));localStorage.setItem('i3d_real_thumbs_saved_again', JSON.stringify(realThumbs));localStorage.setItem('i3d_custom_categories_saved_again', JSON.stringify(customCategories));localStorage.setItem('i3d_deleted_categories_saved_again', JSON.stringify(deletedCategories));localStorage.setItem('i3d_deleted_post_nos_saved_again', JSON.stringify(deletedPostNos));updateCounts();}
+function saveAll(){localStorage.setItem('i3d_vault_saved_again', JSON.stringify(records));localStorage.setItem('i3d_custom_added_posts_saved_again', JSON.stringify(customAddedPosts));localStorage.setItem('i3d_user_updated_posts_saved_again', JSON.stringify(userUpdatedPosts));localStorage.setItem('i3d_real_thumbs_saved_again', JSON.stringify(realThumbs));localStorage.setItem('i3d_custom_categories_saved_again', JSON.stringify(customCategories));localStorage.setItem('i3d_deleted_categories_saved_again', JSON.stringify(deletedCategories));localStorage.setItem('i3d_deleted_post_nos_saved_again', JSON.stringify(deletedPostNos));updateCounts();}
 function updateCounts(){const t=records.length;const c=customCategories.length;document.getElementById('postCountTop').textContent=t;document.getElementById('postCountMobile').textContent=t+' posts';document.getElementById('postCountMobile2').textContent=t;document.getElementById('catCountTop').textContent=c;document.getElementById('catCountMobile').textContent=c;}
 function getPostCategories(r) {
   if(!r) return [];
@@ -404,6 +406,7 @@ window.editTakeaway=async function(no){
   }
   if(finalDesc !== '') {
     rec['Core Idea / 1-Line Takeaway'] = finalDesc;
+    userUpdatedPosts[no] = Object.assign({}, userUpdatedPosts[no] || {}, { takeaway: finalDesc });
     saveAll();
     document.getElementById('grid').innerHTML = '';
     shown = 0;
@@ -411,7 +414,7 @@ window.editTakeaway=async function(no){
   }
 };
 window.openThumb=function(no){editingNo=no;document.getElementById('thumbModalNo').textContent='#'+no;document.getElementById('thumbUrl').value=realThumbs[no]||'';const preview=document.getElementById('thumbPreview');if(realThumbs[no]){preview.src=realThumbs[no];preview.classList.remove('hidden');document.getElementById('removeThumb').classList.remove('hidden');}else{preview.classList.add('hidden');document.getElementById('removeThumb').classList.add('hidden');}document.getElementById('thumbModal').classList.remove('hidden');}
-window.deleteContent=function(no){if(!confirm('Delete post #'+no+'?'))return;if(!deletedPostNos.includes(no))deletedPostNos.push(no);records=records.filter(r=>r['No.']!==no);delete realThumbs[no];saveAll();document.getElementById('search').dispatchEvent(new Event('input'));}
+window.deleteContent=function(no){if(!confirm('Delete post #'+no+'?'))return;if(!deletedPostNos.includes(no))deletedPostNos.push(no);records=records.filter(r=>r['No.']!==no);customAddedPosts=customAddedPosts.filter(r=>r['No.']!==no);delete userUpdatedPosts[no];delete realThumbs[no];saveAll();document.getElementById('search').dispatchEvent(new Event('input'));}
 
 function addCategory(name, color, desc) {
   if(!name) { alert('Name required'); return false; }
@@ -492,8 +495,22 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     if(postType) existingRec['Post Type'] = postType;
     if(takeaway) existingRec['Core Idea / 1-Line Takeaway'] = takeaway;
     if(platform) existingRec['Platform'] = platform;
+
+    userUpdatedPosts[existingRec['No.']] = {
+      takeaway: existingRec['Core Idea / 1-Line Takeaway'],
+      category: existingRec.Category,
+      postType: existingRec['Post Type'],
+      platform: existingRec['Platform']
+    };
+
     syncCategoriesFromRecords();
     saveAll();
+
+    const searchInput = document.getElementById('search'); if(searchInput) searchInput.value = '';
+    const catFilterSelect = document.getElementById('catFilter'); if(catFilterSelect) catFilterSelect.value = '';
+    const filterThumbSelect = document.getElementById('filterThumb'); if(filterThumbSelect) filterThumbSelect.value = '';
+    const sortPostsSelect = document.getElementById('sortPosts'); if(sortPostsSelect) sortPostsSelect.value = 'newest';
+
     document.getElementById('quickLink').value = ''; const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
     document.getElementById('modalLink').value = '';
     document.getElementById('modalType').value = '';
@@ -522,10 +539,19 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     'Category': cats
   };
   records.unshift(newRec);
+  const cpIdx = customAddedPosts.findIndex(cp => cp['No.'] === newRec['No.'] || cp['Original Post Link'] === link);
+  if (cpIdx >= 0) {
+    customAddedPosts[cpIdx] = newRec;
+  } else {
+    customAddedPosts.unshift(newRec);
+  }
   if(!takeaway || takeaway === 'Added via easy add' || takeaway === 'Click to add description...') {
     fetchCaptionFromUrl(link).then(caption => {
       if(caption) {
         newRec['Core Idea / 1-Line Takeaway'] = caption;
+        userUpdatedPosts[newRec['No.']] = Object.assign({}, userUpdatedPosts[newRec['No.']] || {}, { takeaway: caption });
+        const cIdx = customAddedPosts.findIndex(cp => cp['No.'] === newRec['No.']);
+        if(cIdx >= 0) customAddedPosts[cIdx]['Core Idea / 1-Line Takeaway'] = caption;
         saveAll();
         document.getElementById('grid').innerHTML = '';
         shown = 0;
@@ -535,6 +561,12 @@ function quickAdd(link, categories, takeaway, platform, postType) {
   }
   syncCategoriesFromRecords();
   saveAll();
+
+  const searchInput = document.getElementById('search'); if(searchInput) searchInput.value = '';
+  const catFilterSelect = document.getElementById('catFilter'); if(catFilterSelect) catFilterSelect.value = '';
+  const filterThumbSelect = document.getElementById('filterThumb'); if(filterThumbSelect) filterThumbSelect.value = '';
+  const sortPostsSelect = document.getElementById('sortPosts'); if(sortPostsSelect) sortPostsSelect.value = 'newest';
+
   document.getElementById('quickLink').value = ''; const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
   document.getElementById('modalLink').value = '';
   document.getElementById('modalType').value = '';
@@ -745,6 +777,31 @@ function init(){
           rec['Core Idea / 1-Line Takeaway'] = def['Core Idea / 1-Line Takeaway'];
           rec['Post Type'] = def['Post Type'];
         }
+      }
+    });
+  }
+  if (Array.isArray(customAddedPosts)) {
+    customAddedPosts.forEach(cp => {
+      if (cp && cp['No.'] && !deletedPostNos.includes(cp['No.'])) {
+        const idx = records.findIndex(r => r && r['No.'] === cp['No.']);
+        if (idx >= 0) {
+          records[idx] = Object.assign({}, records[idx], cp);
+        } else {
+          records.unshift(cp);
+        }
+      }
+    });
+  }
+  if (userUpdatedPosts && typeof userUpdatedPosts === 'object') {
+    Object.keys(userUpdatedPosts).forEach(noStr => {
+      const no = parseInt(noStr, 10);
+      const updates = userUpdatedPosts[noStr];
+      const rec = records.find(r => r && r['No.'] === no);
+      if (rec && updates) {
+        if (updates.takeaway) rec['Core Idea / 1-Line Takeaway'] = updates.takeaway;
+        if (updates.category) rec['Category'] = updates.category;
+        if (updates.postType) rec['Post Type'] = updates.postType;
+        if (updates.platform) rec['Platform'] = updates.platform;
       }
     });
   }
