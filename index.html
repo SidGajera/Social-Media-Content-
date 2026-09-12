@@ -57,7 +57,10 @@ button,a,select,input{min-height:44px}
 <div class="md:col-span-3"><button id="quickAddBtn" class="w-full py-3 gold text-black rounded-xl font-bold text-sm"><i class="fas fa-plus mr-2"></i>Add Now</button></div>
 </div>
 <div>
-<p class="text-[11px] text-gray-400 font-bold uppercase mb-1.5">Select Categories (Multiple Allowed):</p>
+<div class="flex items-center justify-between mb-1.5">
+<p class="text-[11px] text-gray-400 font-bold uppercase">Select Categories (Multiple Allowed):</p>
+<button type="button" id="clearQuickCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button>
+</div>
 <div id="quickCatChips" class="flex flex-wrap gap-2 p-2.5 bg-black/40 border border-white/10 rounded-xl max-h-32 overflow-y-auto"></div>
 </div>
 </div>
@@ -77,7 +80,7 @@ button,a,select,input{min-height:44px}
 <div class="mt-8 flex justify-center px-4"><button id="loadMore" class="w-full sm:w-auto px-8 py-4 gold text-black rounded-xl font-bold text-sm">Load More 30</button></div>
 </div>
 
-<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold text-lg mb-4">Add New Content - Embed ON</h3><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><label class="text-xs font-bold text-gray-300 flex items-center justify-between"><span>Categories (Click to select multiple):</span><span class="text-[10px] text-yellow-400 font-normal">Multiple allowed</span></label><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold text-lg mb-4">Add New Content - Embed ON</h3><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Click to select multiple):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
 <div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold text-lg mb-4 text-green-400">Create New Category</h3><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
@@ -124,9 +127,6 @@ function getSelectedQuickCategories() {
   document.querySelectorAll('#quickCatChips .quick-cat-chip.active').forEach(btn => {
     selected.push(btn.getAttribute('data-cat'));
   });
-  if(selected.length === 0 && customCategories.length > 0) {
-    selected.push(customCategories[0].name);
-  }
   return selected;
 }
 
@@ -135,10 +135,33 @@ function getSelectedModalCategories() {
   document.querySelectorAll('#modalCatChips .modal-cat-chip.active').forEach(btn => {
     selected.push(btn.getAttribute('data-cat'));
   });
-  if(selected.length === 0 && customCategories.length > 0) {
-    selected.push(customCategories[0].name);
-  }
   return selected;
+}
+
+function resetQuickCatChips() {
+  const container = document.getElementById('quickCatChips');
+  if(!container) return;
+  container.querySelectorAll('.quick-cat-chip').forEach(btn => {
+    btn.classList.remove('active', 'text-black');
+    btn.classList.add('glass', 'text-gray-300');
+    btn.style.backgroundColor = '';
+    btn.style.borderColor = '';
+    const icon = btn.querySelector('i');
+    if(icon) icon.className = 'fas fa-circle text-[10px]';
+  });
+}
+
+function resetModalCatChips() {
+  const container = document.getElementById('modalCatChips');
+  if(!container) return;
+  container.querySelectorAll('.modal-cat-chip').forEach(btn => {
+    btn.classList.remove('active', 'text-black');
+    btn.classList.add('glass', 'text-gray-300');
+    btn.style.backgroundColor = '';
+    btn.style.borderColor = '';
+    const icon = btn.querySelector('i');
+    if(icon) icon.className = 'fas fa-circle text-[10px]';
+  });
 }
 
 function getCode(link){try{const u=new URL(link);const p=u.pathname.split('/').filter(Boolean);if(p.includes('p'))return p[p.indexOf('p')+1];if(p.includes('reel'))return p[p.indexOf('reel')+1];if(p.includes('r'))return p[p.indexOf('r')+1];if(p.includes('status'))return p[p.indexOf('status')+1];return p.pop();}catch{return null;}}
@@ -216,10 +239,11 @@ function renderCatDropdowns(){
 
   const quickChips = document.getElementById('quickCatChips');
   if(quickChips) {
+    const isInitialQuick = quickChips.children.length === 0;
     const currentActive = getSelectedQuickCategories();
     quickChips.innerHTML = '';
     customCategories.forEach((cat, idx) => {
-      const isSel = currentActive.includes(cat.name) || (currentActive.length === 0 && idx === 0);
+      const isSel = currentActive.includes(cat.name) || (isInitialQuick && idx === 0);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `quick-cat-chip px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${isSel ? 'text-black active' : 'glass text-gray-300 border-white/10'}`;
@@ -253,10 +277,11 @@ function renderCatDropdowns(){
 
   const modalChips = document.getElementById('modalCatChips');
   if(modalChips) {
+    const isInitialModal = modalChips.children.length === 0;
     const currentActive = getSelectedModalCategories();
     modalChips.innerHTML = '';
     customCategories.forEach((cat, idx) => {
-      const isSel = currentActive.includes(cat.name) || (currentActive.length === 0 && idx === 0);
+      const isSel = currentActive.includes(cat.name) || (isInitialModal && idx === 0);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `modal-cat-chip px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${isSel ? 'text-black active' : 'glass text-gray-300 border-white/10'}`;
@@ -358,6 +383,8 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     document.getElementById('modalLink').value = '';
     document.getElementById('modalType').value = '';
     document.getElementById('modalTakeaway').value = '';
+    resetQuickCatChips();
+    resetModalCatChips();
     document.getElementById('search').dispatchEvent(new Event('input'));
     return;
   }
@@ -384,6 +411,8 @@ function quickAdd(link, categories, takeaway, platform, postType) {
   document.getElementById('modalLink').value = '';
   document.getElementById('modalType').value = '';
   document.getElementById('modalTakeaway').value = '';
+  resetQuickCatChips();
+  resetModalCatChips();
   document.getElementById('search').dispatchEvent(new Event('input'));
 }
 
@@ -449,7 +478,10 @@ document.getElementById('closeThumb').addEventListener('click',()=>document.getE
 document.getElementById('thumbUrl').addEventListener('input',e=>{const url=e.target.value.trim();if(url){document.getElementById('thumbPreview').src=url;document.getElementById('thumbPreview').classList.remove('hidden');}});
 document.getElementById('thumbFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{document.getElementById('thumbPreview').src=ev.target.result;document.getElementById('thumbPreview').classList.remove('hidden');document.getElementById('thumbUrl').value=ev.target.result;};reader.readAsDataURL(file);});
 document.getElementById('saveThumb').addEventListener('click',()=>{const url=document.getElementById('thumbUrl').value.trim();if(!url){alert('Add image');return;}realThumbs[editingNo]=url;saveAll();document.getElementById('thumbModal').classList.add('hidden');document.getElementById('grid').innerHTML='';shown=0;renderGrid();});
-document.getElementById('removeThumb').addEventListener('click',()=>{delete realThumbs[editingNo];saveAll();document.getElementById('thumbModal').classList.add('hidden');document.getElementById('grid').innerHTML='';shown=0;renderGrid();});
+const clearQuickBtn = document.getElementById('clearQuickCatSelectionBtn');
+if(clearQuickBtn) clearQuickBtn.addEventListener('click', resetQuickCatChips);
+const clearModalBtn = document.getElementById('clearModalCatSelectionBtn');
+if(clearModalBtn) clearModalBtn.addEventListener('click', resetModalCatChips);
 
 init();
 </script>
