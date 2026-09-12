@@ -752,6 +752,7 @@ function init(){
   syncCategoriesFromRecords();
   saveAll();
   filtered=[...records];
+  filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
   renderCatDropdowns();
   renderGrid();
   updateCounts();
