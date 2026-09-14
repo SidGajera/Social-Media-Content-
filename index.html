@@ -1014,6 +1014,36 @@ function addCategory(name, color, desc) {
 }
 
 
+function cleanSocialCaption(text) {
+  if (!text || typeof text !== 'string') return '';
+  let desc = text.trim();
+
+  if (/^Log in to Instagram|^Create an account|^See photos and videos from/i.test(desc)) {
+    return '';
+  }
+
+  // Remove likes, comments, reactions, author name, date prefix up to the colon
+  desc = desc.replace(/^[\d,\.kKmM\s]+(?:likes|like|comments|comment|views|shares|reactions)\b[^\n:]*?:\s*/i, '');
+  desc = desc.replace(/^[^\n:]*?\b(?:on\s+Instagram|on\s+Facebook|on\s+X|on\s+Twitter|on\s+TikTok)\b[^\n:]*?:\s*/i, '');
+  desc = desc.replace(/^[^\n:]*?\bon\s+[A-Za-z]+\s+\d{1,2},\s*\d{4}\s*:\s*/i, '');
+  desc = desc.replace(/^[\w\.\_]+\s+on\s+[^:]+:\s*/i, '');
+  desc = desc.replace(/^(?:Photo|Video)\s+by\s+[^\n:]+?\bon\s+[^\n:]+?:\s*/i, '');
+  desc = desc.replace(/^[^\n:]+:\s*/i, (match) => {
+    if (/likes|comments|instagram|facebook|twitter|tiktok|photo|video|on\s+[a-z]+/i.test(match)) {
+      return '';
+    }
+    return match;
+  });
+
+  // Remove leading quotes
+  desc = desc.replace(/^[“"‘'«\s]+/, '');
+
+  // Remove trailing quotes and trailing dot right after quotes if any
+  desc = desc.replace(/[”"’'»\s]+\.?\s*$/, '');
+
+  return desc.trim();
+}
+
 async function fetchCaptionFromUrl(url) {
   if (!url || typeof url !== 'string' || !url.startsWith('http')) return null;
   try {
@@ -1024,9 +1054,8 @@ async function fetchCaptionFromUrl(url) {
     if (json.status === 'success' && json.data) {
       let desc = json.data.description || json.data.title || '';
       if (!desc) return null;
-      desc = desc.replace(/^[\w\.\_]+\s+on\s+[^:]+:\s*["”’`]?/i, '');
-      desc = desc.replace(/^["”’`\s\u2700-\u27bf\u2600-\u26ff]+/u, '').trim();
-      return desc;
+      const cleaned = cleanSocialCaption(desc);
+      return cleaned || null;
     }
   } catch (err) {
     console.warn('Caption fetch error:', err);
