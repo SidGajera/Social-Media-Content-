@@ -1820,6 +1820,7 @@ if(dlGitBtn) dlGitBtn.addEventListener('click', () => {
   const codeStr = JSON.stringify(records, null, 2);
   navigator.clipboard.writeText(codeStr).then(() => {
     alert('Copied all post data JSON to clipboard! You can paste it into defaultRecords or run sync script.');
+    closeBackupModal();
   }).catch(() => {
     const blob = new Blob([codeStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1827,6 +1828,7 @@ if(dlGitBtn) dlGitBtn.addEventListener('click', () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    closeBackupModal();
   });
 });
 
