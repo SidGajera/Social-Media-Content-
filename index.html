@@ -103,11 +103,11 @@ button,a,select,input{min-height:44px}
 <div class="mt-8 flex justify-center px-4"><button id="loadMore" class="w-full sm:w-auto px-8 py-4 gold text-black rounded-xl font-bold text-sm">Load More 30</button></div>
 </div>
 
-<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold text-lg mb-4">Add New Content - Embed ON</h3><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Click to select multiple):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times">✕</i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
-<div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold text-lg mb-4 text-green-400">Create New Category</h3><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 class="font-bold text-lg text-green-400">Create New Category</h3><button type="button" id="catModalHeaderClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times">✕</i></button></div><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
-<div id="thumbModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><h3 class="font-bold mb-2">Real Thumb for <span id="thumbModalNo"></span></h3><input id="thumbUrl" placeholder="Paste image URL or upload" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><input type="file" id="thumbFile" accept="image/*" class="w-full mt-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><img id="thumbPreview" class="w-full aspect-square object-cover rounded-xl mt-4 hidden"><div class="flex gap-3 mt-4"><button id="saveThumb" class="flex-1 py-4 gold text-black rounded-xl font-bold text-sm">Save Real Thumb</button><button id="closeThumb" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div><button id="removeThumb" class="w-full mt-3 py-3 bg-red-500/20 border border-red-500/30 rounded-xl text-xs text-red-400 hidden">Remove Custom - Back to Embed ON</button></div></div>
+<div id="thumbModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-3"><h3 class="font-bold">Real Thumb for <span id="thumbModalNo"></span></h3><button type="button" id="thumbModalHeaderClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times">✕</i></button></div><input id="thumbUrl" placeholder="Paste image URL or upload" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><input type="file" id="thumbFile" accept="image/*" class="w-full mt-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><img id="thumbPreview" class="w-full aspect-square object-cover rounded-xl mt-4 hidden"><div class="flex gap-3 mt-4"><button id="saveThumb" class="flex-1 py-4 gold text-black rounded-xl font-bold text-sm">Save Real Thumb</button><button id="closeThumb" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div><button id="removeThumb" class="w-full mt-3 py-3 bg-red-500/20 border border-red-500/30 rounded-xl text-xs text-red-400 hidden">Remove Custom - Back to Embed ON</button></div></div>
 
 <script>
 let records = JSON.parse(localStorage.getItem('i3d_vault_saved_again')||'null');
@@ -124,6 +124,7 @@ if(!customCategories) {
     {name: 'How To Start', color: '#FFD700', desc: 'How To Start'},
     {name: 'Content Creation', color: '#00FF88', desc: 'Content Creation'},
     {name: 'Marketing & Branding', color: '#FFD700', desc: 'Marketing & Branding'},
+    {name: 'SEO & Marketing', color: '#00D9FF', desc: 'Search Engine Optimization'},
     {name: 'AI Tools', color: '#00D9FF', desc: 'AI Tools'},
     {name: 'GitHub Repos', color: '#00FF88', desc: 'GitHub Repos'},
     {name: 'Entrepreneurship', color: '#8B5CF6', desc: 'Entrepreneurship'},
@@ -191,24 +192,30 @@ async function loadFromIndexedDB(key) {
 }
 
 function exportFullBackupJson() {
-  const fullBackup = {
-    records: records,
-    customCategories: customCategories,
-    realThumbs: realThumbs,
-    customAddedPosts: customAddedPosts,
-    userUpdatedPosts: userUpdatedPosts,
-    deletedPostNos: deletedPostNos,
-    deletedCategories: deletedCategories,
-    exportDate: new Date().toISOString()
-  };
-  const jsonStr = JSON.stringify(fullBackup, null, 2);
-  const blob = new Blob([jsonStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `i3d-vault-full-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  try {
+    const fullBackup = {
+      records: records,
+      customCategories: customCategories,
+      realThumbs: realThumbs,
+      customAddedPosts: customAddedPosts,
+      userUpdatedPosts: userUpdatedPosts,
+      deletedPostNos: deletedPostNos,
+      deletedCategories: deletedCategories,
+      exportDate: new Date().toISOString()
+    };
+    const jsonStr = JSON.stringify(fullBackup, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `i3d-vault-full-backup-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch(err) {
+    alert('Backup download error: ' + err.message);
+  }
 }
 
 function restoreFullBackupJson(jsonContent) {
@@ -265,7 +272,7 @@ async function deepStorageScan() {
   const idbRecords = await loadFromIndexedDB('records');
   if (idbRecords && Array.isArray(idbRecords)) {
     idbRecords.forEach(r => {
-      if (r && r['No.'] && !records.some(rec => rec['No.'] === r['No.'])) {
+      if (r && r['No.'] && !deletedPostNos.includes(r['No.']) && !records.some(rec => rec['No.'] === r['No.'])) {
         records.unshift(r);
         recovered++;
       }
@@ -280,7 +287,7 @@ async function deepStorageScan() {
         const arr = JSON.parse(val);
         if (Array.isArray(arr)) {
           arr.forEach(r => {
-            if (r && r['No.'] && !records.some(rec => rec['No.'] === r['No.'])) {
+            if (r && r['No.'] && !deletedPostNos.includes(r['No.']) && !records.some(rec => rec['No.'] === r['No.'])) {
               records.unshift(r);
               recovered++;
             }
@@ -299,7 +306,7 @@ async function deepStorageScan() {
   }
 }
 
-function saveAll(){localStorage.setItem('i3d_vault_saved_again', JSON.stringify(records));localStorage.setItem('i3d_vault_master_backup', JSON.stringify(records));localStorage.setItem('i3d_custom_added_posts_saved_again', JSON.stringify(customAddedPosts));localStorage.setItem('i3d_user_updated_posts_saved_again', JSON.stringify(userUpdatedPosts));localStorage.setItem('i3d_real_thumbs_saved_again', JSON.stringify(realThumbs));localStorage.setItem('i3d_custom_categories_saved_again', JSON.stringify(customCategories));localStorage.setItem('i3d_deleted_categories_saved_again', JSON.stringify(deletedCategories));localStorage.setItem('i3d_deleted_post_nos_saved_again', JSON.stringify(deletedPostNos));saveToIndexedDB('records', records);saveToIndexedDB('customAddedPosts', customAddedPosts);saveToIndexedDB('userUpdatedPosts', userUpdatedPosts);saveToIndexedDB('customCategories', customCategories);updateCounts();}
+function saveAll(){localStorage.setItem('i3d_vault_saved_again', JSON.stringify(records));localStorage.setItem('i3d_vault_master_backup', JSON.stringify(records));localStorage.setItem('i3d_custom_added_posts_saved_again', JSON.stringify(customAddedPosts));localStorage.setItem('i3d_user_updated_posts_saved_again', JSON.stringify(userUpdatedPosts));localStorage.setItem('i3d_real_thumbs_saved_again', JSON.stringify(realThumbs));localStorage.setItem('i3d_custom_categories_saved_again', JSON.stringify(customCategories));localStorage.setItem('i3d_deleted_categories_saved_again', JSON.stringify(deletedCategories));localStorage.setItem('i3d_deleted_post_nos_saved_again', JSON.stringify(deletedPostNos));saveToIndexedDB('records', records);saveToIndexedDB('customAddedPosts', customAddedPosts);saveToIndexedDB('userUpdatedPosts', userUpdatedPosts);saveToIndexedDB('customCategories', customCategories);saveToIndexedDB('deletedPostNos', deletedPostNos);saveToIndexedDB('deletedCategories', deletedCategories);updateCounts();}
 function updateCounts(){const t=records.length;const c=customCategories.length;document.getElementById('postCountTop').textContent=t;document.getElementById('postCountMobile').textContent=t+' posts';document.getElementById('postCountMobile2').textContent=t;document.getElementById('catCountTop').textContent=c;document.getElementById('catCountMobile').textContent=c;}
 function getPostCategories(r) {
   if(!r) return [];
@@ -433,11 +440,10 @@ function renderCatDropdowns(){
 
   const quickChips = document.getElementById('quickCatChips');
   if(quickChips) {
-    const isInitialQuick = quickChips.children.length === 0;
     const currentActive = getSelectedQuickCategories();
     quickChips.innerHTML = '';
-    customCategories.forEach((cat, idx) => {
-      const isSel = currentActive.includes(cat.name) || (isInitialQuick && idx === 0);
+    customCategories.forEach((cat) => {
+      const isSel = currentActive.includes(cat.name);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `quick-cat-chip px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border ${isSel ? 'text-black active' : 'glass text-gray-300 border-white/10'}`;
@@ -471,11 +477,10 @@ function renderCatDropdowns(){
 
   const modalChips = document.getElementById('modalCatChips');
   if(modalChips) {
-    const isInitialModal = modalChips.children.length === 0;
     const currentActive = getSelectedModalCategories();
     modalChips.innerHTML = '';
-    customCategories.forEach((cat, idx) => {
-      const isSel = currentActive.includes(cat.name) || (isInitialModal && idx === 0);
+    customCategories.forEach((cat) => {
+      const isSel = currentActive.includes(cat.name);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `modal-cat-chip px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${isSel ? 'text-black active' : 'glass text-gray-300 border-white/10'}`;
@@ -537,7 +542,7 @@ function renderGrid(){
 
     const div=document.createElement('div');
     div.className='card glass rounded-2xl overflow-hidden';
-    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden" style="height:clamp(360px, 50vw, 440px)">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex items-center justify-center bg-zinc-800"><p class="text-xs text-gray-500">No embed</p></div>`}<div class="absolute top-2 left-2 px-2 py-1 bg-black/80 rounded-full text-[9px] font-bold">${r.Platform||'IG'}</div><div class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-11 h-11 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':'bg-yellow-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':'EMBED ON'}</span></div></div><div class="p-4"><div class="flex items-center justify-between gap-1"><p class="text-[10px] text-gray-400 truncate">${r['Post Type']||'Content'}</p><button onclick="editTakeaway(${r['No.']})" title="Edit description / caption" class="text-xs text-yellow-400/80 hover:text-yellow-400 p-1 cursor-pointer shrink-0 transition-colors"><i class="fas fa-pen text-[11px]"></i></button></div><p onclick="editTakeaway(${r['No.']})" title="Click to edit description" class="text-sm font-semibold mt-1 line-clamp-3 leading-snug cursor-pointer hover:text-yellow-300 transition-colors">${r['Core Idea / 1-Line Takeaway']||'Click to add description...'}</p><div class="flex gap-2 mt-3"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 py-3 gold text-black rounded-xl text-xs font-bold text-center">Open Post</a><button onclick="openThumb(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center"><i class="fas fa-image text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`;
+    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden" style="height:clamp(360px, 50vw, 440px)">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex items-center justify-center bg-zinc-800"><p class="text-xs text-gray-500">No embed</p></div>`}<div class="absolute top-2 left-2 px-2 py-1 bg-black/80 rounded-full text-[9px] font-bold">${r.Platform||'IG'}</div><div class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-11 h-11 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg" title="Change Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':'bg-yellow-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':'EMBED ON'}</span></div></div><div class="p-4"><div class="flex items-center justify-between gap-1"><p class="text-[10px] text-gray-400 truncate">${r['Post Type']||'Content'}</p><button onclick="openEditModal(${r['No.']})" title="Edit post details" class="text-xs text-yellow-400/80 hover:text-yellow-400 p-1 cursor-pointer shrink-0 transition-colors"><i class="fas fa-pen text-[11px]"></i></button></div><p onclick="openEditModal(${r['No.']})" title="Click to edit post" class="text-sm font-semibold mt-1 line-clamp-3 leading-snug cursor-pointer hover:text-yellow-300 transition-colors">${r['Core Idea / 1-Line Takeaway']||'Click to add description...'}</p><div class="flex gap-2 mt-3"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 py-3 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center">Open Post</a><button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
     grid.appendChild(div);
   });
   shown+=slice.length;
@@ -570,7 +575,20 @@ window.editTakeaway=async function(no){
   }
 };
 window.openThumb=function(no){editingNo=no;document.getElementById('thumbModalNo').textContent='#'+no;document.getElementById('thumbUrl').value=realThumbs[no]||'';const preview=document.getElementById('thumbPreview');if(realThumbs[no]){preview.src=realThumbs[no];preview.classList.remove('hidden');document.getElementById('removeThumb').classList.remove('hidden');}else{preview.classList.add('hidden');document.getElementById('removeThumb').classList.add('hidden');}document.getElementById('thumbModal').classList.remove('hidden');}
-window.deleteContent=function(no){if(!confirm('Delete post #'+no+'?'))return;if(!deletedPostNos.includes(no))deletedPostNos.push(no);records=records.filter(r=>r['No.']!==no);customAddedPosts=customAddedPosts.filter(r=>r['No.']!==no);delete userUpdatedPosts[no];delete realThumbs[no];saveAll();document.getElementById('search').dispatchEvent(new Event('input'));}
+window.deleteContent=function(no){
+  if(!confirm('Delete post #'+no+'?'))return;
+  if(!deletedPostNos.includes(no)) deletedPostNos.push(no);
+  records = records.filter(r => r && r['No.'] !== no);
+  customAddedPosts = customAddedPosts.filter(r => r && r['No.'] !== no);
+  delete userUpdatedPosts[no];
+  delete realThumbs[no];
+  saveAll();
+  document.getElementById('grid').innerHTML = '';
+  shown = 0;
+  renderGrid();
+  updateCounts();
+  document.getElementById('search').dispatchEvent(new Event('input'));
+}
 
 function addCategory(name, color, desc) {
   if(!name) { alert('Name required'); return false; }
@@ -637,10 +655,11 @@ async function triggerAutoDetectCaption() {
 }
 
 function quickAdd(link, categories, takeaway, platform, postType) {
-  if(!link) { alert('Paste link'); return; }
+  if(!link) { alert('Please paste a post link first'); return; }
   const cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
-  if(cats.length === 0 && customCategories.length > 0) {
-    cats.push(customCategories[0].name);
+  if(cats.length === 0) {
+    alert('Please select at least 1 category before submitting.');
+    return;
   }
 
   const existingRec = records.find(r => r['Original Post Link'] === link);
@@ -695,6 +714,14 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     'Category': cats
   };
   records.unshift(newRec);
+
+  userUpdatedPosts[newRec['No.']] = {
+    takeaway: newRec['Core Idea / 1-Line Takeaway'],
+    category: cats,
+    postType: newRec['Post Type'],
+    platform: newRec['Platform']
+  };
+
   const cpIdx = customAddedPosts.findIndex(cp => cp['No.'] === newRec['No.'] || cp['Original Post Link'] === link);
   if (cpIdx >= 0) {
     customAddedPosts[cpIdx] = newRec;
@@ -705,7 +732,7 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     fetchCaptionFromUrl(link).then(caption => {
       if(caption) {
         newRec['Core Idea / 1-Line Takeaway'] = caption;
-        userUpdatedPosts[newRec['No.']] = Object.assign({}, userUpdatedPosts[newRec['No.']] || {}, { takeaway: caption });
+        userUpdatedPosts[newRec['No.']].takeaway = caption;
         const cIdx = customAddedPosts.findIndex(cp => cp['No.'] === newRec['No.']);
         if(cIdx >= 0) customAddedPosts[cIdx]['Core Idea / 1-Line Takeaway'] = caption;
         saveAll();
@@ -771,6 +798,7 @@ function syncCategoriesFromRecords() {
     {name: 'How To Start', color: '#FFD700', desc: 'How To Start'},
     {name: 'Content Creation', color: '#00FF88', desc: 'Content Creation'},
     {name: 'Marketing & Branding', color: '#FFD700', desc: 'Marketing & Branding'},
+    {name: 'SEO & Marketing', color: '#00D9FF', desc: 'Search Engine Optimization'},
     {name: 'AI Tools', color: '#00D9FF', desc: 'AI Tools'},
     {name: 'GitHub Repos', color: '#00FF88', desc: 'GitHub Repos'},
     {name: 'Entrepreneurship', color: '#8B5CF6', desc: 'Entrepreneurship'},
@@ -798,6 +826,17 @@ function syncCategoriesFromRecords() {
   });
 
   records.forEach(r => {
+    const postTypeStr = (r['Post Type'] || '').toUpperCase();
+    const takeawayStr = (r['Core Idea / 1-Line Takeaway'] || '').toUpperCase();
+    if (postTypeStr.includes('SEO') || takeawayStr.includes('SEO')) {
+      const currentCats = getPostCategories(r);
+      if (!currentCats.includes('SEO & Marketing') && !currentCats.includes('SEO')) {
+        currentCats.push('SEO & Marketing');
+        r.Category = currentCats;
+        changed = true;
+      }
+    }
+
     const cats = getPostCategories(r);
     cats.forEach(cName => {
       if(cName && !deletedCategories.some(d => d.toLowerCase() === cName.toLowerCase()) && !customCategories.some(c => c.name.toLowerCase() === cName.toLowerCase())) {
@@ -856,6 +895,8 @@ function setupCategoryToggles() {
 }
 
 const CATEGORY_MERGE_MAP = {
+  'SEO': 'SEO & Marketing',
+  'Seo': 'SEO & Marketing',
   '1 Content Creation': 'Content Creation',
   '3 Marketing Ideas': 'Marketing & Branding',
   'Sales': 'Sales & Growth',
@@ -922,13 +963,28 @@ function migrateAndMergeCategories() {
 async function init(){
   // 1. Recover from IndexedDB if local storage is missing or smaller
   try {
+    const idbDeleted = await loadFromIndexedDB('deletedPostNos');
+    if (idbDeleted && Array.isArray(idbDeleted)) {
+      idbDeleted.forEach(d => { if (!deletedPostNos.includes(d)) deletedPostNos.push(d); });
+    }
+    const idbDelCats = await loadFromIndexedDB('deletedCategories');
+    if (idbDelCats && Array.isArray(idbDelCats)) {
+      idbDelCats.forEach(dc => { if (!deletedCategories.some(x => x.toLowerCase() === dc.toLowerCase())) deletedCategories.push(dc); });
+    }
+
     const idbRecs = await loadFromIndexedDB('records');
-    if (idbRecs && Array.isArray(idbRecs) && idbRecs.length > (records ? records.length : 0)) {
-      records = idbRecs;
+    if (idbRecs && Array.isArray(idbRecs)) {
+      const validIdbRecs = idbRecs.filter(r => r && r['No.'] && !deletedPostNos.includes(r['No.']));
+      if (validIdbRecs.length > (records ? records.length : 0)) {
+        records = validIdbRecs;
+      }
     }
     const idbCustom = await loadFromIndexedDB('customAddedPosts');
-    if (idbCustom && Array.isArray(idbCustom) && idbCustom.length > customAddedPosts.length) {
-      customAddedPosts = idbCustom;
+    if (idbCustom && Array.isArray(idbCustom)) {
+      const validIdbCustom = idbCustom.filter(cp => cp && cp['No.'] && !deletedPostNos.includes(cp['No.']));
+      if (validIdbCustom.length > customAddedPosts.length) {
+        customAddedPosts = validIdbCustom;
+      }
     }
     const idbUpdates = await loadFromIndexedDB('userUpdatedPosts');
     if (idbUpdates && typeof idbUpdates === 'object') {
@@ -959,6 +1015,10 @@ async function init(){
       }
     });
   }
+
+  // Strict enforcement: purge any deleted post numbers
+  records = records.filter(r => r && r['No.'] && !deletedPostNos.includes(r['No.']));
+  customAddedPosts = customAddedPosts.filter(cp => cp && cp['No.'] && !deletedPostNos.includes(cp['No.']));
   if (Array.isArray(customAddedPosts)) {
     customAddedPosts.forEach(cp => {
       if (cp && cp['No.'] && !deletedPostNos.includes(cp['No.'])) {
@@ -1009,21 +1069,208 @@ async function init(){
   }
 }
 
+let editingPostNo = null;
+
+function openAddModal() {
+  editingPostNo = null;
+  const modalTitle = document.getElementById('modalTitle');
+  if (modalTitle) modalTitle.textContent = 'Add New Content - Embed ON';
+  const modalSave = document.getElementById('modalSave');
+  if (modalSave) modalSave.textContent = 'Save Content';
+  
+  document.getElementById('modalLink').value = '';
+  document.getElementById('modalPlatform').value = 'Instagram';
+  document.getElementById('modalType').value = '';
+  document.getElementById('modalTakeaway').value = '';
+  resetModalCatChips();
+  document.getElementById('addModal').classList.remove('hidden');
+}
+
+window.openEditModal = function(no) {
+  const rec = records.find(r => r && r['No.'] === no);
+  if (!rec) return;
+  editingPostNo = no;
+  const modalTitle = document.getElementById('modalTitle');
+  if (modalTitle) modalTitle.textContent = `Edit Content #${no}`;
+  const modalSave = document.getElementById('modalSave');
+  if (modalSave) modalSave.textContent = 'Save Changes';
+
+  document.getElementById('modalLink').value = rec['Original Post Link'] || '';
+  document.getElementById('modalPlatform').value = rec['Platform'] || 'Instagram';
+  document.getElementById('modalType').value = rec['Post Type'] || '';
+  document.getElementById('modalTakeaway').value = rec['Core Idea / 1-Line Takeaway'] || '';
+
+  const postCats = getPostCategories(rec);
+  const container = document.getElementById('modalCatChips');
+  if (container) {
+    container.querySelectorAll('.modal-cat-chip').forEach(btn => {
+      const cName = btn.getAttribute('data-cat');
+      const catObj = customCategories.find(c => c.name === cName);
+      const isSel = postCats.includes(cName);
+      if (isSel) {
+        btn.classList.add('active', 'text-black');
+        btn.classList.remove('glass', 'text-gray-300');
+        if (catObj) {
+          btn.style.backgroundColor = catObj.color;
+          btn.style.borderColor = catObj.color;
+        }
+        const icon = btn.querySelector('i');
+        if (icon) icon.className = 'fas fa-check-circle text-[10px]';
+      } else {
+        btn.classList.remove('active', 'text-black');
+        btn.classList.add('glass', 'text-gray-300');
+        btn.style.backgroundColor = '';
+        btn.style.borderColor = '';
+        const icon = btn.querySelector('i');
+        if (icon) icon.className = 'fas fa-circle text-[10px]';
+      }
+    });
+  }
+  document.getElementById('addModal').classList.remove('hidden');
+};
+
+function exportExcelData() {
+  try {
+    if (!records || records.length === 0) {
+      alert('No posts available to export.');
+      return;
+    }
+    const exportRecords = records.map(r => ({
+      'No.': r['No.'],
+      'Platform': r['Platform'] || '',
+      'Post Link': r['Original Post Link'] || '',
+      'Post Type': r['Post Type'] || '',
+      'Description / Takeaway': r['Core Idea / 1-Line Takeaway'] || '',
+      'Category': getPostCategories(r).join(', '),
+      'Date Saved': r['Date Saved'] || ''
+    }));
+
+    if (typeof XLSX !== 'undefined' && XLSX.utils) {
+      const ws = XLSX.utils.json_to_sheet(exportRecords);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Master Vault');
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `I3D-VAULT-${records.length}-POSTS.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } else {
+      const keys = Object.keys(exportRecords[0]);
+      let csv = keys.join(',') + '\n';
+      exportRecords.forEach(row => {
+        csv += keys.map(k => `"${String(row[k] || '').replace(/"/g, '""')}"`).join(',') + '\n';
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `I3D-VAULT-${records.length}-POSTS.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  } catch (err) {
+    alert('Export failed: ' + err.message);
+  }
+}
+
 document.getElementById('mobileMenuBtn').addEventListener('click',()=>document.getElementById('mobileDrawer').classList.remove('hidden'));
 document.getElementById('closeDrawer').addEventListener('click',()=>document.getElementById('mobileDrawer').classList.add('hidden'));
 document.getElementById('drawerBackdrop').addEventListener('click',()=>document.getElementById('mobileDrawer').classList.add('hidden'));
-document.getElementById('drawerAdd').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');document.getElementById('addModal').classList.remove('hidden');});
+document.getElementById('drawerAdd').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');openAddModal();});
 document.getElementById('drawerAddCat').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');document.getElementById('catModal').classList.remove('hidden');});
-document.getElementById('drawerExport').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');document.getElementById('exportBtn').click();});
+document.getElementById('drawerExport').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');exportExcelData();});
 document.getElementById('quickAddBtn').addEventListener('click',()=>quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), document.getElementById('quickTakeaway').value.trim()));
 document.getElementById('quickLink').addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(e.target.value.trim(), getSelectedQuickCategories(), document.getElementById('quickTakeaway').value.trim());});
 const qtk=document.getElementById('quickTakeaway');if(qtk)qtk.addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), e.target.value.trim());});
-document.getElementById('addBtn').addEventListener('click',()=>document.getElementById('addModal').classList.remove('hidden'));
+const mobAddBtn = document.getElementById('mobileAddBtn'); if(mobAddBtn) mobAddBtn.addEventListener('click', openAddModal);
+document.getElementById('addBtn').addEventListener('click', openAddModal);
 document.getElementById('addCategoryBtn').addEventListener('click',()=>document.getElementById('catModal').classList.remove('hidden'));
-document.getElementById('modalClose').addEventListener('click',()=>document.getElementById('addModal').classList.add('hidden'));
-document.getElementById('modalSave').addEventListener('click',()=>{const link=document.getElementById('modalLink').value.trim();if(!link){alert('Link required');return;}const cats=getSelectedModalCategories();const platform=document.getElementById('modalPlatform').value;const postType=document.getElementById('modalType').value.trim();const takeaway=document.getElementById('modalTakeaway').value.trim();quickAdd(link,cats,takeaway,platform,postType);document.getElementById('addModal').classList.add('hidden');});
-document.getElementById('catModalClose').addEventListener('click',()=>document.getElementById('catModal').classList.add('hidden'));
-document.getElementById('catModalSave').addEventListener('click',()=>{const name=document.getElementById('catModalName').value.trim();const color=document.getElementById('catModalColor').value;const desc=document.getElementById('catModalDesc').value.trim();if(addCategory(name,color,desc)){document.getElementById('catModal').classList.add('hidden');document.getElementById('catModalName').value='';document.getElementById('catModalDesc').value='';}});
+
+const closeAddModal = () => { document.getElementById('addModal').classList.add('hidden'); editingPostNo = null; };
+const closeCatModal = () => document.getElementById('catModal').classList.add('hidden');
+const closeThumbModal = () => document.getElementById('thumbModal').classList.add('hidden');
+const closeBackupModal = () => document.getElementById('backupSyncModal').classList.add('hidden');
+
+document.getElementById('modalClose').addEventListener('click', closeAddModal);
+const mhClose = document.getElementById('modalHeaderClose'); if(mhClose) mhClose.addEventListener('click', closeAddModal);
+
+document.getElementById('catModalClose').addEventListener('click', closeCatModal);
+const cmhClose = document.getElementById('catModalHeaderClose'); if(cmhClose) cmhClose.addEventListener('click', closeCatModal);
+
+document.getElementById('closeThumb').addEventListener('click', closeThumbModal);
+const tmhClose = document.getElementById('thumbModalHeaderClose'); if(tmhClose) tmhClose.addEventListener('click', closeThumbModal);
+
+const bsClose = document.getElementById('backupSyncModalClose'); if(bsClose) bsClose.addEventListener('click', closeBackupModal);
+
+// Backdrop click handlers for all modals
+['addModal', 'catModal', 'thumbModal', 'backupSyncModal'].forEach(id => {
+  const m = document.getElementById(id);
+  if (m) {
+    m.addEventListener('click', (e) => {
+      if (e.target === m) {
+        if (id === 'addModal') closeAddModal();
+        else if (id === 'catModal') closeCatModal();
+        else if (id === 'thumbModal') closeThumbModal();
+        else if (id === 'backupSyncModal') closeBackupModal();
+      }
+    });
+  }
+});
+
+document.getElementById('modalSave').addEventListener('click',()=>{
+  const link=document.getElementById('modalLink').value.trim();
+  if(!link){alert('Link required');return;}
+  const cats=getSelectedModalCategories();
+  if(cats.length === 0) {
+    alert('Please select at least 1 category before submitting.');
+    return;
+  }
+  const platform=document.getElementById('modalPlatform').value;
+  const postType=document.getElementById('modalType').value.trim();
+  const takeaway=document.getElementById('modalTakeaway').value.trim();
+
+  if(editingPostNo) {
+    const rec = records.find(r => r && r['No.'] === editingPostNo);
+    if(rec) {
+      rec['Original Post Link'] = link;
+      rec['Platform'] = platform;
+      rec['Category'] = cats;
+      rec['Post Type'] = postType || (cats[0] || 'Content');
+      rec['Core Idea / 1-Line Takeaway'] = takeaway || 'No description provided';
+
+      userUpdatedPosts[editingPostNo] = {
+        takeaway: rec['Core Idea / 1-Line Takeaway'],
+        category: rec['Category'],
+        postType: rec['Post Type'],
+        platform: rec['Platform']
+      };
+
+      const cpIdx = customAddedPosts.findIndex(cp => cp && cp['No.'] === editingPostNo);
+      if(cpIdx >= 0) {
+        customAddedPosts[cpIdx] = Object.assign({}, customAddedPosts[cpIdx], rec);
+      }
+
+      saveAll();
+      closeAddModal();
+      document.getElementById('grid').innerHTML = '';
+      shown = 0;
+      renderGrid();
+      return;
+    }
+  }
+
+  quickAdd(link,cats,takeaway,platform,postType);
+  closeAddModal();
+});
+
+document.getElementById('catModalSave').addEventListener('click',()=>{const name=document.getElementById('catModalName').value.trim();const color=document.getElementById('catModalColor').value;const desc=document.getElementById('catModalDesc').value.trim();if(addCategory(name,color,desc)){closeCatModal();document.getElementById('catModalName').value='';document.getElementById('catModalDesc').value='';}});
 document.getElementById('saveNewCatBtn').addEventListener('click',()=>{const name=document.getElementById('newCatName').value.trim();const color=document.getElementById('newCatColor').value;const desc=document.getElementById('newCatDesc').value.trim();if(addCategory(name,color,desc)){document.getElementById('newCatName').value='';document.getElementById('newCatDesc').value='';}});
 document.getElementById('search').addEventListener('input',e=>{
   const q=e.target.value.toLowerCase();
@@ -1056,11 +1303,10 @@ document.getElementById('filterThumb').addEventListener('change',()=>document.ge
 const sortSelect = document.getElementById('sortPosts');
 if(sortSelect) sortSelect.addEventListener('change',()=>document.getElementById('search').dispatchEvent(new Event('input')));
 document.getElementById('loadMore').addEventListener('click',renderGrid);
-document.getElementById('exportBtn').addEventListener('click',()=>{const exportRecords=records.map(r=>({...r,Category:getPostCategories(r).join(', ')}));const ws=XLSX.utils.json_to_sheet(exportRecords);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Master Vault');XLSX.writeFile(wb,`I3D-VAULT-${records.length}-SAVED-AGAIN.xlsx`);});
-document.getElementById('closeThumb').addEventListener('click',()=>document.getElementById('thumbModal').classList.add('hidden'));
+document.getElementById('exportBtn').addEventListener('click', exportExcelData);
 document.getElementById('thumbUrl').addEventListener('input',e=>{const url=e.target.value.trim();if(url){document.getElementById('thumbPreview').src=url;document.getElementById('thumbPreview').classList.remove('hidden');}});
 document.getElementById('thumbFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{document.getElementById('thumbPreview').src=ev.target.result;document.getElementById('thumbPreview').classList.remove('hidden');document.getElementById('thumbUrl').value=ev.target.result;};reader.readAsDataURL(file);});
-document.getElementById('saveThumb').addEventListener('click',()=>{const url=document.getElementById('thumbUrl').value.trim();if(!url){alert('Add image');return;}realThumbs[editingNo]=url;saveAll();document.getElementById('thumbModal').classList.add('hidden');document.getElementById('grid').innerHTML='';shown=0;renderGrid();});
+document.getElementById('saveThumb').addEventListener('click',()=>{const url=document.getElementById('thumbUrl').value.trim();if(!url){alert('Add image');return;}realThumbs[editingNo]=url;saveAll();closeThumbModal();document.getElementById('grid').innerHTML='';shown=0;renderGrid();});
 const clearQuickBtn = document.getElementById('clearQuickCatSelectionBtn');
 if(clearQuickBtn) clearQuickBtn.addEventListener('click', resetQuickCatChips);
 const clearModalBtn = document.getElementById('clearModalCatSelectionBtn');
@@ -1078,8 +1324,6 @@ if(dbsBtn) dbsBtn.addEventListener('click', () => {
   document.getElementById('backupCountBadge').textContent = `${records.length} Posts`;
   document.getElementById('backupSyncModal').classList.remove('hidden');
 });
-const bsClose = document.getElementById('backupSyncModalClose');
-if(bsClose) bsClose.addEventListener('click', () => document.getElementById('backupSyncModal').classList.add('hidden'));
 
 const dlJsonBtn = document.getElementById('downloadBackupJsonBtn');
 if(dlJsonBtn) dlJsonBtn.addEventListener('click', exportFullBackupJson);
@@ -1101,7 +1345,10 @@ if(dlGitBtn) dlGitBtn.addEventListener('click', () => {
   }).catch(() => {
     const blob = new Blob([codeStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a'); link.href = url; link.download = 'defaultRecords.json'; link.click();
+    const link = document.createElement('a'); link.href = url; link.download = 'defaultRecords.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   });
 });
 
@@ -1117,8 +1364,8 @@ init();
       <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
         <i class="fas fa-database text-blue-400"></i> Permanent Data Vault Backup & Sync
       </h3>
-      <button id="backupSyncModalClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer">
-        <i class="fas fa-times"></i>
+      <button id="backupSyncModalClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close">
+        <i class="fas fa-times">✕</i>
       </button>
     </div>
 
