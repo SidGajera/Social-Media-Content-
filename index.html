@@ -1022,18 +1022,16 @@ function cleanSocialCaption(text) {
     return '';
   }
 
-  // Remove likes, comments, reactions, author name, date prefix up to the colon
-  desc = desc.replace(/^[\d,\.kKmM\s]+(?:likes|like|comments|comment|views|shares|reactions)\b[^\n:]*?:\s*/i, '');
-  desc = desc.replace(/^[^\n:]*?\b(?:on\s+Instagram|on\s+Facebook|on\s+X|on\s+Twitter|on\s+TikTok)\b[^\n:]*?:\s*/i, '');
-  desc = desc.replace(/^[^\n:]*?\bon\s+[A-Za-z]+\s+\d{1,2},\s*\d{4}\s*:\s*/i, '');
-  desc = desc.replace(/^[\w\.\_]+\s+on\s+[^:]+:\s*/i, '');
-  desc = desc.replace(/^(?:Photo|Video)\s+by\s+[^\n:]+?\bon\s+[^\n:]+?:\s*/i, '');
-  desc = desc.replace(/^[^\n:]+:\s*/i, (match) => {
-    if (/likes|comments|instagram|facebook|twitter|tiktok|photo|video|on\s+[a-z]+/i.test(match)) {
-      return '';
+  // Strip anything up to colon if it matches social metadata (likes, comments, date, author on platform, etc.)
+  desc = desc.replace(/^(?:[\d,\.kKmM\s]+(?:likes?|comments?|views?|shares?|reactions?)\b[^\n:]*?:|[^\n:]*?\b(?:on\s+Instagram|on\s+Facebook|on\s+X|on\s+Twitter|on\s+TikTok)\b[^\n:]*?:|[^\n:]*?\bon\s+[A-Za-z]+\s+\d{1,2},\s*\d{4}\s*:|[\w\.\_]+\s+on\s+[^:]+:|(?:Photo|Video)\s+by\s+[^\n:]+?\bon\s+[^\n:]+?:)\s*/i, '');
+
+  const colonIdx = desc.indexOf(':');
+  if (colonIdx > 0 && colonIdx < 150) {
+    const prefix = desc.substring(0, colonIdx);
+    if (/likes|comments|instagram|facebook|twitter|tiktok|photo|video|on\s+[a-z]+/i.test(prefix)) {
+      desc = desc.substring(colonIdx + 1).trim();
     }
-    return match;
-  });
+  }
 
   // Remove leading quotes
   desc = desc.replace(/^[“"‘'«\s]+/, '');
@@ -1620,7 +1618,7 @@ window.openEditModal = function(no) {
   if (mel) mel.value = rec['Extra Link'] || rec['Extra URL'] || rec['extraUrl'] || '';
   document.getElementById('modalPlatform').value = rec['Platform'] || 'Instagram';
   document.getElementById('modalType').value = rec['Post Type'] || '';
-  document.getElementById('modalTakeaway').value = rec['Core Idea / 1-Line Takeaway'] || '';
+  document.getElementById('modalTakeaway').value = cleanSocialCaption(rec['Core Idea / 1-Line Takeaway'] || '');
 
   const postCats = getPostCategories(rec);
   const container = document.getElementById('modalCatChips');
