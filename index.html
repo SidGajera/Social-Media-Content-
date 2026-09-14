@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="theme-color" content="#FFD700">
-<title>I3D JEWEL VAULT - Saved Again - Fully Responsive</title>
+<title>Social Media Content</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,7 +28,7 @@ button,a,select,input{min-height:44px}
 <body class="antialiased">
 <div class="lg:hidden sticky top-0 z-50 bg-black/95 backdrop-blur-xl border-b border-yellow-500/20 px-4 py-3">
 <div class="flex justify-between items-center">
-<div class="flex items-center gap-2"><div class="w-9 h-9 gold rounded-xl flex items-center justify-center font-black text-black">I3D</div><div><h1 class="font-bold text-sm">I3D VAULT</h1><p class="text-[10px] text-gray-400" id="postCountMobile">0 posts</p></div></div>
+<div class="flex items-center gap-2"><div class="w-9 h-9 gold rounded-xl flex items-center justify-center font-black text-black text-xs">SMC</div><div><h1 class="font-bold text-sm">Social Media Content</h1><p class="text-[10px] text-gray-400" id="postCountMobile">0 posts</p></div></div>
 <div class="flex gap-2"><button id="mobileMenuBtn" class="w-11 h-11 glass rounded-xl flex items-center justify-center"><i class="fas fa-bars"></i></button><button id="mobileAddBtn" class="w-11 h-11 gold rounded-xl flex items-center justify-center text-black"><i class="fas fa-plus"></i></button></div>
 </div>
 <div class="grid grid-cols-3 gap-2 mt-3">
@@ -40,7 +40,7 @@ button,a,select,input{min-height:44px}
 
 <div class="hidden lg:block sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-yellow-500/20">
 <div class="max-w-[1800px] mx-auto px-6 py-4 flex justify-between items-center">
-<div class="flex items-center gap-6"><div class="flex items-center gap-3"><div class="w-12 h-12 gold rounded-xl flex items-center justify-center font-black text-black text-lg">I3D</div><div><h1 class="font-bold text-lg">I3D JEWEL VAULT - SAVED AGAIN</h1><p class="text-[11px] text-gray-400">FULLY RESPONSIVE • EMBED ON • NEW CATEGORY • 458 POSTS</p></div></div><div class="h-10 w-px bg-white/10"></div><div class="flex items-center gap-6"><div><p class="text-[10px] text-gray-400 uppercase">Total Posts</p><p class="text-3xl font-black text-yellow-400" id="postCountTop">0</p></div><div><p class="text-[10px] text-gray-400 uppercase">Categories</p><p class="text-2xl font-black text-green-400" id="catCountTop">0</p></div></div></div>
+<div class="flex items-center gap-6"><div class="flex items-center gap-3"><div class="w-12 h-12 gold rounded-xl flex items-center justify-center font-black text-black text-base">SMC</div><div><h1 class="font-bold text-lg tracking-wide uppercase">Social Media Content</h1><p class="text-[11px] text-gray-400">PERMANENT VAULT • ALL PLATFORMS • EMBED & DISK SYNC</p></div></div><div class="h-10 w-px bg-white/10"></div><div class="flex items-center gap-6"><div><p class="text-[10px] text-gray-400 uppercase">Total Posts</p><p class="text-3xl font-black text-yellow-400" id="postCountTop">0</p></div><div><p class="text-[10px] text-gray-400 uppercase">Categories</p><p class="text-2xl font-black text-green-400" id="catCountTop">0</p></div></div></div>
 <div class="flex gap-2"><button id="addCategoryBtn" class="px-4 py-3 bg-green-500 text-black rounded-xl font-bold text-sm"><i class="fas fa-folder-plus mr-2"></i>New Category</button><button id="addBtn" class="px-6 py-3 gold text-black rounded-xl font-bold text-sm"><i class="fas fa-plus mr-2"></i>Add Content</button><button id="backupSyncBtn" class="px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"><i class="fas fa-database"></i>Backup & Sync</button><button id="exportBtn" class="px-4 py-3 glass rounded-xl text-xs">Export Excel</button></div>
 </div>
 </div>
@@ -104,11 +104,45 @@ button,a,select,input{min-height:44px}
 <div class="mt-8 flex justify-center px-4"><button id="loadMore" class="w-full sm:w-auto px-8 py-4 gold text-black rounded-xl font-bold text-sm">Load More 30</button></div>
 </div>
 
-<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" onclick="closeAddModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><input id="modalExtraLink" placeholder="Extra Link / Website URL (optional)" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option value="Instagram">Instagram</option><option value="YouTube">YouTube</option><option value="Threads">Threads</option><option value="X (Twitter)">X (Twitter)</option><option value="Facebook">Facebook</option><option value="TikTok">TikTok</option><option value="Website / Other">Website / Other</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="space-y-1.5 border border-white/10 p-3 rounded-xl bg-white/5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300 flex items-center gap-1.5"><i class="fas fa-camera text-yellow-400"></i> Post Image / Custom Thumbnail (optional):</label><button type="button" id="clearModalImageBtn" class="text-[11px] text-red-400 hover:text-red-300 font-bold hover:underline cursor-pointer hidden"><i class="fas fa-trash mr-1"></i>Remove Image</button></div><input id="modalImageUrl" placeholder="Paste image URL (e.g. https://...)" class="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-xs focus:border-yellow-500 outline-none"><div class="flex items-center gap-2 mt-1.5"><span class="text-[11px] text-gray-400 font-medium">Or upload file:</span><input type="file" id="modalImageFile" accept="image/*" class="text-xs text-gray-300 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-yellow-500/20 file:text-yellow-400 hover:file:bg-yellow-500/30 cursor-pointer"></div><img id="modalImagePreview" class="w-full h-36 object-cover rounded-xl mt-2 hidden border border-yellow-500/30"></div><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Description / Caption:</label><button type="button" id="modalAutoDetectBtn" class="px-2.5 py-1.5 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer" title="Auto-detect description from post link"><i id="modalAutoDetectIcon" class="fas fa-magic"></i><span id="modalAutoDetectText">Auto Detect</span></button></div><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"></textarea></div><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" onclick="closeAddModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><input id="modalExtraLink" placeholder="Extra Link / Website URL (optional)" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option value="Instagram">Instagram</option><option value="YouTube">YouTube</option><option value="Threads">Threads</option><option value="X (Twitter)">X (Twitter)</option><option value="Facebook">Facebook</option><option value="TikTok">TikTok</option><option value="Website / Other">Website / Other</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="space-y-1.5"><label class="text-xs font-bold text-gray-300 flex items-center gap-1.5"><i class="far fa-calendar-alt text-yellow-400"></i> Date Added / Saved:</label><input type="date" id="modalDateSaved" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none text-white"></div><div class="space-y-1.5 border border-white/10 p-3 rounded-xl bg-white/5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300 flex items-center gap-1.5"><i class="fas fa-camera text-yellow-400"></i> Post Image / Custom Thumbnail (optional):</label><button type="button" id="clearModalImageBtn" class="text-[11px] text-red-400 hover:text-red-300 font-bold hover:underline cursor-pointer hidden"><i class="fas fa-trash mr-1"></i>Remove Image</button></div><input id="modalImageUrl" placeholder="Paste image URL (e.g. https://...)" class="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-xs focus:border-yellow-500 outline-none"><div class="flex items-center gap-2 mt-1.5"><span class="text-[11px] text-gray-400 font-medium">Or upload file:</span><input type="file" id="modalImageFile" accept="image/*" class="text-xs text-gray-300 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-yellow-500/20 file:text-yellow-400 hover:file:bg-yellow-500/30 cursor-pointer"></div><img id="modalImagePreview" class="w-full h-36 object-cover rounded-xl mt-2 hidden border border-yellow-500/30"></div><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Description / Caption:</label><button type="button" id="modalAutoDetectBtn" class="px-2.5 py-1.5 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer" title="Auto-detect description from post link"><i id="modalAutoDetectIcon" class="fas fa-magic"></i><span id="modalAutoDetectText">Auto Detect</span></button></div><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"></textarea></div><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
 <div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 class="font-bold text-lg text-green-400">Create New Category</h3><button type="button" id="catModalHeaderClose" onclick="closeCatModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
 <div id="thumbModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-3"><h3 class="font-bold">Real Thumb for <span id="thumbModalNo"></span></h3><button type="button" id="thumbModalHeaderClose" onclick="closeThumbModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><input id="thumbUrl" placeholder="Paste image URL or upload" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><input type="file" id="thumbFile" accept="image/*" class="w-full mt-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><img id="thumbPreview" class="w-full aspect-square object-cover rounded-xl mt-4 hidden"><div class="flex gap-3 mt-4"><button id="saveThumb" class="flex-1 py-4 gold text-black rounded-xl font-bold text-sm">Save Real Thumb</button><button id="closeThumb" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div><button id="removeThumb" class="w-full mt-3 py-3 bg-red-500/20 border border-red-500/30 rounded-xl text-xs text-red-400 hidden">Remove Custom - Back to Embed ON</button></div></div>
+
+<div id="captionModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-4">
+  <div class="glass rounded-2xl w-full max-w-xl p-6 border border-yellow-500/30 max-h-[85vh] flex flex-col shadow-2xl">
+    <div class="flex items-center justify-between border-b border-yellow-500/20 pb-3 mb-4 shrink-0">
+      <div class="flex items-center gap-2">
+        <span id="captionModalNoBadge" class="px-2.5 py-1 bg-yellow-500 text-black font-black text-xs rounded-full">#0</span>
+        <h3 class="font-bold text-base text-gray-200" id="captionModalTitle">Full Post Caption</h3>
+      </div>
+      <button type="button" onclick="closeCaptionModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto pr-1">
+      <div class="p-4 bg-black/60 border border-white/10 rounded-xl">
+        <p id="captionModalText" class="text-sm leading-relaxed text-gray-100 whitespace-pre-wrap font-sans select-text"></p>
+      </div>
+      <div id="captionModalArchiveNotice" class="mt-3 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-300 flex items-center gap-2">
+        <i class="fas fa-shield-alt text-emerald-400 text-sm"></i>
+        <span><strong>Permanent Archive ✓:</strong> Stored safely on server vault.json. Available even if original post is deleted from social media.</span>
+      </div>
+    </div>
+    <div class="flex gap-2.5 mt-4 pt-3 border-t border-white/10 shrink-0">
+      <button type="button" id="copyCaptionBtn" onclick="copyModalCaption()" class="flex-1 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+        <i class="fas fa-copy"></i> <span id="copyCaptionBtnText">Copy Full Caption</span>
+      </button>
+      <button type="button" id="editCaptionFromModalBtn" class="px-4 py-3 glass rounded-xl text-xs font-bold text-yellow-400 hover:bg-white/10 transition-all flex items-center gap-1.5 cursor-pointer">
+        <i class="fas fa-pen"></i> Edit
+      </button>
+      <button type="button" onclick="closeCaptionModal()" class="px-4 py-3 glass rounded-xl text-xs font-bold text-gray-400 hover:text-white transition-all cursor-pointer">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
 
 <div id="backupSyncModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-4">
   <div class="bg-zinc-900 border border-blue-500/30 rounded-2xl w-full max-w-xl p-6 relative max-h-[90vh] overflow-y-auto shadow-2xl">
@@ -746,6 +780,13 @@ function getPostCategories(r) {
   return [];
 }
 
+function getPostDate(r) {
+  if (!r) return '';
+  const d = r['Date Saved'] || r['Date Added'] || r['dateSaved'] || r['dateAdded'] || r['Date'] || r['date'];
+  if (d) return String(d).trim();
+  return '';
+}
+
 function isPostInCategory(r, targetCat) {
   if(!targetCat) return true;
   const cats = getPostCategories(r);
@@ -1039,8 +1080,9 @@ function matchesSearchQuery(r, q) {
   const typeStr = (r['Post Type'] || '').toLowerCase();
   const platformStr = (r['Platform'] || '').toLowerCase();
   const catsStr = getPostCategories(r).join(' ').toLowerCase();
+  const dateStr = getPostDate(r).toLowerCase();
 
-  const fullText = `${noStr} #${noStr} ${linkStr} ${extraStr} ${takeawayStr} ${typeStr} ${platformStr} ${catsStr}`;
+  const fullText = `${noStr} #${noStr} ${linkStr} ${extraStr} ${takeawayStr} ${typeStr} ${platformStr} ${catsStr} ${dateStr}`;
 
   return fullText.includes(rawQ) || (cleanQ && fullText.includes(cleanQ));
 }
@@ -1143,10 +1185,11 @@ function renderGrid(){
 
     const takeawayText = cleanSocialCaption(r['Core Idea / 1-Line Takeaway'] || 'No description provided');
     const escTakeaway = takeawayText.replace(/"/g, '&quot;');
+    const dateSavedStr = getPostDate(r);
 
     const div=document.createElement('div');
     div.className='card glass rounded-2xl overflow-hidden flex flex-col h-full border border-white/10 hover:border-yellow-400/30 transition-all shadow-xl';
-    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden shrink-0" style="height:380px">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-zinc-800 via-zinc-900 to-black p-6 text-center text-gray-400 gap-3 border border-white/5"><i class="${platformIconClass} text-5xl text-yellow-500/50"></i><span class="text-xs font-bold text-gray-200 truncate max-w-[200px]">${domainName || 'Web Content Link'}</span><span class="text-[10px] text-gray-400 px-3 py-1 bg-white/5 rounded-full border border-white/10">Click "Open Post" to view content</span></div>`}<div class="absolute top-2 left-2 flex items-center gap-1">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-10 h-10 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform" title="Change Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':embedUrl?'bg-yellow-500/90':'bg-emerald-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':embedUrl?'EMBED ON':'WEB LINK'}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type']||'Content'}</p></div><div class="mt-1.5 h-[4.2em] overflow-hidden"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-3" title="${escTakeaway}">${takeawayText}</p></div></div><div class="flex gap-2 mt-4 pt-3 border-t border-white/5 items-center shrink-0"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-11 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center truncate shadow-sm hover:opacity-95 transition-opacity">Open Post</a>${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 truncate transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-external-link-alt text-[10px]"></i>Extra Link</a>` : ''}<button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors shrink-0" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
+    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden shrink-0" style="height:380px">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-zinc-800 via-zinc-900 to-black p-6 text-center text-gray-400 gap-3 border border-white/5"><i class="${platformIconClass} text-5xl text-yellow-500/50"></i><span class="text-xs font-bold text-gray-200 truncate max-w-[200px]">${domainName || 'Web Content Link'}</span><span class="text-[10px] text-gray-400 px-3 py-1 bg-white/5 rounded-full border border-white/10">Click "Open Post" to view content</span></div>`}<div class="absolute top-2 left-2 flex items-center gap-1">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-10 h-10 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform" title="Change Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':embedUrl?'bg-yellow-500/90':'bg-emerald-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':embedUrl?'EMBED ON':'WEB LINK'}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1.5 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type']||'Content'}</p>${dateSavedStr ? `<span class="text-[10px] text-gray-400 font-medium shrink-0 flex items-center gap-1" title="Date Added: ${dateSavedStr}"><i class="far fa-calendar-alt text-[9px] text-yellow-400/90"></i> ${dateSavedStr}</span>` : ''}</div><div class="mt-1.5 flex-1 flex flex-col justify-between"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-3 cursor-pointer hover:text-yellow-300 transition-colors" onclick="openCaptionModal(${r['No.']})" title="Click to read full caption">${takeawayText}</p><button type="button" onclick="openCaptionModal(${r['No.']})" class="mt-2 text-[11px] text-yellow-400 hover:text-yellow-300 font-bold self-start flex items-center gap-1.5 cursor-pointer bg-yellow-400/10 px-2.5 py-1 rounded-lg border border-yellow-400/20 hover:bg-yellow-400/20 transition-all shadow-sm"><i class="fas fa-align-left text-[10px]"></i> Read Full Caption</button></div></div><div class="flex gap-2 mt-4 pt-3 border-t border-white/5 items-center shrink-0"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-11 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center truncate shadow-sm hover:opacity-95 transition-opacity">Open Post</a>${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 truncate transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-external-link-alt text-[10px]"></i>Extra Link</a>` : ''}<button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors shrink-0" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
     grid.appendChild(div);
   });
   shown+=slice.length;
@@ -1384,6 +1427,7 @@ function quickAdd(link, categories, takeaway, platform, postType, extraUrl, thum
 
   const maxNo = Math.max(...records.map(r => r['No.']), 0);
   let p = platform || detectPlatformFromUrl(link);
+  const dateVal = (document.getElementById('modalDateSaved') && document.getElementById('modalDateSaved').value) ? document.getElementById('modalDateSaved').value : new Date().toISOString().slice(0, 10);
   const newRec = {
     'No.': maxNo + 1,
     'Platform': p,
@@ -1392,7 +1436,7 @@ function quickAdd(link, categories, takeaway, platform, postType, extraUrl, thum
     'Post Type': postType || (cats[0] || 'New Content'),
     'Core Idea / 1-Line Takeaway': takeaway || 'Added via easy add',
     'Status': 'Not Used',
-    'Date Saved': new Date().toISOString().slice(0, 10),
+    'Date Saved': dateVal,
     'Category': cats
   };
   if(thumbUrl) {
@@ -1847,6 +1891,7 @@ function openAddModal() {
   document.getElementById('modalPlatform').value = 'Instagram';
   document.getElementById('modalType').value = '';
   document.getElementById('modalTakeaway').value = '';
+  const mds = document.getElementById('modalDateSaved'); if (mds) mds.value = new Date().toISOString().slice(0, 10);
   const miu = document.getElementById('modalImageUrl'); if (miu) miu.value = '';
   const mif = document.getElementById('modalImageFile'); if (mif) mif.value = '';
   const mip = document.getElementById('modalImagePreview'); if (mip) mip.classList.add('hidden');
@@ -1870,6 +1915,7 @@ window.openEditModal = function(no) {
   document.getElementById('modalPlatform').value = rec['Platform'] || 'Instagram';
   document.getElementById('modalType').value = rec['Post Type'] || '';
   document.getElementById('modalTakeaway').value = cleanSocialCaption(rec['Core Idea / 1-Line Takeaway'] || '');
+  const mds = document.getElementById('modalDateSaved'); if (mds) mds.value = getPostDate(rec) || new Date().toISOString().slice(0, 10);
 
   const currentThumb = realThumbs[no] || '';
   const miu = document.getElementById('modalImageUrl'); if (miu) miu.value = currentThumb;
@@ -1983,6 +2029,48 @@ const closeAddModal = () => { document.getElementById('addModal').classList.add(
 const closeCatModal = () => document.getElementById('catModal').classList.add('hidden');
 const closeThumbModal = () => document.getElementById('thumbModal').classList.add('hidden');
 const closeBackupModal = () => document.getElementById('backupSyncModal').classList.add('hidden');
+const closeCaptionModal = () => { const m = document.getElementById('captionModal'); if (m) m.classList.add('hidden'); };
+
+let currentCaptionNo = null;
+window.openCaptionModal = function(no) {
+  const rec = records.find(r => r && r['No.'] === no);
+  if (!rec) return;
+  currentCaptionNo = no;
+  const badge = document.getElementById('captionModalNoBadge');
+  if (badge) badge.textContent = `#${no}`;
+  const title = document.getElementById('captionModalTitle');
+  if (title) title.textContent = `${rec.Platform || 'Social Media'} Post Caption`;
+  const textEl = document.getElementById('captionModalText');
+  const rawCaption = cleanSocialCaption(rec['Core Idea / 1-Line Takeaway'] || 'No description provided');
+  if (textEl) textEl.textContent = rawCaption;
+  const copyBtnText = document.getElementById('copyCaptionBtnText');
+  if (copyBtnText) copyBtnText.textContent = 'Copy Full Caption';
+  const editBtn = document.getElementById('editCaptionFromModalBtn');
+  if (editBtn) {
+    editBtn.onclick = () => {
+      closeCaptionModal();
+      openEditModal(no);
+    };
+  }
+  const modal = document.getElementById('captionModal');
+  if (modal) modal.classList.remove('hidden');
+};
+
+window.closeCaptionModal = closeCaptionModal;
+
+window.copyModalCaption = function() {
+  const textEl = document.getElementById('captionModalText');
+  if (!textEl || !textEl.textContent) return;
+  navigator.clipboard.writeText(textEl.textContent).then(() => {
+    const copyBtnText = document.getElementById('copyCaptionBtnText');
+    if (copyBtnText) copyBtnText.textContent = 'Copied! ✓';
+    setTimeout(() => {
+      if (copyBtnText) copyBtnText.textContent = 'Copy Full Caption';
+    }, 2000);
+  }).catch(() => {
+    alert('Caption copied to clipboard!');
+  });
+};
 
 document.getElementById('modalClose').addEventListener('click', closeAddModal);
 const mhClose = document.getElementById('modalHeaderClose'); if(mhClose) mhClose.addEventListener('click', closeAddModal);
@@ -1996,7 +2084,7 @@ const tmhClose = document.getElementById('thumbModalHeaderClose'); if(tmhClose) 
 const bsClose = document.getElementById('backupSyncModalClose'); if(bsClose) bsClose.addEventListener('click', closeBackupModal);
 
 // Backdrop click handlers for all modals
-['addModal', 'catModal', 'thumbModal', 'backupSyncModal'].forEach(id => {
+['addModal', 'catModal', 'thumbModal', 'backupSyncModal', 'captionModal'].forEach(id => {
   const m = document.getElementById(id);
   if (m) {
     m.addEventListener('click', (e) => {
@@ -2005,6 +2093,7 @@ const bsClose = document.getElementById('backupSyncModalClose'); if(bsClose) bsC
         else if (id === 'catModal') closeCatModal();
         else if (id === 'thumbModal') closeThumbModal();
         else if (id === 'backupSyncModal') closeBackupModal();
+        else if (id === 'captionModal') closeCaptionModal();
       }
     });
   }
@@ -2064,6 +2153,7 @@ document.getElementById('modalSave').addEventListener('click',()=>{
   const extraUrl = document.getElementById('modalExtraLink') ? document.getElementById('modalExtraLink').value.trim() : '';
   const platform=document.getElementById('modalPlatform').value;
   const postType=document.getElementById('modalType').value.trim();
+  const dateSaved=document.getElementById('modalDateSaved') ? document.getElementById('modalDateSaved').value.trim() : new Date().toISOString().slice(0, 10);
   const takeaway=document.getElementById('modalTakeaway').value.trim();
   const thumbUrl=document.getElementById('modalImageUrl') ? document.getElementById('modalImageUrl').value.trim() : '';
 
@@ -2075,6 +2165,7 @@ document.getElementById('modalSave').addEventListener('click',()=>{
       rec['Platform'] = platform;
       rec['Category'] = cats;
       rec['Post Type'] = postType || (cats[0] || 'Content');
+      rec['Date Saved'] = dateSaved || rec['Date Saved'] || new Date().toISOString().slice(0, 10);
       rec['Core Idea / 1-Line Takeaway'] = takeaway || 'No description provided';
 
       if (thumbUrl) {
@@ -2089,7 +2180,8 @@ document.getElementById('modalSave').addEventListener('click',()=>{
         postType: rec['Post Type'],
         platform: rec['Platform'],
         extraUrl: rec['Extra Link'],
-        thumb: thumbUrl || ''
+        thumb: thumbUrl || '',
+        dateSaved: rec['Date Saved']
       };
 
       const cpIdx = customAddedPosts.findIndex(cp => cp && cp['No.'] === editingPostNo);
