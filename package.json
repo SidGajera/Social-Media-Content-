@@ -13,5 +13,8 @@
     "sync"
   ],
   "author": "SidGajera",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
 }
