@@ -311,7 +311,10 @@ function exportFullBackupJson() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      closeBackupModal();
+    }, 500);
   } catch(err) {
     alert('Backup download error: ' + err.message);
   }
@@ -525,6 +528,7 @@ function processBackupData(rawContent, format) {
     if (backupFileInput) backupFileInput.value = '';
 
     alert(`✅ Backup Merged Successfully!\n\n• Added: ${addedCount} new posts\n• Updated: ${updatedCount} existing posts\n• Total Posts in Vault: ${records.length}\n\nAll existing posts were preserved without replacement.`);
+    closeBackupModal();
   } catch (err) {
     alert('Import / Merge error: ' + err.message);
   }
@@ -568,6 +572,7 @@ async function deepStorageScan() {
   } else {
     alert(`Storage Scan Complete: All ${records.length} posts are fully synchronized and intact.`);
   }
+  closeBackupModal();
 }
 
 function saveAll(){
@@ -1500,6 +1505,7 @@ async function init(){
       if (!val) { alert('Please paste your GitHub Personal Access Token (ghp_...)'); return; }
       localStorage.setItem('i3d_github_pat', val);
       await syncToGitHubServer(true);
+      closeBackupModal();
     });
   }
   filtered=[...records];
