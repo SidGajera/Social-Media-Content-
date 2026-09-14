@@ -146,13 +146,13 @@ button,a,select,input{min-height:44px}
       <!-- Section 2: Import / Restore Backup -->
       <div class="p-4 glass rounded-xl border border-white/10 hover:border-blue-500/30 transition-all">
         <h4 class="font-bold text-sm text-white flex items-center gap-2 mb-1">
-          <i class="fas fa-upload text-yellow-400"></i> 2. Restore / Import Backup File
+          <i class="fas fa-upload text-yellow-400"></i> 2. Restore / Import Backup File (Excel .xlsx, .csv, JSON)
         </h4>
-        <p class="text-[11px] text-gray-400 mb-3">Select any previously saved JSON backup file to restore 100% of lost or missing posts instantly.</p>
+        <p class="text-[11px] text-gray-400 mb-3">Select any Excel (.xlsx, .csv) or JSON backup file to merge & restore missing posts directly into your vault without replacing existing data.</p>
         <div class="flex gap-2">
-          <input type="file" id="uploadBackupJsonInput" accept=".json" class="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-yellow-400 hover:file:bg-zinc-700 bg-black/40 rounded-xl border border-white/10 p-1">
+          <input type="file" id="uploadBackupJsonInput" accept=".xlsx,.xls,.csv,.json" class="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-yellow-400 hover:file:bg-zinc-700 bg-black/40 rounded-xl border border-white/10 p-1">
           <button id="restoreBackupJsonBtn" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer">
-            <i class="fas fa-undo"></i> Restore Data
+            <i class="fas fa-file-import"></i> Upload & Merge Data
           </button>
         </div>
       </div>
@@ -300,50 +300,200 @@ function exportFullBackupJson() {
   }
 }
 
-function restoreFullBackupJson(jsonContent) {
+function restoreFullBackupFile(file) {
+  if (!file) {
+    alert('Please select an Excel (.xlsx, .csv) or JSON backup file first.');
+    return;
+  }
+  const fileName = file.name.toLowerCase();
+  const reader = new FileReader();
+
+  if (fileName.endsWith('.json')) {
+    reader.onload = (e) => processBackupData(e.target.result, 'json');
+    reader.readAsText(file);
+  } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
+    reader.onload = (e) => processBackupData(e.target.result, 'excel');
+    reader.readAsArrayBuffer(file);
+  } else {
+    alert('Unsupported file format. Please upload an Excel (.xlsx, .xls, .csv) or JSON (.json) file.');
+  }
+}
+
+function processBackupData(rawContent, format) {
   try {
-    const data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
-    let restoredCount = 0;
-    if (data.records && Array.isArray(data.records)) {
-      data.records.forEach(r => {
-        if (!r || !r['No.']) return;
-        deletedPostNos = deletedPostNos.filter(no => no !== r['No.']);
-        const idx = records.findIndex(rec => rec['No.'] === r['No.']);
-        if (idx >= 0) {
-          records[idx] = Object.assign({}, records[idx], r);
-        } else {
-          records.unshift(r);
-          restoredCount++;
+    let importedPosts = [];
+    let customCats = [];
+    let userUpdates = {};
+    let thumbs = {};
+
+    if (format === 'json') {
+      const data = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
+      if (Array.isArray(data)) {
+        importedPosts = data;
+      } else if (typeof data === 'object' && data !== null) {
+        if (Array.isArray(data.records)) importedPosts = data.records;
+        if (Array.isArray(data.customAddedPosts)) {
+          data.customAddedPosts.forEach(cp => {
+            if (cp && !importedPosts.some(r => r && r['No.'] === cp['No.'])) {
+              importedPosts.push(cp);
+            }
+          });
+        }
+        if (Array.isArray(data.customCategories)) customCats = data.customCategories;
+        if (data.userUpdatedPosts) userUpdates = data.userUpdatedPosts;
+        if (data.realThumbs) thumbs = data.realThumbs;
+      }
+    } else if (format === 'excel') {
+      if (typeof XLSX === 'undefined') {
+        alert('Excel processor library is loading... please try again.');
+        return;
+      }
+      const dataBuf = new Uint8Array(rawContent);
+      const workbook = XLSX.read(dataBuf, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+      importedPosts = rawRows.map(row => {
+        const link = row['Original Post Link'] || row['Post Link'] || row['Link'] || row['URL'] || row['link'] || row['url'] || '';
+        const extraLink = row['Extra Link'] || row['Extra URL'] || row['extraUrl'] || row['Extra'] || '';
+        const platform = row['Platform'] || row['platform'] || (link.includes('facebook.com') ? 'Facebook' : (link.includes('x.com') || link.includes('twitter.com') ? 'X (Twitter)' : 'Instagram'));
+        const postType = row['Post Type'] || row['Type'] || row['type'] || '';
+        const takeaway = row['Core Idea / 1-Line Takeaway'] || row['Description / Takeaway'] || row['Description'] || row['Takeaway'] || row['Caption'] || row['takeaway'] || '';
+        
+        let categories = [];
+        const catRaw = row['Category'] || row['Categories'] || row['category'] || '';
+        if (Array.isArray(catRaw)) categories = catRaw;
+        else if (typeof catRaw === 'string' && catRaw.trim()) {
+          categories = catRaw.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        const noRaw = row['No.'] || row['No'] || row['#'] || row['no'];
+        const no = noRaw ? parseInt(noRaw, 10) : null;
+        const dateSaved = row['Date Saved'] || row['Date'] || new Date().toISOString().slice(0, 10);
+
+        return {
+          'No.': isNaN(no) ? null : no,
+          'Platform': platform,
+          'Original Post Link': link,
+          'Extra Link': extraLink,
+          'Post Type': postType || (categories[0] || 'Content'),
+          'Core Idea / 1-Line Takeaway': takeaway || 'No description provided',
+          'Status': row['Status'] || 'Not Used',
+          'Date Saved': dateSaved,
+          'Category': categories
+        };
+      }).filter(item => item && item['Original Post Link']);
+    }
+
+    if (!Array.isArray(importedPosts) || importedPosts.length === 0) {
+      alert('No valid post records found in the selected file.');
+      return;
+    }
+
+    let addedCount = 0;
+    let updatedCount = 0;
+
+    importedPosts.forEach(imp => {
+      if (!imp || !imp['Original Post Link']) return;
+      const link = imp['Original Post Link'];
+      const impNo = imp['No.'];
+
+      // Unmark deleted
+      if (impNo) deletedPostNos = deletedPostNos.filter(no => no !== impNo);
+
+      // Search existing record by Link or No.
+      const existingIdx = records.findIndex(r => r && ((link && r['Original Post Link'] === link) || (impNo && r['No.'] === impNo)));
+
+      if (existingIdx >= 0) {
+        const rec = records[existingIdx];
+        let wasUpdated = false;
+
+        // Merge categories without wiping existing
+        const existingCats = getPostCategories(rec);
+        const impCats = getPostCategories(imp);
+        const mergedCats = Array.from(new Set([...existingCats, ...impCats]));
+        if (mergedCats.length > existingCats.length) {
+          rec['Category'] = mergedCats;
+          wasUpdated = true;
+        }
+
+        // Merge Extra Link if missing
+        const impExtra = imp['Extra Link'] || imp['Extra URL'] || imp['extraUrl'];
+        if (impExtra && !rec['Extra Link']) {
+          rec['Extra Link'] = impExtra;
+          wasUpdated = true;
+        }
+
+        // Merge Takeaway if current is generic/short
+        const impDesc = imp['Core Idea / 1-Line Takeaway'];
+        if (impDesc && impDesc.length > 5 && (!rec['Core Idea / 1-Line Takeaway'] || rec['Core Idea / 1-Line Takeaway'] === 'Added via easy add' || rec['Core Idea / 1-Line Takeaway'] === 'No description provided')) {
+          rec['Core Idea / 1-Line Takeaway'] = impDesc;
+          wasUpdated = true;
+        }
+
+        if (imp['Post Type'] && (!rec['Post Type'] || rec['Post Type'] === 'New Content')) {
+          rec['Post Type'] = imp['Post Type'];
+          wasUpdated = true;
+        }
+
+        if (wasUpdated) {
+          userUpdatedPosts[rec['No.']] = {
+            takeaway: rec['Core Idea / 1-Line Takeaway'],
+            category: rec['Category'],
+            postType: rec['Post Type'],
+            platform: rec['Platform'],
+            extraUrl: rec['Extra Link']
+          };
+          updatedCount++;
+        }
+      } else {
+        // Brand NEW post -> Add without replacing existing posts
+        let targetNo = impNo;
+        if (!targetNo || records.some(r => r && r['No.'] === targetNo)) {
+          const maxNo = Math.max(...records.map(r => (r && r['No.']) || 0), 0);
+          targetNo = maxNo + 1;
+        }
+
+        const newRec = {
+          'No.': targetNo,
+          'Platform': imp['Platform'] || 'Instagram',
+          'Original Post Link': link,
+          'Extra Link': imp['Extra Link'] || imp['Extra URL'] || imp['extraUrl'] || '',
+          'Post Type': imp['Post Type'] || 'Content',
+          'Core Idea / 1-Line Takeaway': imp['Core Idea / 1-Line Takeaway'] || 'Imported content',
+          'Status': imp['Status'] || 'Not Used',
+          'Date Saved': imp['Date Saved'] || new Date().toISOString().slice(0, 10),
+          'Category': getPostCategories(imp)
+        };
+
+        records.unshift(newRec);
+        customAddedPosts.unshift(newRec);
+        userUpdatedPosts[newRec['No.']] = {
+          takeaway: newRec['Core Idea / 1-Line Takeaway'],
+          category: newRec['Category'],
+          postType: newRec['Post Type'],
+          platform: newRec['Platform'],
+          extraUrl: newRec['Extra Link']
+        };
+        addedCount++;
+      }
+    });
+
+    if (Array.isArray(customCats)) {
+      customCats.forEach(cat => {
+        if (cat && cat.name && !customCategories.some(c => c.name.toLowerCase() === cat.name.toLowerCase())) {
+          customCategories.push(cat);
         }
       });
     }
-    if (data.customAddedPosts && Array.isArray(data.customAddedPosts)) {
-      data.customAddedPosts.forEach(cp => {
-        if (cp && cp['No.']) {
-          deletedPostNos = deletedPostNos.filter(no => no !== cp['No.']);
-          const idx = customAddedPosts.findIndex(item => item['No.'] === cp['No.']);
-          if (idx >= 0) customAddedPosts[idx] = cp;
-          else customAddedPosts.unshift(cp);
-        }
-      });
+
+    if (thumbs && typeof thumbs === 'object') {
+      realThumbs = Object.assign({}, thumbs, realThumbs);
     }
-    if (data.userUpdatedPosts && typeof data.userUpdatedPosts === 'object') {
-      userUpdatedPosts = Object.assign({}, userUpdatedPosts, data.userUpdatedPosts);
-    }
-    if (data.realThumbs && typeof data.realThumbs === 'object') {
-      realThumbs = Object.assign({}, realThumbs, data.realThumbs);
-    }
-    if (data.customCategories && Array.isArray(data.customCategories)) {
-      data.customCategories.forEach(cat => {
-        if (cat && cat.name) {
-          deletedCategories = deletedCategories.filter(dc => dc.toLowerCase() !== cat.name.toLowerCase());
-          if (!customCategories.some(c => c.name.toLowerCase() === cat.name.toLowerCase())) {
-            customCategories.push(cat);
-          }
-        }
-      });
-    }
+
+    syncCategoriesFromRecords();
     saveAll();
+
     filtered = [...records];
     filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
     renderCatDropdowns();
@@ -353,9 +503,10 @@ function restoreFullBackupJson(jsonContent) {
     renderGrid();
     updateCounts();
     document.getElementById('search').dispatchEvent(new Event('input'));
-    alert(`Backup Restored Successfully! Total Posts in Vault: ${records.length}`);
+
+    alert(`✅ Backup Merged Successfully!\n\n• Added: ${addedCount} new posts\n• Updated: ${updatedCount} existing posts\n• Total Posts in Vault: ${records.length}\n\nAll existing posts were preserved without replacement.`);
   } catch (err) {
-    alert('Invalid backup file format: ' + err.message);
+    alert('Import / Merge error: ' + err.message);
   }
 }
 
@@ -1448,10 +1599,8 @@ if(dlJsonBtn) dlJsonBtn.addEventListener('click', exportFullBackupJson);
 const resJsonBtn = document.getElementById('restoreBackupJsonBtn');
 if(resJsonBtn) resJsonBtn.addEventListener('click', () => {
   const input = document.getElementById('uploadBackupJsonInput');
-  if(!input.files || !input.files[0]) { alert('Select a JSON backup file first'); return; }
-  const reader = new FileReader();
-  reader.onload = (e) => restoreFullBackupJson(e.target.result);
-  reader.readAsText(input.files[0]);
+  if(!input.files || !input.files[0]) { alert('Select an Excel (.xlsx, .csv) or JSON backup file first'); return; }
+  restoreFullBackupFile(input.files[0]);
 });
 
 const dlGitBtn = document.getElementById('downloadGitJsonBtn');
