@@ -103,11 +103,92 @@ button,a,select,input{min-height:44px}
 <div class="mt-8 flex justify-center px-4"><button id="loadMore" class="w-full sm:w-auto px-8 py-4 gold text-black rounded-xl font-bold text-sm">Load More 30</button></div>
 </div>
 
-<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times">✕</i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" onclick="closeAddModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
-<div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 class="font-bold text-lg text-green-400">Create New Category</h3><button type="button" id="catModalHeaderClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times">✕</i></button></div><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 class="font-bold text-lg text-green-400">Create New Category</h3><button type="button" id="catModalHeaderClose" onclick="closeCatModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
-<div id="thumbModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-3"><h3 class="font-bold">Real Thumb for <span id="thumbModalNo"></span></h3><button type="button" id="thumbModalHeaderClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times">✕</i></button></div><input id="thumbUrl" placeholder="Paste image URL or upload" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><input type="file" id="thumbFile" accept="image/*" class="w-full mt-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><img id="thumbPreview" class="w-full aspect-square object-cover rounded-xl mt-4 hidden"><div class="flex gap-3 mt-4"><button id="saveThumb" class="flex-1 py-4 gold text-black rounded-xl font-bold text-sm">Save Real Thumb</button><button id="closeThumb" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div><button id="removeThumb" class="w-full mt-3 py-3 bg-red-500/20 border border-red-500/30 rounded-xl text-xs text-red-400 hidden">Remove Custom - Back to Embed ON</button></div></div>
+<div id="thumbModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-3"><h3 class="font-bold">Real Thumb for <span id="thumbModalNo"></span></h3><button type="button" id="thumbModalHeaderClose" onclick="closeThumbModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><input id="thumbUrl" placeholder="Paste image URL or upload" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><input type="file" id="thumbFile" accept="image/*" class="w-full mt-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><img id="thumbPreview" class="w-full aspect-square object-cover rounded-xl mt-4 hidden"><div class="flex gap-3 mt-4"><button id="saveThumb" class="flex-1 py-4 gold text-black rounded-xl font-bold text-sm">Save Real Thumb</button><button id="closeThumb" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div><button id="removeThumb" class="w-full mt-3 py-3 bg-red-500/20 border border-red-500/30 rounded-xl text-xs text-red-400 hidden">Remove Custom - Back to Embed ON</button></div></div>
+
+<div id="backupSyncModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-4">
+  <div class="bg-zinc-900 border border-blue-500/30 rounded-2xl w-full max-w-xl p-6 relative max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div class="flex justify-between items-center mb-5 border-b border-blue-500/20 pb-3">
+      <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
+        <i class="fas fa-database text-blue-400"></i> Permanent Data Vault Backup & Sync
+      </h3>
+      <button id="backupSyncModalClose" onclick="closeBackupModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Status Alert Box -->
+    <div id="backupStatusAlert" class="mb-5 p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-300 flex items-center justify-between">
+      <span id="backupStatusText"><i class="fas fa-shield-alt mr-1.5 text-blue-400"></i> Local Storage & IndexedDB Auto-Sync is ACTIVE.</span>
+      <span id="backupCountBadge" class="px-2 py-0.5 bg-blue-500 text-black font-bold rounded-md">0 Posts</span>
+    </div>
+
+    <div class="space-y-4">
+      <!-- Section 1: Export Full Backup -->
+      <div class="p-4 glass rounded-xl border border-white/10 hover:border-blue-500/30 transition-all">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h4 class="font-bold text-sm text-white flex items-center gap-2">
+              <i class="fas fa-download text-green-400"></i> 1. Download Full Data Backup (JSON)
+            </h4>
+            <p class="text-[11px] text-gray-400 mt-0.5">Saves all posts, custom categories, thumbnails, descriptions & user edits into a single file.</p>
+          </div>
+          <button id="downloadBackupJsonBtn" class="px-4 py-2.5 bg-green-500 hover:bg-green-400 text-black font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer">
+            <i class="fas fa-file-download"></i> Download JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 2: Import / Restore Backup -->
+      <div class="p-4 glass rounded-xl border border-white/10 hover:border-blue-500/30 transition-all">
+        <h4 class="font-bold text-sm text-white flex items-center gap-2 mb-1">
+          <i class="fas fa-upload text-yellow-400"></i> 2. Restore / Import Backup File
+        </h4>
+        <p class="text-[11px] text-gray-400 mb-3">Select any previously saved JSON backup file to restore 100% of lost or missing posts instantly.</p>
+        <div class="flex gap-2">
+          <input type="file" id="uploadBackupJsonInput" accept=".json" class="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-yellow-400 hover:file:bg-zinc-700 bg-black/40 rounded-xl border border-white/10 p-1">
+          <button id="restoreBackupJsonBtn" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-undo"></i> Restore Data
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 3: Sync to Codebase / Git -->
+      <div class="p-4 glass rounded-xl border border-white/10 hover:border-blue-500/30 transition-all">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h4 class="font-bold text-sm text-white flex items-center gap-2">
+              <i class="fab fa-github text-purple-400"></i> 3. Permanent Codebase Sync
+            </h4>
+            <p class="text-[11px] text-gray-400 mt-0.5">Generates codebase data so your data can be saved into Git permanently across all devices.</p>
+          </div>
+          <button id="downloadGitJsonBtn" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer">
+            <i class="fas fa-code"></i> Copy Git Data
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 4: Emergency Storage Deep Scan & Recovery -->
+      <div class="p-4 glass rounded-xl border border-red-500/20 bg-red-500/5">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h4 class="font-bold text-sm text-red-400 flex items-center gap-2">
+              <i class="fas fa-medkit text-red-400"></i> Deep Storage Auto-Recover
+            </h4>
+            <p class="text-[11px] text-gray-400 mt-0.5">Scans all IndexedDB databases, secondary storage keys & legacy backups to recover lost posts.</p>
+          </div>
+          <button id="deepScanRecoverBtn" class="px-3.5 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-search-plus"></i> Auto Recover
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <script>
 let records = JSON.parse(localStorage.getItem('i3d_vault_saved_again')||'null');
@@ -225,6 +306,7 @@ function restoreFullBackupJson(jsonContent) {
     if (data.records && Array.isArray(data.records)) {
       data.records.forEach(r => {
         if (!r || !r['No.']) return;
+        deletedPostNos = deletedPostNos.filter(no => no !== r['No.']);
         const idx = records.findIndex(rec => rec['No.'] === r['No.']);
         if (idx >= 0) {
           records[idx] = Object.assign({}, records[idx], r);
@@ -237,6 +319,7 @@ function restoreFullBackupJson(jsonContent) {
     if (data.customAddedPosts && Array.isArray(data.customAddedPosts)) {
       data.customAddedPosts.forEach(cp => {
         if (cp && cp['No.']) {
+          deletedPostNos = deletedPostNos.filter(no => no !== cp['No.']);
           const idx = customAddedPosts.findIndex(item => item['No.'] === cp['No.']);
           if (idx >= 0) customAddedPosts[idx] = cp;
           else customAddedPosts.unshift(cp);
@@ -251,14 +334,23 @@ function restoreFullBackupJson(jsonContent) {
     }
     if (data.customCategories && Array.isArray(data.customCategories)) {
       data.customCategories.forEach(cat => {
-        if (cat && cat.name && !customCategories.some(c => c.name.toLowerCase() === cat.name.toLowerCase())) {
-          customCategories.push(cat);
+        if (cat && cat.name) {
+          deletedCategories = deletedCategories.filter(dc => dc.toLowerCase() !== cat.name.toLowerCase());
+          if (!customCategories.some(c => c.name.toLowerCase() === cat.name.toLowerCase())) {
+            customCategories.push(cat);
+          }
         }
       });
     }
     saveAll();
+    filtered = [...records];
+    filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
     renderCatDropdowns();
     renderQuickCatFilters();
+    document.getElementById('grid').innerHTML = '';
+    shown = 0;
+    renderGrid();
+    updateCounts();
     document.getElementById('search').dispatchEvent(new Event('input'));
     alert(`Backup Restored Successfully! Total Posts in Vault: ${records.length}`);
   } catch (err) {
@@ -1355,89 +1447,19 @@ if(dlGitBtn) dlGitBtn.addEventListener('click', () => {
 const deepRecBtn = document.getElementById('deepScanRecoverBtn');
 if(deepRecBtn) deepRecBtn.addEventListener('click', deepStorageScan);
 
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAddModal();
+    closeCatModal();
+    closeThumbModal();
+    closeBackupModal();
+    const md = document.getElementById('mobileDrawer');
+    if (md) md.classList.add('hidden');
+  }
+});
+
 init();
 </script>
-
-<div id="backupSyncModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-4">
-  <div class="bg-zinc-900 border border-blue-500/30 rounded-2xl w-full max-w-xl p-6 relative max-h-[90vh] overflow-y-auto shadow-2xl">
-    <div class="flex justify-between items-center mb-5 border-b border-blue-500/20 pb-3">
-      <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
-        <i class="fas fa-database text-blue-400"></i> Permanent Data Vault Backup & Sync
-      </h3>
-      <button id="backupSyncModalClose" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close">
-        <i class="fas fa-times">✕</i>
-      </button>
-    </div>
-
-    <!-- Status Alert Box -->
-    <div id="backupStatusAlert" class="mb-5 p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-300 flex items-center justify-between">
-      <span id="backupStatusText"><i class="fas fa-shield-alt mr-1.5 text-blue-400"></i> Local Storage & IndexedDB Auto-Sync is ACTIVE.</span>
-      <span id="backupCountBadge" class="px-2 py-0.5 bg-blue-500 text-black font-bold rounded-md">0 Posts</span>
-    </div>
-
-    <div class="space-y-4">
-      <!-- Section 1: Export Full Backup -->
-      <div class="p-4 glass rounded-xl border border-white/10 hover:border-blue-500/30 transition-all">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h4 class="font-bold text-sm text-white flex items-center gap-2">
-              <i class="fas fa-download text-green-400"></i> 1. Download Full Data Backup (JSON)
-            </h4>
-            <p class="text-[11px] text-gray-400 mt-0.5">Saves all posts, custom categories, thumbnails, descriptions & user edits into a single file.</p>
-          </div>
-          <button id="downloadBackupJsonBtn" class="px-4 py-2.5 bg-green-500 hover:bg-green-400 text-black font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer">
-            <i class="fas fa-file-download"></i> Download JSON
-          </button>
-        </div>
-      </div>
-
-      <!-- Section 2: Import / Restore Backup -->
-      <div class="p-4 glass rounded-xl border border-white/10 hover:border-blue-500/30 transition-all">
-        <h4 class="font-bold text-sm text-white flex items-center gap-2 mb-1">
-          <i class="fas fa-upload text-yellow-400"></i> 2. Restore / Import Backup File
-        </h4>
-        <p class="text-[11px] text-gray-400 mb-3">Select any previously saved JSON backup file to restore 100% of lost or missing posts instantly.</p>
-        <div class="flex gap-2">
-          <input type="file" id="uploadBackupJsonInput" accept=".json" class="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-yellow-400 hover:file:bg-zinc-700 bg-black/40 rounded-xl border border-white/10 p-1">
-          <button id="restoreBackupJsonBtn" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer">
-            <i class="fas fa-undo"></i> Restore Data
-          </button>
-        </div>
-      </div>
-
-      <!-- Section 3: Sync to Codebase / Git -->
-      <div class="p-4 glass rounded-xl border border-white/10 hover:border-blue-500/30 transition-all">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h4 class="font-bold text-sm text-white flex items-center gap-2">
-              <i class="fab fa-github text-purple-400"></i> 3. Permanent Codebase Sync
-            </h4>
-            <p class="text-[11px] text-gray-400 mt-0.5">Generates codebase data so your data can be saved into Git permanently across all devices.</p>
-          </div>
-          <button id="downloadGitJsonBtn" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer">
-            <i class="fas fa-code"></i> Copy Git Data
-          </button>
-        </div>
-      </div>
-
-      <!-- Section 4: Emergency Storage Deep Scan & Recovery -->
-      <div class="p-4 glass rounded-xl border border-red-500/20 bg-red-500/5">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h4 class="font-bold text-sm text-red-400 flex items-center gap-2">
-              <i class="fas fa-medkit text-red-400"></i> Deep Storage Auto-Recover
-            </h4>
-            <p class="text-[11px] text-gray-400 mt-0.5">Scans all IndexedDB databases, secondary storage keys & legacy backups to recover lost posts.</p>
-          </div>
-          <button id="deepScanRecoverBtn" class="px-3.5 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer">
-            <i class="fas fa-search-plus"></i> Auto Recover
-          </button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
