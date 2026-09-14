@@ -104,7 +104,7 @@ button,a,select,input{min-height:44px}
 <div class="mt-8 flex justify-center px-4"><button id="loadMore" class="w-full sm:w-auto px-8 py-4 gold text-black rounded-xl font-bold text-sm">Load More 30</button></div>
 </div>
 
-<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" onclick="closeAddModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><input id="modalExtraLink" placeholder="Extra Link / Website URL (optional)" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Description / Caption:</label><button type="button" id="modalAutoDetectBtn" class="px-2.5 py-1.5 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer" title="Auto-detect description from post link"><i id="modalAutoDetectIcon" class="fas fa-magic"></i><span id="modalAutoDetectText">Auto Detect</span></button></div><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"></textarea></div><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" onclick="closeAddModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><input id="modalExtraLink" placeholder="Extra Link / Website URL (optional)" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option value="Instagram">Instagram</option><option value="YouTube">YouTube</option><option value="Threads">Threads</option><option value="X (Twitter)">X (Twitter)</option><option value="Facebook">Facebook</option><option value="TikTok">TikTok</option><option value="Website / Other">Website / Other</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Description / Caption:</label><button type="button" id="modalAutoDetectBtn" class="px-2.5 py-1.5 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer" title="Auto-detect description from post link"><i id="modalAutoDetectIcon" class="fas fa-magic"></i><span id="modalAutoDetectText">Auto Detect</span></button></div><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"></textarea></div><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
 <div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 class="font-bold text-lg text-green-400">Create New Category</h3><button type="button" id="catModalHeaderClose" onclick="closeCatModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
@@ -769,8 +769,77 @@ function resetModalCatChips() {
   });
 }
 
-function getCode(link){try{const u=new URL(link);const p=u.pathname.split('/').filter(Boolean);if(p.includes('p'))return p[p.indexOf('p')+1];if(p.includes('reel'))return p[p.indexOf('reel')+1];if(p.includes('r'))return p[p.indexOf('r')+1];if(p.includes('status'))return p[p.indexOf('status')+1];return p.pop();}catch{return null;}}
-function getEmbedUrl(link){try{const code=getCode(link);if(!code)return null;if(link.includes('instagram.com'))return `https://www.instagram.com/p/${code}/embed/captioned/`;if(link.includes('facebook.com'))return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(link)}&show_text=true&width=400`;if(link.includes('x.com')||link.includes('twitter.com'))return `https://platform.twitter.com/embed/Tweet.html?id=${code}`;return null;}catch{return null;}}
+function detectPlatformFromUrl(url) {
+  if (!url || typeof url !== 'string') return 'Website / Other';
+  const u = url.toLowerCase();
+  if (u.includes('youtube.com') || u.includes('youtu.be')) return 'YouTube';
+  if (u.includes('threads.net')) return 'Threads';
+  if (u.includes('x.com') || u.includes('twitter.com')) return 'X (Twitter)';
+  if (u.includes('instagram.com')) return 'Instagram';
+  if (u.includes('facebook.com')) return 'Facebook';
+  if (u.includes('tiktok.com')) return 'TikTok';
+  return 'Website / Other';
+}
+
+function getYouTubeId(url) {
+  try {
+    const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+    if (u.hostname.includes('youtu.be')) {
+      return u.pathname.replace(/^\//, '').split('/')[0];
+    }
+    if (u.pathname.includes('/shorts/')) {
+      return u.pathname.split('/shorts/')[1].split('/')[0];
+    }
+    if (u.pathname.includes('/embed/')) {
+      return u.pathname.split('/embed/')[1].split('/')[0];
+    }
+    return u.searchParams.get('v');
+  } catch {
+    return null;
+  }
+}
+
+function getThreadsId(url) {
+  try {
+    const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+    const parts = u.pathname.split('/').filter(Boolean);
+    if (parts.includes('t')) return parts[parts.indexOf('t') + 1];
+    if (parts.includes('post')) return parts[parts.indexOf('post') + 1];
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function getCode(link){try{const u=new URL(link.startsWith('http') ? link : 'https://' + link);const p=u.pathname.split('/').filter(Boolean);if(p.includes('p'))return p[p.indexOf('p')+1];if(p.includes('reel'))return p[p.indexOf('reel')+1];if(p.includes('r'))return p[p.indexOf('r')+1];if(p.includes('status'))return p[p.indexOf('status')+1];return p.pop();}catch{return null;}}
+
+function getEmbedUrl(link){
+  if (!link || typeof link !== 'string') return null;
+  try {
+    if (link.includes('youtube.com') || link.includes('youtu.be')) {
+      const ytId = getYouTubeId(link);
+      if (ytId) return `https://www.youtube.com/embed/${ytId}`;
+    }
+    if (link.includes('threads.net')) {
+      const tId = getThreadsId(link);
+      if (tId) return `https://www.threads.net/t/${tId}/embed`;
+    }
+    if (link.includes('instagram.com')) {
+      const code = getCode(link);
+      if (code) return `https://www.instagram.com/p/${code}/embed/captioned/`;
+    }
+    if (link.includes('facebook.com')) {
+      return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(link)}&show_text=true&width=400`;
+    }
+    if (link.includes('x.com') || link.includes('twitter.com')) {
+      const code = getCode(link);
+      if (code) return `https://platform.twitter.com/embed/Tweet.html?id=${code}`;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 function renderQuickCatFilters() {
   const container = document.getElementById('searchCategoryButtons');
@@ -948,12 +1017,46 @@ function renderGrid(){
     const hasValidExtra = extraUrl && (extraUrl.startsWith('http://') || extraUrl.startsWith('https://') || extraUrl.includes('.'));
     const formattedExtra = hasValidExtra ? (extraUrl.startsWith('http') ? extraUrl : 'https://' + extraUrl) : '';
 
+    const platformName = r.Platform || detectPlatformFromUrl(r['Original Post Link']);
+    let platformBadgeHtml = '';
+    let platformIconClass = 'fas fa-globe';
+    let domainName = '';
+    try {
+      if (r['Original Post Link']) {
+        const u = new URL(r['Original Post Link'].startsWith('http') ? r['Original Post Link'] : 'https://' + r['Original Post Link']);
+        domainName = u.hostname.replace(/^www\./, '');
+      }
+    } catch {}
+
+    if (platformName === 'YouTube') {
+      platformBadgeHtml = `<span class="px-2.5 py-1 bg-red-600/90 text-white font-bold rounded-full text-[9px] border border-red-400/30 flex items-center gap-1 shadow-md"><i class="fa-brands fa-youtube text-[10px]"></i> YouTube</span>`;
+      platformIconClass = 'fa-brands fa-youtube';
+    } else if (platformName === 'Threads') {
+      platformBadgeHtml = `<span class="px-2.5 py-1 bg-black/90 text-white font-bold rounded-full text-[9px] border border-white/20 flex items-center gap-1 shadow-md"><i class="fa-solid fa-at text-[10px]"></i> Threads</span>`;
+      platformIconClass = 'fa-solid fa-at';
+    } else if (platformName === 'X (Twitter)' || platformName === 'X' || platformName === 'Twitter') {
+      platformBadgeHtml = `<span class="px-2.5 py-1 bg-zinc-900 text-sky-400 font-bold rounded-full text-[9px] border border-sky-500/30 flex items-center gap-1 shadow-md"><i class="fa-brands fa-x-twitter text-[10px]"></i> X (Twitter)</span>`;
+      platformIconClass = 'fa-brands fa-x-twitter';
+    } else if (platformName === 'Instagram') {
+      platformBadgeHtml = `<span class="px-2.5 py-1 bg-pink-600/90 text-white font-bold rounded-full text-[9px] border border-pink-400/30 flex items-center gap-1 shadow-md"><i class="fa-brands fa-instagram text-[10px]"></i> Instagram</span>`;
+      platformIconClass = 'fa-brands fa-instagram';
+    } else if (platformName === 'Facebook') {
+      platformBadgeHtml = `<span class="px-2.5 py-1 bg-blue-600/90 text-white font-bold rounded-full text-[9px] border border-blue-400/30 flex items-center gap-1 shadow-md"><i class="fa-brands fa-facebook text-[10px]"></i> Facebook</span>`;
+      platformIconClass = 'fa-brands fa-facebook';
+    } else if (platformName === 'TikTok') {
+      platformBadgeHtml = `<span class="px-2.5 py-1 bg-black/90 text-cyan-400 font-bold rounded-full text-[9px] border border-cyan-400/30 flex items-center gap-1 shadow-md"><i class="fa-brands fa-tiktok text-[10px]"></i> TikTok</span>`;
+      platformIconClass = 'fa-brands fa-tiktok';
+    } else {
+      platformBadgeHtml = `<span class="px-2.5 py-1 bg-emerald-600/90 text-white font-bold rounded-full text-[9px] border border-emerald-400/30 flex items-center gap-1 shadow-md"><i class="fas fa-globe text-[10px]"></i> ${domainName || 'Web'}</span>`;
+      platformIconClass = 'fas fa-globe';
+    }
+
     const takeawayText = cleanSocialCaption(r['Core Idea / 1-Line Takeaway'] || 'No description provided');
     const escTakeaway = takeawayText.replace(/"/g, '&quot;');
 
     const div=document.createElement('div');
     div.className='card glass rounded-2xl overflow-hidden flex flex-col h-full border border-white/10 hover:border-yellow-400/30 transition-all shadow-xl';
-    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden shrink-0" style="height:380px">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex items-center justify-center bg-zinc-800"><p class="text-xs text-gray-500">No embed</p></div>`}<div class="absolute top-2 left-2 px-2.5 py-1 bg-black/80 backdrop-blur-md rounded-full text-[9px] font-bold border border-white/10 text-gray-200">${r.Platform||'IG'}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-10 h-10 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform" title="Change Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':'bg-yellow-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':'EMBED ON'}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type']||'Content'}</p></div><div class="mt-1.5 h-[4.2em] overflow-hidden"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-3" title="${escTakeaway}">${takeawayText}</p></div></div><div class="flex gap-2 mt-4 pt-3 border-t border-white/5 items-center shrink-0"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-11 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center truncate shadow-sm hover:opacity-95 transition-opacity">Open Post</a>${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 truncate transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-external-link-alt text-[10px]"></i>Extra Link</a>` : ''}<button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors shrink-0" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
+    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden shrink-0" style="height:380px">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-zinc-800 via-zinc-900 to-black p-6 text-center text-gray-400 gap-3 border border-white/5"><i class="${platformIconClass} text-5xl text-yellow-500/50"></i><span class="text-xs font-bold text-gray-200 truncate max-w-[200px]">${domainName || 'Web Content Link'}</span><span class="text-[10px] text-gray-400 px-3 py-1 bg-white/5 rounded-full border border-white/10">Click "Open Post" to view content</span></div>`}<div class="absolute top-2 left-2 flex items-center gap-1">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-10 h-10 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform" title="Change Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':embedUrl?'bg-yellow-500/90':'bg-emerald-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':embedUrl?'EMBED ON':'WEB LINK'}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type']||'Content'}</p></div><div class="mt-1.5 h-[4.2em] overflow-hidden"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-3" title="${escTakeaway}">${takeawayText}</p></div></div><div class="flex gap-2 mt-4 pt-3 border-t border-white/5 items-center shrink-0"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-11 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center truncate shadow-sm hover:opacity-95 transition-opacity">Open Post</a>${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 truncate transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-external-link-alt text-[10px]"></i>Extra Link</a>` : ''}<button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors shrink-0" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
     grid.appendChild(div);
   });
   shown+=slice.length;
@@ -1171,11 +1274,7 @@ function quickAdd(link, categories, takeaway, platform, postType, extraUrl) {
   }
 
   const maxNo = Math.max(...records.map(r => r['No.']), 0);
-  let p = platform || 'Instagram';
-  if(!platform) {
-    if(link.includes('facebook.com')) p = 'Facebook';
-    if(link.includes('x.com') || link.includes('twitter.com')) p = 'X (Twitter)';
-  }
+  let p = platform || detectPlatformFromUrl(link);
   const newRec = {
     'No.': maxNo + 1,
     'Platform': p,
@@ -1594,8 +1693,21 @@ async function init(){
   }
   const mlink = document.getElementById('modalLink');
   if(mlink) {
+    mlink.addEventListener('input', () => {
+      const link = mlink.value.trim();
+      if (link) {
+        const detected = detectPlatformFromUrl(link);
+        const platSelect = document.getElementById('modalPlatform');
+        if (platSelect) platSelect.value = detected;
+      }
+    });
     mlink.addEventListener('blur', () => {
       const link = mlink.value.trim();
+      if (link) {
+        const detected = detectPlatformFromUrl(link);
+        const platSelect = document.getElementById('modalPlatform');
+        if (platSelect) platSelect.value = detected;
+      }
       const mtk = document.getElementById('modalTakeaway');
       if(link && mtk && !mtk.value.trim()) {
         triggerModalAutoDetectCaption();
