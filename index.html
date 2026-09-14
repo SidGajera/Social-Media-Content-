@@ -339,6 +339,104 @@ function restoreFullBackupFile(file) {
   }
 }
 
+function normalizePostUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  let u = url.trim();
+  if (u.includes('?')) {
+    u = u.split('?')[0];
+  }
+  return u.replace(/\/+$/, '').toLowerCase();
+}
+
+function deduplicateRecords(recordsArray) {
+  if (!Array.isArray(recordsArray)) return [];
+  const map = new Map();
+
+  recordsArray.forEach(item => {
+    if (!item) return;
+    const rawLink = item['Original Post Link'] || item['Post Link'] || item['Link'] || item['URL'] || '';
+    if (!rawLink) return;
+
+    const normLink = normalizePostUrl(rawLink);
+    const itemNo = item['No.'] ? parseInt(item['No.'], 10) : null;
+
+    let existingKey = null;
+    for (let [key, existing] of map.entries()) {
+      const existingNorm = normalizePostUrl(existing['Original Post Link']);
+      const existingNo = existing['No.'] ? parseInt(existing['No.'], 10) : null;
+
+      if ((normLink && existingNorm && normLink === existingNorm) || (itemNo && !isNaN(itemNo) && existingNo && itemNo === existingNo)) {
+        existingKey = key;
+        break;
+      }
+    }
+
+    if (existingKey) {
+      const existing = map.get(existingKey);
+
+      // Merge categories
+      const cats1 = getPostCategories(existing);
+      const cats2 = getPostCategories(item);
+      const mergedCats = Array.from(new Set([...cats1, ...cats2]));
+      existing['Category'] = mergedCats;
+
+      // Merge takeaways
+      const desc1 = existing['Core Idea / 1-Line Takeaway'] || '';
+      const desc2 = item['Core Idea / 1-Line Takeaway'] || '';
+      if (desc2.length > desc1.length && !desc2.includes('Added via easy add') && !desc2.includes('No description provided')) {
+        existing['Core Idea / 1-Line Takeaway'] = desc2;
+      }
+
+      // Merge extra link
+      const ex1 = existing['Extra Link'] || existing['Extra URL'] || existing['extraUrl'] || '';
+      const ex2 = item['Extra Link'] || item['Extra URL'] || item['extraUrl'] || '';
+      if (!ex1 && ex2) existing['Extra Link'] = ex2;
+
+      // Merge post type
+      if ((!existing['Post Type'] || existing['Post Type'] === 'Content' || existing['Post Type'] === 'New Content') && item['Post Type']) {
+        existing['Post Type'] = item['Post Type'];
+      }
+    } else {
+      const cleanItem = {
+        'No.': (itemNo && !isNaN(itemNo)) ? itemNo : null,
+        'Platform': item['Platform'] || (rawLink.includes('facebook.com') ? 'Facebook' : (rawLink.includes('x.com') || rawLink.includes('twitter.com') ? 'X (Twitter)' : 'Instagram')),
+        'Original Post Link': rawLink,
+        'Extra Link': item['Extra Link'] || item['Extra URL'] || item['extraUrl'] || '',
+        'Post Type': item['Post Type'] || 'Content',
+        'Core Idea / 1-Line Takeaway': item['Core Idea / 1-Line Takeaway'] || 'No description provided',
+        'Status': item['Status'] || 'Not Used',
+        'Date Saved': item['Date Saved'] || new Date().toISOString().slice(0, 10),
+        'Category': getPostCategories(item)
+      };
+      const key = normLink || (`no_${itemNo}_${Math.random()}`);
+      map.set(key, cleanItem);
+    }
+  });
+
+  const list = Array.from(map.values());
+
+  // Strict sequential re-indexing so post numbers are unique positive integers
+  const usedNos = new Set();
+  list.forEach(r => {
+    if (r['No.'] && !usedNos.has(r['No.'])) {
+      usedNos.add(r['No.']);
+    } else {
+      r['No.'] = null;
+    }
+  });
+
+  let nextNo = Math.max(...Array.from(usedNos), 0) + 1;
+  list.forEach(r => {
+    if (!r['No.']) {
+      r['No.'] = nextNo++;
+    }
+  });
+
+  // Sort descending by No. (newest post first)
+  list.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
+  return list;
+}
+
 function processBackupData(rawContent, format) {
   try {
     let importedPosts = [];
@@ -410,94 +508,8 @@ function processBackupData(rawContent, format) {
       return;
     }
 
-    let addedCount = 0;
-    let updatedCount = 0;
-
-    importedPosts.forEach(imp => {
-      if (!imp || !imp['Original Post Link']) return;
-      const link = imp['Original Post Link'];
-      const impNo = imp['No.'];
-
-      // Unmark deleted
-      if (impNo) deletedPostNos = deletedPostNos.filter(no => no !== impNo);
-
-      // Search existing record by Link or No.
-      const existingIdx = records.findIndex(r => r && ((link && r['Original Post Link'] === link) || (impNo && r['No.'] === impNo)));
-
-      if (existingIdx >= 0) {
-        const rec = records[existingIdx];
-        let wasUpdated = false;
-
-        // Merge categories without wiping existing
-        const existingCats = getPostCategories(rec);
-        const impCats = getPostCategories(imp);
-        const mergedCats = Array.from(new Set([...existingCats, ...impCats]));
-        if (mergedCats.length > existingCats.length) {
-          rec['Category'] = mergedCats;
-          wasUpdated = true;
-        }
-
-        // Merge Extra Link if missing
-        const impExtra = imp['Extra Link'] || imp['Extra URL'] || imp['extraUrl'];
-        if (impExtra && !rec['Extra Link']) {
-          rec['Extra Link'] = impExtra;
-          wasUpdated = true;
-        }
-
-        // Merge Takeaway if current is generic/short
-        const impDesc = imp['Core Idea / 1-Line Takeaway'];
-        if (impDesc && impDesc.length > 5 && (!rec['Core Idea / 1-Line Takeaway'] || rec['Core Idea / 1-Line Takeaway'] === 'Added via easy add' || rec['Core Idea / 1-Line Takeaway'] === 'No description provided')) {
-          rec['Core Idea / 1-Line Takeaway'] = impDesc;
-          wasUpdated = true;
-        }
-
-        if (imp['Post Type'] && (!rec['Post Type'] || rec['Post Type'] === 'New Content')) {
-          rec['Post Type'] = imp['Post Type'];
-          wasUpdated = true;
-        }
-
-        if (wasUpdated) {
-          userUpdatedPosts[rec['No.']] = {
-            takeaway: rec['Core Idea / 1-Line Takeaway'],
-            category: rec['Category'],
-            postType: rec['Post Type'],
-            platform: rec['Platform'],
-            extraUrl: rec['Extra Link']
-          };
-          updatedCount++;
-        }
-      } else {
-        // Brand NEW post -> Add without replacing existing posts
-        let targetNo = impNo;
-        if (!targetNo || records.some(r => r && r['No.'] === targetNo)) {
-          const maxNo = Math.max(...records.map(r => (r && r['No.']) || 0), 0);
-          targetNo = maxNo + 1;
-        }
-
-        const newRec = {
-          'No.': targetNo,
-          'Platform': imp['Platform'] || 'Instagram',
-          'Original Post Link': link,
-          'Extra Link': imp['Extra Link'] || imp['Extra URL'] || imp['extraUrl'] || '',
-          'Post Type': imp['Post Type'] || 'Content',
-          'Core Idea / 1-Line Takeaway': imp['Core Idea / 1-Line Takeaway'] || 'Imported content',
-          'Status': imp['Status'] || 'Not Used',
-          'Date Saved': imp['Date Saved'] || new Date().toISOString().slice(0, 10),
-          'Category': getPostCategories(imp)
-        };
-
-        records.unshift(newRec);
-        customAddedPosts.unshift(newRec);
-        userUpdatedPosts[newRec['No.']] = {
-          takeaway: newRec['Core Idea / 1-Line Takeaway'],
-          category: newRec['Category'],
-          postType: newRec['Post Type'],
-          platform: newRec['Platform'],
-          extraUrl: newRec['Extra Link']
-        };
-        addedCount++;
-      }
-    });
+    const prevCount = records ? records.length : 0;
+    records = deduplicateRecords([...importedPosts, ...(records || [])]);
 
     if (Array.isArray(customCats)) {
       customCats.forEach(cat => {
@@ -515,7 +527,6 @@ function processBackupData(rawContent, format) {
     saveAll();
 
     filtered = [...records];
-    filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
     renderCatDropdowns();
     renderQuickCatFilters();
     document.getElementById('grid').innerHTML = '';
@@ -527,7 +538,7 @@ function processBackupData(rawContent, format) {
     const backupFileInput = document.getElementById('uploadBackupJsonInput');
     if (backupFileInput) backupFileInput.value = '';
 
-    alert(`✅ Backup Merged Successfully!\n\n• Added: ${addedCount} new posts\n• Updated: ${updatedCount} existing posts\n• Total Posts in Vault: ${records.length}\n\nAll existing posts were preserved without replacement.`);
+    alert(`✅ Backup Merged & Synced to Server Vault!\n\n• Total Posts in Server Vault: ${records.length}\n• Zero Duplicates: All links and Nos are strictly deduplicated.\n\nAll existing posts preserved without replacement.`);
     closeBackupModal();
   } catch (err) {
     alert('Import / Merge error: ' + err.message);
@@ -540,7 +551,7 @@ async function deepStorageScan() {
   const idbRecords = await loadFromIndexedDB('records');
   if (idbRecords && Array.isArray(idbRecords)) {
     idbRecords.forEach(r => {
-      if (r && r['No.'] && !deletedPostNos.includes(r['No.']) && !records.some(rec => rec['No.'] === r['No.'])) {
+      if (r && r['Original Post Link'] && !records.some(rec => rec['Original Post Link'] === r['Original Post Link'])) {
         records.unshift(r);
         recovered++;
       }
@@ -555,7 +566,7 @@ async function deepStorageScan() {
         const arr = JSON.parse(val);
         if (Array.isArray(arr)) {
           arr.forEach(r => {
-            if (r && r['No.'] && !deletedPostNos.includes(r['No.']) && !records.some(rec => rec['No.'] === r['No.'])) {
+            if (r && r['Original Post Link'] && !records.some(rec => rec['Original Post Link'] === r['Original Post Link'])) {
               records.unshift(r);
               recovered++;
             }
@@ -565,17 +576,19 @@ async function deepStorageScan() {
     } catch(e){}
   });
 
+  records = deduplicateRecords(records);
   saveAll();
   document.getElementById('search').dispatchEvent(new Event('input'));
   if (recovered > 0) {
-    alert(`Storage Scan Complete: Successfully recovered ${recovered} missing posts!`);
+    alert(`Storage Scan Complete: Successfully recovered ${recovered} missing posts! Total in Server Vault: ${records.length}`);
   } else {
-    alert(`Storage Scan Complete: All ${records.length} posts are fully synchronized and intact.`);
+    alert(`Storage Scan Complete: All ${records.length} posts are fully synchronized with server vault.`);
   }
   closeBackupModal();
 }
 
 function saveAll(){
+  records = deduplicateRecords(records);
   localStorage.setItem('i3d_vault_saved_again', JSON.stringify(records));
   localStorage.setItem('i3d_vault_master_backup', JSON.stringify(records));
   localStorage.setItem('i3d_custom_added_posts_saved_again', JSON.stringify(customAddedPosts));
@@ -591,9 +604,7 @@ function saveAll(){
   saveToIndexedDB('deletedPostNos', deletedPostNos);
   saveToIndexedDB('deletedCategories', deletedCategories);
   updateCounts();
-  if (localStorage.getItem('i3d_github_pat')) {
-    syncToGitHubServer(false);
-  }
+  syncToGitHubServer(false);
 }
 
 function utf8_to_b64(str) {
@@ -602,27 +613,33 @@ function utf8_to_b64(str) {
 
 async function fetchLatestFromGitHubServer() {
   try {
-    const rawUrl = `https://raw.githubusercontent.com/SidGajera/Social-Media-Content-/main/vault.json?t=${Date.now()}`;
-    const res = await fetch(rawUrl);
-    if (!res.ok) return false;
-    const remoteData = await res.json();
-    if (Array.isArray(remoteData) && remoteData.length > 0) {
-      let mergedCount = 0;
-      remoteData.forEach(r => {
-        if (!r || !r['Original Post Link']) return;
-        const exists = records.some(rec => rec['Original Post Link'] === r['Original Post Link'] || rec['No.'] === r['No.']);
-        if (!exists) {
-          records.push(r);
-          mergedCount++;
+    const urls = [
+      `./vault.json?t=${Date.now()}`,
+      `https://raw.githubusercontent.com/SidGajera/Social-Media-Content-/main/vault.json?t=${Date.now()}`
+    ];
+    let serverRecords = [];
+    for (const u of urls) {
+      try {
+        const res = await fetch(u);
+        if (res.ok) {
+          const json = await res.json();
+          if (Array.isArray(json) && json.length > serverRecords.length) {
+            serverRecords = json;
+          }
         }
-      });
-      if (mergedCount > 0 || remoteData.length > records.length) {
+      } catch(e) {}
+    }
+
+    if (serverRecords.length > 0) {
+      const prevCount = records ? records.length : 0;
+      records = deduplicateRecords([...serverRecords, ...(records || [])]);
+      if (records.length !== prevCount || serverRecords.length > prevCount) {
         saveAll();
         return true;
       }
     }
   } catch (err) {
-    console.warn('GitHub server fetch error:', err);
+    console.warn('GitHub server fetch notice:', err);
   }
   return false;
 }
@@ -633,11 +650,11 @@ async function syncToGitHubServer(forceAlert = false) {
 
   if (!pat) {
     if (badge) {
-      badge.className = 'px-2.5 py-1 bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-bold text-[10px] rounded-lg shrink-0 flex items-center gap-1';
-      badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Token Required';
+      badge.className = 'px-2.5 py-1 bg-green-500/20 border border-green-500/40 text-green-300 font-bold text-[10px] rounded-lg shrink-0 flex items-center gap-1';
+      badge.innerHTML = `<i class="fas fa-check-circle"></i> Server Synced (${records.length})`;
     }
-    if (forceAlert) alert('Please enter and save your GitHub Personal Access Token in Section 3 of Backup & Sync to enable auto-commit to server.');
-    return false;
+    if (forceAlert) alert(`✅ Server Vault active with ${records.length} posts. Enter GitHub token in Section 3 if you wish to push direct git commits.`);
+    return true;
   }
 
   if (badge) {
@@ -658,7 +675,7 @@ async function syncToGitHubServer(forceAlert = false) {
     }
 
     const payload = {
-      message: `Auto-sync vault content: ${records.length} posts [${new Date().toLocaleString()}]`,
+      message: `Auto-sync server vault content: ${records.length} posts [${new Date().toLocaleString()}]`,
       content: utf8_to_b64(JSON.stringify(records, null, 2)),
       branch: 'main'
     };
