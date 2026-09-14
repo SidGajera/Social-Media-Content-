@@ -1509,17 +1509,32 @@ async function init(){
       }
     });
   }
+
+  // Ensure any GitHub URL erroneously placed in Takeaway is moved to Extra Link across all records
+  records.forEach(r => {
+    if (!r) return;
+    const takeaway = r['Core Idea / 1-Line Takeaway'] || '';
+    const extra = (r['Extra Link'] || r['Extra URL'] || r['extraUrl'] || '').trim();
+    if (takeaway.includes('github.com')) {
+      if (!extra || extra.length < 5 || extra === takeaway) {
+        r['Extra Link'] = takeaway;
+      }
+    }
+  });
+
   if (userUpdatedPosts && typeof userUpdatedPosts === 'object') {
     Object.keys(userUpdatedPosts).forEach(noStr => {
       const no = parseInt(noStr, 10);
       const updates = userUpdatedPosts[noStr];
       const rec = records.find(r => r && r['No.'] === no);
       if (rec && updates) {
-        if (updates.takeaway) rec['Core Idea / 1-Line Takeaway'] = updates.takeaway;
+        if (updates.takeaway && !updates.takeaway.includes('github.com')) {
+          rec['Core Idea / 1-Line Takeaway'] = cleanSocialCaption(updates.takeaway);
+        }
         if (updates.category) rec['Category'] = updates.category;
         if (updates.postType) rec['Post Type'] = updates.postType;
         if (updates.platform) rec['Platform'] = updates.platform;
-        if (updates.extraUrl !== undefined) rec['Extra Link'] = updates.extraUrl;
+        if (updates.extraUrl) rec['Extra Link'] = updates.extraUrl;
       }
     });
   }
