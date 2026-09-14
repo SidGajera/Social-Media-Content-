@@ -504,6 +504,9 @@ function processBackupData(rawContent, format) {
     updateCounts();
     document.getElementById('search').dispatchEvent(new Event('input'));
 
+    const backupFileInput = document.getElementById('uploadBackupJsonInput');
+    if (backupFileInput) backupFileInput.value = '';
+
     alert(`✅ Backup Merged Successfully!\n\n• Added: ${addedCount} new posts\n• Updated: ${updatedCount} existing posts\n• Total Posts in Vault: ${records.length}\n\nAll existing posts were preserved without replacement.`);
   } catch (err) {
     alert('Import / Merge error: ' + err.message);
