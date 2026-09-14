@@ -1,0 +1,17 @@
+{
+  "name": "social-media-content-vault",
+  "version": "1.0.0",
+  "description": "Social Media Content Vault with live server disk & GitHub sync",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "social-media",
+    "vault",
+    "sync"
+  ],
+  "author": "SidGajera",
+  "license": "ISC"
+}
