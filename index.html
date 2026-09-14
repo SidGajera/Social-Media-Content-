@@ -1000,8 +1000,73 @@ function renderCatDropdowns(){
   renderQuickCatFilters();
 }
 
+function matchesSearchQuery(r, q) {
+  if (!q) return true;
+  const rawQ = q.trim().toLowerCase();
+  if (!rawQ) return true;
+
+  const cleanQ = rawQ.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
+
+  const noStr = String(r['No.'] || '');
+  const linkStr = (r['Original Post Link'] || '').toLowerCase();
+  const extraStr = (r['Extra Link'] || r['Extra URL'] || r['extraUrl'] || '').toLowerCase();
+  const takeawayStr = (r['Core Idea / 1-Line Takeaway'] || '').toLowerCase();
+  const typeStr = (r['Post Type'] || '').toLowerCase();
+  const platformStr = (r['Platform'] || '').toLowerCase();
+  const catsStr = getPostCategories(r).join(' ').toLowerCase();
+
+  const fullText = `${noStr} #${noStr} ${linkStr} ${extraStr} ${takeawayStr} ${typeStr} ${platformStr} ${catsStr}`;
+
+  return fullText.includes(rawQ) || (cleanQ && fullText.includes(cleanQ));
+}
+
+window.resetSearchFilters = function() {
+  const searchInput = document.getElementById('search'); if (searchInput) searchInput.value = '';
+  const catFilterSelect = document.getElementById('catFilter'); if (catFilterSelect) catFilterSelect.value = '';
+  const filterThumbSelect = document.getElementById('filterThumb'); if (filterThumbSelect) filterThumbSelect.value = '';
+  const sortPostsSelect = document.getElementById('sortPosts'); if (sortPostsSelect) sortPostsSelect.value = 'newest';
+  document.getElementById('search').dispatchEvent(new Event('input'));
+};
+
 function renderGrid(){
   const grid=document.getElementById('grid');
+  if(!grid) return;
+
+  const loadMoreBtn = document.getElementById('loadMore');
+  const loadMoreContainer = loadMoreBtn ? loadMoreBtn.parentElement : null;
+
+  if (filtered.length === 0) {
+    grid.className = 'col-span-full py-16 px-4 flex flex-col items-center justify-center text-center glass rounded-2xl border border-yellow-500/20 my-4';
+    const qVal = document.getElementById('search') ? document.getElementById('search').value.trim() : '';
+    const catVal = document.getElementById('catFilter') ? document.getElementById('catFilter').value : '';
+    
+    let msg = 'No content matches your search query or filter criteria.';
+    if (qVal) {
+      msg = `No posts found matching "${qVal.replace(/</g, '&lt;').replace(/>/g, '&gt;')}".`;
+    } else if (catVal) {
+      msg = `No posts found in category "${catVal}".`;
+    }
+
+    grid.innerHTML = `
+      <div class="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mb-4 text-yellow-400">
+        <i class="fas fa-search text-2xl"></i>
+      </div>
+      <h3 class="text-base font-bold text-gray-200">No Matching Content Found</h3>
+      <p class="text-xs text-gray-400 mt-1.5 max-w-sm leading-relaxed">${msg}</p>
+      <button type="button" onclick="resetSearchFilters()" class="mt-5 px-5 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-black font-bold text-xs rounded-xl transition-all shadow-lg cursor-pointer flex items-center gap-2">
+        <i class="fas fa-undo"></i> Reset All Search & Filters
+      </button>
+    `;
+
+    if (loadMoreContainer) {
+      loadMoreContainer.classList.add('hidden');
+      loadMoreContainer.classList.remove('flex');
+    }
+    return;
+  }
+
+  grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-6';
+
   const slice=filtered.slice(shown, shown+perPage);
   slice.forEach(r=>{
     const custom=realThumbs[r['No.']];
@@ -1060,6 +1125,19 @@ function renderGrid(){
     grid.appendChild(div);
   });
   shown+=slice.length;
+
+  if (loadMoreContainer) {
+    if (shown >= filtered.length) {
+      loadMoreContainer.classList.add('hidden');
+      loadMoreContainer.classList.remove('flex');
+    } else {
+      loadMoreContainer.classList.remove('hidden');
+      loadMoreContainer.classList.add('flex');
+      const remaining = filtered.length - shown;
+      const nextCount = Math.min(perPage, remaining);
+      if (loadMoreBtn) loadMoreBtn.textContent = `Load More ${nextCount}`;
+    }
+  }
 }
 
 window.editTakeaway=async function(no){
@@ -2010,13 +2088,13 @@ document.getElementById('modalSave').addEventListener('click',()=>{
 document.getElementById('catModalSave').addEventListener('click',()=>{const name=document.getElementById('catModalName').value.trim();const color=document.getElementById('catModalColor').value;const desc=document.getElementById('catModalDesc').value.trim();if(addCategory(name,color,desc)){closeCatModal();document.getElementById('catModalName').value='';document.getElementById('catModalDesc').value='';}});
 document.getElementById('saveNewCatBtn').addEventListener('click',()=>{const name=document.getElementById('newCatName').value.trim();const color=document.getElementById('newCatColor').value;const desc=document.getElementById('newCatDesc').value.trim();if(addCategory(name,color,desc)){document.getElementById('newCatName').value='';document.getElementById('newCatDesc').value='';}});
 document.getElementById('search').addEventListener('input',e=>{
-  const q=e.target.value.toLowerCase();
+  const q=e.target.value;
   const cat=document.getElementById('catFilter').value;
   const ft=document.getElementById('filterThumb').value;
   const sort=document.getElementById('sortPosts') ? document.getElementById('sortPosts').value : 'newest';
   
   filtered=records.filter(r=>{
-    const mq=!q||JSON.stringify(r).toLowerCase().includes(q);
+    const mq=matchesSearchQuery(r, q);
     const mc=!cat||isPostInCategory(r,cat);
     const mf=ft===''||(ft==='withThumb'&&realThumbs[r['No.']])||(ft==='embedOnly'&&!realThumbs[r['No.']]);
     return mq&&mc&&mf;
