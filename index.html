@@ -64,8 +64,9 @@ button,a,select,input{min-height:44px}
 </div>
 <div class="space-y-3">
 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-<div class="md:col-span-5"><input id="quickLink" placeholder="Paste Instagram / X / Facebook link..." class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
-<div class="md:col-span-5 flex gap-2"><input id="quickTakeaway" placeholder="Post Description / Caption..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"><button type="button" id="autoDetectCaptionBtn" class="px-3 py-3 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer" title="Auto-detect description from post link"><i id="autoDetectIcon" class="fas fa-magic"></i><span id="autoDetectText" class="hidden sm:inline">Auto Detect</span></button></div>
+<div class="md:col-span-4"><input id="quickLink" placeholder="Paste Instagram / X / Facebook link..." class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
+<div class="md:col-span-3"><input id="quickExtraLink" placeholder="Extra Link / Website (optional)" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"></div>
+<div class="md:col-span-3 flex gap-2"><input id="quickTakeaway" placeholder="Post Description / Caption..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"><button type="button" id="autoDetectCaptionBtn" class="px-3 py-3 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer" title="Auto-detect description from post link"><i id="autoDetectIcon" class="fas fa-magic"></i><span id="autoDetectText" class="hidden sm:inline">Auto Detect</span></button></div>
 <div class="md:col-span-2"><button id="quickAddBtn" class="w-full py-3 gold text-black rounded-xl font-bold text-sm"><i class="fas fa-plus mr-2"></i>Add Now</button></div>
 </div>
 <div>
@@ -103,7 +104,7 @@ button,a,select,input{min-height:44px}
 <div class="mt-8 flex justify-center px-4"><button id="loadMore" class="w-full sm:w-auto px-8 py-4 gold text-black rounded-xl font-bold text-sm">Load More 30</button></div>
 </div>
 
-<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" onclick="closeAddModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
+<div id="addModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-yellow-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 id="modalTitle" class="font-bold text-lg">Add New Content - Embed ON</h3><button type="button" id="modalHeaderClose" onclick="closeAddModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="modalLink" placeholder="Post Link (required)" class="w-full px-4 py-3 bg-black/50 border border-yellow-500/30 rounded-xl text-sm"><input id="modalExtraLink" placeholder="Extra Link / Website URL (optional)" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-yellow-500 outline-none"><select id="modalPlatform" class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-sm"><option>Instagram</option><option>Facebook</option><option>X (Twitter)</option></select><div class="space-y-1.5"><div class="flex items-center justify-between"><label class="text-xs font-bold text-gray-300">Categories (Select at least 1):</label><button type="button" id="clearModalCatSelectionBtn" class="text-[11px] text-yellow-400 hover:text-yellow-300 font-bold hover:underline cursor-pointer"><i class="fas fa-undo mr-1"></i>Clear Selection</button></div><div id="modalCatChips" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-yellow-500/30 rounded-xl text-xs"></div></div><input id="modalType" placeholder="Post Type e.g. Carousel, Reel" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><textarea id="modalTakeaway" placeholder="Core idea / 1-line takeaway" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"></textarea><div class="flex gap-3"><button id="modalSave" class="flex-1 py-4 gold text-black rounded-xl font-bold">Save Content</button><button id="modalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
 <div id="catModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-end lg:items-center justify-center p-0 lg:p-6"><div class="glass rounded-t-2xl lg:rounded-2xl w-full lg:max-w-md p-6 border border-green-500/30"><div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4 lg:hidden"></div><div class="flex items-center justify-between mb-4"><h3 class="font-bold text-lg text-green-400">Create New Category</h3><button type="button" id="catModalHeaderClose" onclick="closeCatModal()" class="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer font-black text-sm" title="Close"><i class="fas fa-times"></i></button></div><div class="space-y-4"><input id="catModalName" placeholder="Category name" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-xl text-sm"><div class="flex items-center gap-2 bg-black/50 border border-white/10 rounded-xl p-2 focus-within:border-green-500 transition-all"><div class="relative flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden shrink-0 cursor-pointer group" title="Click to pick color"><div id="catModalColorPreview" class="w-full h-full rounded-lg transition-colors" style="background-color: #FFD700;"></div><i class="fas fa-palette absolute text-black/70 group-hover:scale-110 transition-transform text-xs"></i><input id="catModalColor" type="color" value="#FFD700" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"></div><input id="catModalColorHex" type="text" value="#FFD700" maxlength="7" placeholder="#FFD700" class="w-24 bg-transparent font-mono text-xs text-yellow-400 font-bold uppercase outline-none px-2"><div class="flex items-center gap-1.5 pl-2 border-l border-white/10"><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FFD700" data-color="#FFD700" title="Gold"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00D9FF" data-color="#00D9FF" title="Cyan"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#00FF88" data-color="#00FF88" title="Emerald"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#FF6B00" data-color="#FF6B00" title="Orange"></button><button type="button" class="cat-modal-preset w-5 h-5 rounded-full border border-white/20 transition-transform hover:scale-125 focus:outline-none" style="background:#EC4899" data-color="#EC4899" title="Pink"></button></div></div><input id="catModalDesc" placeholder="Description" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm"><div class="flex gap-3"><button id="catModalSave" class="flex-1 py-4 bg-green-500 text-black rounded-xl font-bold">Create Category</button><button id="catModalClose" class="px-6 py-4 glass rounded-xl text-sm">Cancel</button></div></div></div></div>
 
@@ -632,9 +633,13 @@ function renderGrid(){
       return `<span class="px-2 py-1 rounded-full text-[8px] font-bold truncate max-w-[120px] inline-block shadow-sm" style="background:${catColor};color:black" title="${cName}">${cName}</span>`;
     }).join('');
 
+    const extraUrl = (r['Extra Link'] || r['Extra URL'] || r['extraUrl'] || '').trim();
+    const hasValidExtra = extraUrl && (extraUrl.startsWith('http://') || extraUrl.startsWith('https://') || extraUrl.includes('.'));
+    const formattedExtra = hasValidExtra ? (extraUrl.startsWith('http') ? extraUrl : 'https://' + extraUrl) : '';
+
     const div=document.createElement('div');
     div.className='card glass rounded-2xl overflow-hidden';
-    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden" style="height:clamp(360px, 50vw, 440px)">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex items-center justify-center bg-zinc-800"><p class="text-xs text-gray-500">No embed</p></div>`}<div class="absolute top-2 left-2 px-2 py-1 bg-black/80 rounded-full text-[9px] font-bold">${r.Platform||'IG'}</div><div class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-11 h-11 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg" title="Change Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':'bg-yellow-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':'EMBED ON'}</span></div></div><div class="p-4"><div class="flex items-center justify-between gap-1"><p class="text-[10px] text-gray-400 truncate">${r['Post Type']||'Content'}</p><button onclick="openEditModal(${r['No.']})" title="Edit post details" class="text-xs text-yellow-400/80 hover:text-yellow-400 p-1 cursor-pointer shrink-0 transition-colors"><i class="fas fa-pen text-[11px]"></i></button></div><p onclick="openEditModal(${r['No.']})" title="Click to edit post" class="text-sm font-semibold mt-1 line-clamp-3 leading-snug cursor-pointer hover:text-yellow-300 transition-colors">${r['Core Idea / 1-Line Takeaway']||'Click to add description...'}</p><div class="flex gap-2 mt-3"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 py-3 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center">Open Post</a><button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
+    div.innerHTML=`<div class="relative bg-zinc-900 overflow-hidden" style="height:clamp(360px, 50vw, 440px)">${custom?`<img src="${custom}" class="w-full h-full object-cover">`:embedUrl?`<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`:`<div class="w-full h-full flex items-center justify-center bg-zinc-800"><p class="text-xs text-gray-500">No embed</p></div>`}<div class="absolute top-2 left-2 px-2 py-1 bg-black/80 rounded-full text-[9px] font-bold">${r.Platform||'IG'}</div><div class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-11 h-11 ${custom?'bg-green-500':'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg" title="Change Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${custom?'bg-green-500':'bg-yellow-500/90'} text-black rounded-full text-[8px] font-bold">${custom?'REAL ✓':'EMBED ON'}</span></div></div><div class="p-4"><div class="flex items-center justify-between gap-1"><p class="text-[10px] text-gray-400 truncate">${r['Post Type']||'Content'}</p><button onclick="openEditModal(${r['No.']})" title="Edit post details" class="text-xs text-yellow-400/80 hover:text-yellow-400 p-1 cursor-pointer shrink-0 transition-colors"><i class="fas fa-pen text-[11px]"></i></button></div><p onclick="openEditModal(${r['No.']})" title="Click to edit post" class="text-sm font-semibold mt-1 line-clamp-3 leading-snug cursor-pointer hover:text-yellow-300 transition-colors">${r['Core Idea / 1-Line Takeaway']||'Click to add description...'}</p><div class="flex gap-2 mt-3"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 py-3 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center truncate">Open Post</a>${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 truncate transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-external-link-alt text-[10px]"></i>Extra Link</a>` : ''}<button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors shrink-0" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
     grid.appendChild(div);
   });
   shown+=slice.length;
@@ -746,13 +751,15 @@ async function triggerAutoDetectCaption() {
   }
 }
 
-function quickAdd(link, categories, takeaway, platform, postType) {
+function quickAdd(link, categories, takeaway, platform, postType, extraUrl) {
   if(!link) { alert('Please paste a post link first'); return; }
   const cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
   if(cats.length === 0) {
     alert('Please select at least 1 category before submitting.');
     return;
   }
+
+  const exUrl = extraUrl !== undefined ? extraUrl : (document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : '');
 
   const existingRec = records.find(r => r['Original Post Link'] === link);
   if(existingRec) {
@@ -762,12 +769,14 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     if(postType) existingRec['Post Type'] = postType;
     if(takeaway) existingRec['Core Idea / 1-Line Takeaway'] = takeaway;
     if(platform) existingRec['Platform'] = platform;
+    if(exUrl) existingRec['Extra Link'] = exUrl;
 
     userUpdatedPosts[existingRec['No.']] = {
       takeaway: existingRec['Core Idea / 1-Line Takeaway'],
       category: existingRec.Category,
       postType: existingRec['Post Type'],
-      platform: existingRec['Platform']
+      platform: existingRec['Platform'],
+      extraUrl: existingRec['Extra Link'] || ''
     };
 
     syncCategoriesFromRecords();
@@ -778,8 +787,11 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     const filterThumbSelect = document.getElementById('filterThumb'); if(filterThumbSelect) filterThumbSelect.value = '';
     const sortPostsSelect = document.getElementById('sortPosts'); if(sortPostsSelect) sortPostsSelect.value = 'newest';
 
-    document.getElementById('quickLink').value = ''; const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
+    document.getElementById('quickLink').value = '';
+    const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
+    const qelEl=document.getElementById('quickExtraLink'); if(qelEl) qelEl.value = '';
     document.getElementById('modalLink').value = '';
+    const melEl=document.getElementById('modalExtraLink'); if(melEl) melEl.value = '';
     document.getElementById('modalType').value = '';
     document.getElementById('modalTakeaway').value = '';
     renderCatDropdowns();
@@ -799,6 +811,7 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     'No.': maxNo + 1,
     'Platform': p,
     'Original Post Link': link,
+    'Extra Link': exUrl || '',
     'Post Type': postType || (cats[0] || 'New Content'),
     'Core Idea / 1-Line Takeaway': takeaway || 'Added via easy add',
     'Status': 'Not Used',
@@ -811,7 +824,8 @@ function quickAdd(link, categories, takeaway, platform, postType) {
     takeaway: newRec['Core Idea / 1-Line Takeaway'],
     category: cats,
     postType: newRec['Post Type'],
-    platform: newRec['Platform']
+    platform: newRec['Platform'],
+    extraUrl: newRec['Extra Link']
   };
 
   const cpIdx = customAddedPosts.findIndex(cp => cp['No.'] === newRec['No.'] || cp['Original Post Link'] === link);
@@ -842,8 +856,11 @@ function quickAdd(link, categories, takeaway, platform, postType) {
   const filterThumbSelect = document.getElementById('filterThumb'); if(filterThumbSelect) filterThumbSelect.value = '';
   const sortPostsSelect = document.getElementById('sortPosts'); if(sortPostsSelect) sortPostsSelect.value = 'newest';
 
-  document.getElementById('quickLink').value = ''; const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
+  document.getElementById('quickLink').value = '';
+  const qtkEl=document.getElementById('quickTakeaway'); if(qtkEl) qtkEl.value = '';
+  const qelEl=document.getElementById('quickExtraLink'); if(qelEl) qelEl.value = '';
   document.getElementById('modalLink').value = '';
+  const melEl=document.getElementById('modalExtraLink'); if(melEl) melEl.value = '';
   document.getElementById('modalType').value = '';
   document.getElementById('modalTakeaway').value = '';
   renderCatDropdowns();
@@ -1133,6 +1150,7 @@ async function init(){
         if (updates.category) rec['Category'] = updates.category;
         if (updates.postType) rec['Post Type'] = updates.postType;
         if (updates.platform) rec['Platform'] = updates.platform;
+        if (updates.extraUrl !== undefined) rec['Extra Link'] = updates.extraUrl;
       }
     });
   }
@@ -1171,6 +1189,7 @@ function openAddModal() {
   if (modalSave) modalSave.textContent = 'Save Content';
   
   document.getElementById('modalLink').value = '';
+  const mel = document.getElementById('modalExtraLink'); if (mel) mel.value = '';
   document.getElementById('modalPlatform').value = 'Instagram';
   document.getElementById('modalType').value = '';
   document.getElementById('modalTakeaway').value = '';
@@ -1188,6 +1207,8 @@ window.openEditModal = function(no) {
   if (modalSave) modalSave.textContent = 'Save Changes';
 
   document.getElementById('modalLink').value = rec['Original Post Link'] || '';
+  const mel = document.getElementById('modalExtraLink');
+  if (mel) mel.value = rec['Extra Link'] || rec['Extra URL'] || rec['extraUrl'] || '';
   document.getElementById('modalPlatform').value = rec['Platform'] || 'Instagram';
   document.getElementById('modalType').value = rec['Post Type'] || '';
   document.getElementById('modalTakeaway').value = rec['Core Idea / 1-Line Takeaway'] || '';
@@ -1231,6 +1252,7 @@ function exportExcelData() {
       'No.': r['No.'],
       'Platform': r['Platform'] || '',
       'Post Link': r['Original Post Link'] || '',
+      'Extra Link': r['Extra Link'] || r['Extra URL'] || '',
       'Post Type': r['Post Type'] || '',
       'Description / Takeaway': r['Core Idea / 1-Line Takeaway'] || '',
       'Category': getPostCategories(r).join(', '),
@@ -1278,9 +1300,9 @@ document.getElementById('drawerBackdrop').addEventListener('click',()=>document.
 document.getElementById('drawerAdd').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');openAddModal();});
 document.getElementById('drawerAddCat').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');document.getElementById('catModal').classList.remove('hidden');});
 document.getElementById('drawerExport').addEventListener('click',()=>{document.getElementById('mobileDrawer').classList.add('hidden');exportExcelData();});
-document.getElementById('quickAddBtn').addEventListener('click',()=>quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), document.getElementById('quickTakeaway').value.trim()));
-document.getElementById('quickLink').addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(e.target.value.trim(), getSelectedQuickCategories(), document.getElementById('quickTakeaway').value.trim());});
-const qtk=document.getElementById('quickTakeaway');if(qtk)qtk.addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), e.target.value.trim());});
+document.getElementById('quickAddBtn').addEventListener('click',()=>quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), document.getElementById('quickTakeaway').value.trim(), null, null, document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : ''));
+document.getElementById('quickLink').addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(e.target.value.trim(), getSelectedQuickCategories(), document.getElementById('quickTakeaway').value.trim(), null, null, document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : '');});
+const qtk=document.getElementById('quickTakeaway');if(qtk)qtk.addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd(document.getElementById('quickLink').value.trim(), getSelectedQuickCategories(), e.target.value.trim(), null, null, document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : '');});
 const mobAddBtn = document.getElementById('mobileAddBtn'); if(mobAddBtn) mobAddBtn.addEventListener('click', openAddModal);
 document.getElementById('addBtn').addEventListener('click', openAddModal);
 document.getElementById('addCategoryBtn').addEventListener('click',()=>document.getElementById('catModal').classList.remove('hidden'));
@@ -1324,6 +1346,7 @@ document.getElementById('modalSave').addEventListener('click',()=>{
     alert('Please select at least 1 category before submitting.');
     return;
   }
+  const extraUrl = document.getElementById('modalExtraLink') ? document.getElementById('modalExtraLink').value.trim() : '';
   const platform=document.getElementById('modalPlatform').value;
   const postType=document.getElementById('modalType').value.trim();
   const takeaway=document.getElementById('modalTakeaway').value.trim();
@@ -1332,6 +1355,7 @@ document.getElementById('modalSave').addEventListener('click',()=>{
     const rec = records.find(r => r && r['No.'] === editingPostNo);
     if(rec) {
       rec['Original Post Link'] = link;
+      rec['Extra Link'] = extraUrl;
       rec['Platform'] = platform;
       rec['Category'] = cats;
       rec['Post Type'] = postType || (cats[0] || 'Content');
@@ -1341,7 +1365,8 @@ document.getElementById('modalSave').addEventListener('click',()=>{
         takeaway: rec['Core Idea / 1-Line Takeaway'],
         category: rec['Category'],
         postType: rec['Post Type'],
-        platform: rec['Platform']
+        platform: rec['Platform'],
+        extraUrl: rec['Extra Link']
       };
 
       const cpIdx = customAddedPosts.findIndex(cp => cp && cp['No.'] === editingPostNo);
@@ -1358,7 +1383,7 @@ document.getElementById('modalSave').addEventListener('click',()=>{
     }
   }
 
-  quickAdd(link,cats,takeaway,platform,postType);
+  quickAdd(link,cats,takeaway,platform,postType,extraUrl);
   closeAddModal();
 });
 
