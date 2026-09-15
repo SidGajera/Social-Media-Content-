@@ -1227,6 +1227,7 @@
       try {
         const timestamp = Date.now();
         const urls = [
+          `/api/mysql/posts?t=${timestamp}`,
           `/api/sync?t=${timestamp}`,
           `./vault.json?t=${timestamp}`,
           `https://raw.githubusercontent.com/SidGajera/Social-Media-Content-/main/vault.json?t=${timestamp}`
