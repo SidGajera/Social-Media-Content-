@@ -941,12 +941,12 @@
     function deduplicateRecords(recordsArray) {
       if (!Array.isArray(recordsArray)) return [];
       const map = new Map();
-      let highestNo = 0;
 
       recordsArray.forEach(item => {
         if (!item || typeof item !== 'object') return;
         const rawLink = item['Original Post Link'] || item['Post Link'] || item['Link'] || item['URL'] || '';
         const normLink = rawLink ? normalizePostUrl(rawLink) : '';
+        const itemNo = item['No.'] ? parseInt(item['No.'], 10) : null;
 
         // Match primarily by normalized URL
         let existingKey = null;
