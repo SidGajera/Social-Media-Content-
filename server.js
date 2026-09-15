@@ -133,6 +133,61 @@ if (existingCount === 0 && fs.existsSync(VAULT_PATH)) {
   }
 }
 
+async function getFromDatabase() {
+  if (pool && mysqlConnected) {
+    try {
+      const [rows] = await pool.query('SELECT * FROM social_media_posts ORDER BY post_no DESC');
+      const [metaRows] = await pool.query('SELECT * FROM social_media_meta');
+      
+      let customCategories = null, deletedCategories = null, deletedPostNos = null, realThumbs = {};
+      metaRows.forEach(m => {
+        try {
+          const val = typeof m.meta_value === 'string' ? JSON.parse(m.meta_value) : m.meta_value;
+          if (m.meta_key === 'customCategories') customCategories = val;
+          if (m.meta_key === 'deletedCategories') deletedCategories = val;
+          if (m.meta_key === 'deletedPostNos') deletedPostNos = val;
+          if (m.meta_key === 'realThumbs') realThumbs = val;
+        } catch(e) {}
+      });
+
+      const records = rows.map(r => {
+        let catArr = [];
+        try {
+          catArr = typeof r.category === 'string' ? JSON.parse(r.category) : r.category;
+        } catch(e) {
+          catArr = [r.category];
+        }
+        return {
+          'No.': r.post_no,
+          'Platform': r.platform,
+          'Original Post Link': r.original_post_link,
+          'Extra Link': r.extra_link,
+          'Post Type': r.post_type,
+          'Core Idea / 1-Line Takeaway': r.takeaway,
+          'Status': r.status,
+          'Date Saved': r.date_saved,
+          'Category': Array.isArray(catArr) ? catArr : [catArr],
+          'realThumb': r.real_thumb
+        };
+      });
+
+      return {
+        records,
+        customCategories,
+        deletedCategories,
+        deletedPostNos,
+        realThumbs,
+        storage: 'mysql'
+      };
+    } catch (err) {
+      console.error('[MySQL Read Error]:', err.message);
+    }
+  }
+  const sqliteData = getFromSQLite();
+  sqliteData.storage = 'sql_database';
+  return sqliteData;
+}
+
 function getFromSQLite() {
   const rows = sqliteDb.prepare('SELECT * FROM social_media_posts ORDER BY post_no DESC').all();
   const metaRows = sqliteDb.prepare('SELECT * FROM social_media_meta').all();
@@ -276,7 +331,7 @@ const server = http.createServer(async (req, res) => {
 
   // GET /api/mysql/status or /api/status
   if (req.method === 'GET' && (pathname === '/api/mysql/status' || pathname === '/api/status')) {
-    const data = getFromSQLite();
+    const data = await getFromDatabase();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       status: 'online',
@@ -291,7 +346,7 @@ const server = http.createServer(async (req, res) => {
 
   // GET /api/mysql/posts or GET /api/sync - ALWAYS INSTANT!
   if (req.method === 'GET' && (pathname === '/api/mysql/posts' || pathname === '/api/sync' || pathname === '/get-vault')) {
-    const data = getFromSQLite();
+    const data = await getFromDatabase();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       success: true,
@@ -320,7 +375,7 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
-        const data = getFromSQLite();
+        const data = await getFromDatabase();
         let records = data.records || [];
         let realThumbs = data.realThumbs || {};
 
@@ -413,7 +468,7 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
-        const data = getFromSQLite();
+        const data = await getFromDatabase();
         let customCategories = data.customCategories || [];
 
         if (!customCategories.some(c => c.name.toLowerCase() === cat.name.toLowerCase())) {
