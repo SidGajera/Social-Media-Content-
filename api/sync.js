@@ -18,11 +18,40 @@ module.exports = async (req, res) => {
     try {
       if (fs.existsSync(vaultPath)) {
         const raw = fs.readFileSync(vaultPath, 'utf8');
-        const records = JSON.parse(raw);
-        return res.status(200).json({ success: true, count: Array.isArray(records) ? records.length : 0, records });
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return res.status(200).json({
+            success: true,
+            count: parsed.length,
+            records: parsed,
+            customCategories: [],
+            deletedCategories: [],
+            deletedPostNos: [],
+            realThumbs: {}
+          });
+        } else if (parsed && typeof parsed === 'object') {
+          const records = Array.isArray(parsed.records) ? parsed.records : (Array.isArray(parsed.data) ? parsed.data : []);
+          return res.status(200).json({
+            success: true,
+            count: records.length,
+            records,
+            customCategories: Array.isArray(parsed.customCategories) ? parsed.customCategories : [],
+            deletedCategories: Array.isArray(parsed.deletedCategories) ? parsed.deletedCategories : [],
+            deletedPostNos: Array.isArray(parsed.deletedPostNos) ? parsed.deletedPostNos : [],
+            realThumbs: (parsed.realThumbs && typeof parsed.realThumbs === 'object') ? parsed.realThumbs : {}
+          });
+        }
       }
     } catch (e) {}
-    return res.status(200).json({ success: true, count: 0, records: [] });
+    return res.status(200).json({
+      success: true,
+      count: 0,
+      records: [],
+      customCategories: [],
+      deletedCategories: [],
+      deletedPostNos: [],
+      realThumbs: {}
+    });
   }
 
   if (req.method !== 'POST') {
@@ -41,12 +70,22 @@ module.exports = async (req, res) => {
 
     const pat = (body && body.pat) || process.env.GITHUB_PAT || process.env.GH_TOKEN;
 
+    const vaultObj = {
+      records,
+      customCategories: (body && Array.isArray(body.customCategories)) ? body.customCategories : [],
+      deletedCategories: (body && Array.isArray(body.deletedCategories)) ? body.deletedCategories : [],
+      deletedPostNos: (body && Array.isArray(body.deletedPostNos)) ? body.deletedPostNos : [],
+      realThumbs: (body && body.realThumbs && typeof body.realThumbs === 'object') ? body.realThumbs : {}
+    };
+
+    const jsonContent = JSON.stringify(vaultObj, null, 2);
+
     // Check if running on local Node server vs Vercel serverless
     const vaultPath = path.join(process.cwd(), 'vault.json');
     let localDiskSaved = false;
     try {
       if (fs.existsSync(vaultPath)) {
-        fs.writeFileSync(vaultPath, JSON.stringify(records, null, 2), 'utf8');
+        fs.writeFileSync(vaultPath, jsonContent, 'utf8');
         localDiskSaved = true;
       }
     } catch (e) {
@@ -66,7 +105,7 @@ module.exports = async (req, res) => {
         sha = fileData.sha;
       }
 
-      const contentB64 = Buffer.from(JSON.stringify(records, null, 2), 'utf8').toString('base64');
+      const contentB64 = Buffer.from(jsonContent, 'utf8').toString('base64');
       const payload = {
         message: `Auto-sync vault data: ${records.length} posts [${new Date().toISOString()}]`,
         content: contentB64,

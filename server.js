@@ -71,15 +71,27 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'GET' && (pathname === '/api/sync' || pathname === '/get-vault')) {
     let records = [];
+    let customCategories = [];
+    let deletedCategories = [];
+    let deletedPostNos = [];
+    let realThumbs = {};
     try {
       if (fs.existsSync(VAULT_PATH)) {
         const raw = fs.readFileSync(VAULT_PATH, 'utf8');
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) records = parsed;
+        if (Array.isArray(parsed)) {
+          records = parsed;
+        } else if (parsed && typeof parsed === 'object') {
+          records = Array.isArray(parsed.records) ? parsed.records : (Array.isArray(parsed.data) ? parsed.data : []);
+          if (Array.isArray(parsed.customCategories)) customCategories = parsed.customCategories;
+          if (Array.isArray(parsed.deletedCategories)) deletedCategories = parsed.deletedCategories;
+          if (Array.isArray(parsed.deletedPostNos)) deletedPostNos = parsed.deletedPostNos;
+          if (parsed.realThumbs && typeof parsed.realThumbs === 'object') realThumbs = parsed.realThumbs;
+        }
       }
     } catch(e) {}
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, count: records.length, records }));
+    res.end(JSON.stringify({ success: true, count: records.length, records, customCategories, deletedCategories, deletedPostNos, realThumbs }));
     return;
   }
 
@@ -90,15 +102,23 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const payload = JSON.parse(body);
-        const records = Array.isArray(payload) ? payload : (payload.records || payload.data);
+        const records = Array.isArray(payload) ? payload : (payload && (payload.records || payload.data) || []);
         if (!Array.isArray(records)) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: false, error: 'Invalid payload: records array required' }));
           return;
         }
 
+        const vaultObj = {
+          records,
+          customCategories: (payload && Array.isArray(payload.customCategories)) ? payload.customCategories : [],
+          deletedCategories: (payload && Array.isArray(payload.deletedCategories)) ? payload.deletedCategories : [],
+          deletedPostNos: (payload && Array.isArray(payload.deletedPostNos)) ? payload.deletedPostNos : [],
+          realThumbs: (payload && payload.realThumbs && typeof payload.realThumbs === 'object') ? payload.realThumbs : {}
+        };
+
         // Format and save vault.json to server disk
-        const jsonStr = JSON.stringify(records, null, 2);
+        const jsonStr = JSON.stringify(vaultObj, null, 2);
         fs.writeFileSync(VAULT_PATH, jsonStr, 'utf8');
         console.log(`[Vault Server Sync]: Saved ${records.length} records to vault.json on disk.`);
 
