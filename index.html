@@ -111,6 +111,17 @@
   </style>
 </head>
 
+<div id="appSplashLoader" class="fixed inset-0 bg-black/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+    <div class="relative flex flex-col items-center gap-4">
+      <div class="w-16 h-16 rounded-full border-4 border-yellow-500/20 border-t-yellow-400 animate-spin flex items-center justify-center shadow-2xl">
+        <i class="fas fa-layer-group text-yellow-400 text-xl animate-pulse"></i>
+      </div>
+      <div class="text-center space-y-1">
+        <h2 class="text-lg font-black text-yellow-400 tracking-wider uppercase">Social Media Content Vault</h2>
+        <p class="text-xs text-gray-400 font-medium animate-pulse">Syncing Server Vault & Loading Content...</p>
+      </div>
+    </div>
+  </div>
 <body class="antialiased">
   <div class="lg:hidden sticky top-0 z-50 bg-black/95 backdrop-blur-xl border-b border-yellow-500/20 px-4 py-3">
     <div class="flex justify-between items-center">
@@ -1762,6 +1773,17 @@
       document.getElementById('search').dispatchEvent(new Event('input'));
     };
 
+    
+    function dismissSplashLoader() {
+      const loader = document.getElementById('appSplashLoader');
+      if (loader && !loader.classList.contains('opacity-0')) {
+        loader.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => { if (loader && loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
+      }
+    }
+    window.addEventListener('DOMContentLoaded', () => { setTimeout(dismissSplashLoader, 600); });
+    setTimeout(dismissSplashLoader, 1200);
+
     function renderGrid() {
       const grid = document.getElementById('grid');
       if (!grid) return;
@@ -1868,7 +1890,7 @@
           if (isVideoMedia) {
             mediaContentHtml = `<video src="${custom}" class="w-full h-full object-cover" autoplay loop muted playsinline controls></video>`;
           } else {
-            mediaContentHtml = `<img src="${custom}" class="w-full h-full object-cover">`;
+            mediaContentHtml = `<div class="relative w-full h-full bg-zinc-900 overflow-hidden"><div class="absolute inset-0 bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 animate-pulse flex items-center justify-center text-gray-500 text-xs font-semibold gap-2" id="imgSkeleton_${r['No.']}"><i class="fas fa-spinner fa-spin text-yellow-400 text-sm"></i> Loading Image...</div><img src="${custom}" class="w-full h-full object-cover relative z-10 opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0'); const sk=document.getElementById('imgSkeleton_${r['No.']}'); if(sk) sk.remove();" onerror="const sk=document.getElementById('imgSkeleton_${r['No.']}'); if(sk) sk.innerHTML='<span class=\"text-gray-400 text-xs\"><i class=\"fas fa-exclamation-triangle text-yellow-500 mr-1\"></i> Image Preview</span>';"></div>`;
           }
         } else if (embedUrl) {
           mediaContentHtml = `<div class="embed-container"><iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe></div>`;
@@ -1881,7 +1903,28 @@
 
         const div = document.createElement('div');
         div.className = 'card glass rounded-2xl overflow-hidden flex flex-col h-[540px] border border-white/10 hover:border-yellow-400/30 transition-all shadow-xl';
-        div.innerHTML = `<div class="relative bg-zinc-900 overflow-hidden shrink-0 group" style="height:310px">${mediaContentHtml}<div class="absolute inset-0 z-10 cursor-pointer group-hover:bg-black/40 transition-colors flex items-center justify-center" onclick="event.preventDefault(); event.stopPropagation(); openExtractedDocumentModal(${r['No.']}); return false;" title="Click image thumbnail to open Consolidated Document Format &amp; Extracted Image Content"><div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-yellow-300 font-bold text-xs gap-2 backdrop-blur-[3px] bg-black/70 px-4 py-2 rounded-xl border border-yellow-500/40 pointer-events-none shadow-xl"><i class="fas fa-file-alt text-base text-yellow-400"></i><span>Read Extracted Image Document</span></div></div><div class="absolute top-2 left-2 flex items-center gap-1 z-20 pointer-events-none">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md z-20 pointer-events-none">#${r['No.']}</div><button onclick="event.preventDefault(); event.stopPropagation(); openThumb(${r['No.']}); return false;" class="absolute bottom-2 right-2 z-30 w-10 h-10 ${custom ? 'bg-green-500' : 'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform cursor-pointer" title="Change Media / Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%] z-20 pointer-events-none">${catBadgesHtml}<span class="px-2 py-1 ${mediaBadgeBg} rounded-full text-[8px] font-bold">${mediaBadgeText}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1.5 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type'] || 'Content'}</p>${dateSavedStr ? `<span class="text-[10px] text-gray-400 font-medium shrink-0 flex items-center gap-1" title="Date Added: ${dateSavedStr}"><i class="far fa-calendar-alt text-[9px] text-yellow-400/90"></i> ${dateSavedStr}</span>` : ''}</div><div class="mt-2 flex-1"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-2 cursor-pointer hover:text-yellow-300 transition-colors mb-1.5" onclick="openCaptionModal(${r['No.']})" title="Click to preview full HTML document">${formattedCardCaption}</p><button type="button" onclick="openCaptionModal(${r['No.']})" class="mt-1 w-full py-1 px-2.5 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 hover:text-yellow-300 font-bold text-[11px] rounded-xl flex items-center justify-between cursor-pointer transition-all group shadow-sm" title="Preview full text &amp; image content in HTML pop-up"><span class="flex items-center gap-1.5"><i class="fas fa-eye text-yellow-400 text-[11px]"></i> HTML Document Preview</span><i class="fas fa-chevron-down text-xs text-yellow-400 group-hover:translate-y-0.5 transition-transform"></i></button></div></div><div class="flex gap-2 mt-4 pt-3 border-t border-white/5 items-center shrink-0"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-11 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center truncate shadow-sm hover:opacity-95 transition-opacity">Open Post</a>${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 truncate transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-external-link-alt text-[10px]"></i>Extra Link</a>` : ''}<button onclick="openCaptionModal(${r['No.']})" class="w-11 h-11 bg-yellow-500/20 border border-yellow-500/30 rounded-xl flex items-center justify-center text-yellow-400 hover:bg-yellow-500/40 transition-colors shrink-0" title="Read Image Content & Extracted Bullet Points"><i class="fas fa-eye text-xs"></i></button><button onclick="copyFormattedPost(${r['No.']})" class="w-11 h-11 bg-yellow-500/20 border border-yellow-500/30 rounded-xl flex items-center justify-center text-yellow-400 hover:bg-yellow-500/40 transition-colors shrink-0" title="Copy Formatted Post with Bullet Points & Links"><i class="fas fa-copy text-xs"></i></button><button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors shrink-0" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
+        div.innerHTML = `<div class="relative bg-zinc-900 overflow-hidden shrink-0 group" style="height:310px">${mediaContentHtml}<div class="absolute inset-0 z-10 cursor-pointer group-hover:bg-black/40 transition-colors flex items-center justify-center" onclick="event.preventDefault(); event.stopPropagation(); openExtractedDocumentModal(${r['No.']}); return false;" title="Click image thumbnail to open Consolidated Document Format &amp; Extracted Image Content"><div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-yellow-300 font-bold text-xs gap-2 backdrop-blur-[3px] bg-black/70 px-4 py-2 rounded-xl border border-yellow-500/40 pointer-events-none shadow-xl"><i class="fas fa-file-alt text-base text-yellow-400"></i><span>Read Extracted Image Document</span></div></div><div class="absolute top-2 left-2 flex items-center gap-1 z-20 pointer-events-none">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md z-20 pointer-events-none">#${r['No.']}</div><button onclick="event.preventDefault(); event.stopPropagation(); openThumb(${r['No.']}); return false;" class="absolute bottom-2 right-2 z-30 w-10 h-10 ${custom ? 'bg-green-500' : 'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform cursor-pointer" title="Change Media / Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%] z-20 pointer-events-none">${catBadgesHtml}<span class="px-2 py-1 ${mediaBadgeBg} rounded-full text-[8px] font-bold">${mediaBadgeText}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1.5 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type'] || 'Content'}</p>${dateSavedStr ? `<span class="text-[10px] text-gray-400 font-medium shrink-0 flex items-center gap-1" title="Date Added: ${dateSavedStr}"><i class="far fa-calendar-alt text-[9px] text-yellow-400/90"></i> ${dateSavedStr}</span>` : ''}</div><div class="mt-2 flex-1"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-2 cursor-pointer hover:text-yellow-300 transition-colors mb-1.5" onclick="openCaptionModal(${r['No.']})" title="Click to preview full HTML document">${formattedCardCaption}</p><button type="button" onclick="openCaptionModal(${r['No.']})" class="mt-1 w-full py-1 px-2.5 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 hover:text-yellow-300 font-bold text-[11px] rounded-xl flex items-center justify-between cursor-pointer transition-all group shadow-sm" title="Preview full text &amp; image content in HTML pop-up"><span class="flex items-center gap-1.5"><i class="fas fa-eye text-yellow-400 text-[11px]"></i> HTML Document Preview</span><i class="fas fa-chevron-down text-xs text-yellow-400 group-hover:translate-y-0.5 transition-transform"></i></button></div></div><div class="mt-3 pt-3 border-t border-white/10 flex flex-col gap-2 shrink-0">
+          <div class="flex gap-2 items-center">
+            <a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-10 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 whitespace-nowrap px-3 shadow-md hover:opacity-95 transition-opacity">
+              <i class="fas fa-external-link-alt text-[11px]"></i> Open Post
+            </a>
+            ${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-10 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 whitespace-nowrap px-3 transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-link text-[11px]"></i> Extra Link</a>` : ''}
+          </div>
+          <div class="flex gap-1.5 items-center">
+            <button onclick="openCaptionModal(${r['No.']})" class="flex-1 h-9 bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/30 rounded-xl flex items-center justify-center gap-1 text-yellow-300 font-bold text-[11px] transition-colors cursor-pointer" title="Read Image Content & Extracted Bullet Points">
+              <i class="fas fa-eye text-xs"></i><span>Preview</span>
+            </button>
+            <button onclick="copyFormattedPost(${r['No.']})" class="flex-1 h-9 bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/30 rounded-xl flex items-center justify-center gap-1 text-yellow-300 font-bold text-[11px] transition-colors cursor-pointer" title="Copy Formatted Post with Bullet Points & Links">
+              <i class="fas fa-copy text-xs"></i><span>Copy</span>
+            </button>
+            <button onclick="openEditModal(${r['No.']})" class="flex-1 h-9 glass rounded-xl flex items-center justify-center gap-1 text-yellow-300 hover:bg-white/10 font-bold text-[11px] transition-colors cursor-pointer" title="Edit Post">
+              <i class="fas fa-pen text-xs"></i><span>Edit</span>
+            </button>
+            <button onclick="deleteContent(${r['No.']})" class="w-9 h-9 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0 cursor-pointer" title="Delete Post">
+              <i class="fas fa-trash text-xs"></i>
+            </button>
+          </div>
+        </div></div>`;
         grid.appendChild(div);
       });
       shown += slice.length;
@@ -1898,6 +1941,7 @@
           if (loadMoreBtn) loadMoreBtn.textContent = `Load More ${nextCount}`;
         }
       }
+      dismissSplashLoader();
     }
 
     window.editTakeaway = async function (no) {
@@ -2202,11 +2246,10 @@
       const hasHtmlTags = /<[a-z][\s\S]*>/i.test(str);
       if (hasHtmlTags) {
         return str
-          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(new RegExp('<' + 'script[\\s\\S]*?<' + '/script>', 'gi'), '')
           .replace(/\s*on\w+="[^"]*"/gi, '');
       }
 
-      // Check if text contains explicit carousel slide markers (Carousel Image, Slide 1, Slide 2...)
       const isSlideStructured = /(?:Carousel\s*Image|Slide\s*#?\d+|Image\s*#?\d+|Page\s*#?\d+)/i.test(str);
 
       if (isSlideStructured) {
@@ -2214,24 +2257,24 @@
         let formattedHtml = '';
         rawBlocks.forEach((block, idx) => {
           let blockText = block.trim();
-          let slideTitle = `?? Carousel Image ${idx + 1} / Slide ${idx + 1}`;
+          let slideTitle = `Carousel Image ${idx + 1} / Slide ${idx + 1}`;
           
           const headerMatch = blockText.match(/^(Carousel\s*Image\s*\d+(?:\s*\/\s*Slide\s*\d+)?(?:\s*\([^)]+\))?|Slide\s*#?\d+(?:\s*\([^)]+\))?|Image\s*#?\d+|Page\s*#?\d+)[:\-\s]*/i);
           if (headerMatch && headerMatch[1]) {
-            let matchedTitle = headerMatch[1].trim();
+            let matchedTitle = headerMatch[1].replace(/^[?\s?]*\s*/, '').trim();
             if (!matchedTitle.toLowerCase().startsWith('carousel image')) {
-              slideTitle = `?? Carousel Image ${idx + 1} / ${matchedTitle}`;
+              slideTitle = `Carousel Image ${idx + 1} / ${matchedTitle}`;
             } else {
-              slideTitle = `?? ${matchedTitle}`;
+              slideTitle = matchedTitle;
             }
             blockText = blockText.substring(headerMatch[0].length).trim();
           }
 
           let lines = blockText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
           let slideContent = lines.map(line => {
-            let cleanLine = line.replace(/^[-*?????]\s*/, '').replace(/^&bull;\s*/, '').trim();
+            let cleanLine = line.replace(/^[?\-*?????&bull;\u2022\uFFFD\u25CF\s]+/, '').trim();
             if (!cleanLine) return '';
-            return `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">?</span><span class="flex-1 text-gray-100 font-medium">${cleanLine}</span></div>`;
+            return `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">&bull;</span><span class="flex-1 text-gray-100 font-medium">${cleanLine}</span></div>`;
           }).join('');
 
           slideContent = slideContent
@@ -2264,21 +2307,22 @@
         .replace(/>/g, '&gt;');
 
       let lines = str.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-      let hasBullets = lines.some(l => /^[-*?????]\s*/.test(l));
+      let hasBullets = lines.some(l => /^[?\-*?????&bull;\u2022\uFFFD\u25CF]\s*/.test(l));
 
       if (hasBullets) {
         lines = lines.map(line => {
-          if (/^[-*?????]\s*/.test(line)) {
-            const cleanContent = line.replace(/^[-*?????]\s*/, '');
-            return `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">?</span><span class="flex-1 text-gray-100 font-medium">${cleanContent}</span></div>`;
-          }
-          return `<div class="text-justify leading-relaxed my-1.5 text-gray-100 font-medium">${line}</div>`;
+          const cleanContent = line.replace(/^[?\-*?????&bull;\u2022\uFFFD\u25CF\s]+/, '').trim();
+          if (!cleanContent) return '';
+          return `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">&bull;</span><span class="flex-1 text-gray-100 font-medium">${cleanContent}</span></div>`;
         });
         str = lines.join('');
       } else if (str.includes('.') && str.length > 40) {
         const sentences = str.split(/(?<=\.)\s+/).map(s => s.trim()).filter(s => s.length > 5);
         if (sentences.length > 1) {
-          str = sentences.map(s => `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">?</span><span class="flex-1 text-gray-100 font-medium">${s}</span></div>`).join('');
+          str = sentences.map(s => {
+            const cleanContent = s.replace(/^[?\-*?????&bull;\u2022\uFFFD\u25CF\s]+/, '').trim();
+            return `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">&bull;</span><span class="flex-1 text-gray-100 font-medium">${cleanContent}</span></div>`;
+          }).join('');
         } else {
           str = `<div class="text-justify leading-relaxed my-1 text-gray-100 font-medium">${str}</div>`;
         }
@@ -2375,7 +2419,8 @@
       if (!text || typeof text !== 'string') return text || '';
       let str = text.trim();
       if (!str) return str;
-      if (str.includes('?? Carousel Image') || str.includes('?? Slide')) return str;
+      str = str.replace(/\?\?\s*/g, '');
+      if (str.includes('Carousel Image') || str.includes('Slide')) return str;
       const isCarousel = (postType || '').toLowerCase().includes('carousel') || str.toLowerCase().includes('carousel') || str.toLowerCase().includes('slide');
       const lines = str.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
       const explicitMatches = str.split(/(?=(?:Slide|Image|Page|Card)\s*#?\d+)/i).filter(b => b.trim());
@@ -2383,25 +2428,98 @@
         return explicitMatches.map((m, idx) => {
           let cleanBody = m.replace(/^(?:Slide|Image|Page|Card)\s*#?\d+[:\-\s]*/i, '').trim();
           let bulletBody = cleanBody.split(/\r?\n/).map(l => {
-            let cl = l.replace(/^[?\-*?????&bull;\s]+/, '').trim();
-            return cl ? '? ' + cl : '';
+            let cl = l.replace(/^[?\-*•📍✨▶\u2022\uFFFD\u25CF\s]+/, '').trim();
+            return cl ? '• ' + cl : '';
           }).filter(Boolean).join('\n');
-          return '?? Carousel Image ' + (idx + 1) + ' / Slide ' + (idx + 1) + ':\n' + (bulletBody || ('? ' + cleanBody));
+          return 'Carousel Image ' + (idx + 1) + ' / Slide ' + (idx + 1) + ':\n' + (bulletBody || ('• ' + cleanBody));
         }).join('\n\n');
       }
       if (isCarousel || lines.length > 1) {
         const slideItems = lines.length >= 2 ? lines : str.split(/(?<=\.)\s+/).filter(s => s.trim().length > 5);
         if (slideItems.length >= 2) {
           return slideItems.map((item, idx) => {
-            let cl = item.replace(/^[?\-*?????&bull;\s]+/, '').trim();
-            let label = idx === 0 ? '?? Carousel Image 1 / Slide 1 (Cover & Overview)' : '?? Carousel Image ' + (idx + 1) + ' / Slide ' + (idx + 1);
-            return label + ':\n? ' + cl;
+            let cl = item.replace(/^[?\-*•📍✨▶\u2022\uFFFD\u25CF\s]+/, '').trim();
+            let label = idx === 0 ? 'Carousel Image 1 / Slide 1 (Cover & Overview)' : 'Carousel Image ' + (idx + 1) + ' / Slide ' + (idx + 1);
+            return label + ':\n• ' + cl;
           }).join('\n\n');
         }
       }
-      return '?? Carousel Image 1 / Slide 1 (Cover & Overview):\n? ' + str.replace(/^[?\-*?????&bull;\s]+/, '').trim();
+      return 'Carousel Image 1 / Slide 1 (Cover & Overview):\n• ' + str.replace(/^[?\-*•📍✨▶\u2022\uFFFD\u25CF\s]+/, '').trim();
     }
-async function quickAdd(link, categories, takeaway, platform, postType, extraUrl, thumbUrl) {
+
+    let currentModalNo = null;
+
+    window.openExtractedDocumentModal = function(no) {
+      window.openCaptionModal(no, 'Extracted Document');
+    };
+
+    window.openCaptionModal = function(no, mode = 'HTML Document') {
+      currentModalNo = no;
+      const rec = records.find(r => r && r['No.'] === no);
+      if (!rec) return;
+
+      const badgeEl = document.getElementById('captionModalNoBadge');
+      if (badgeEl) badgeEl.textContent = '#' + no;
+
+      const titleEl = document.getElementById('captionModalTitle');
+      if (titleEl) {
+        if (mode === 'Extracted Document') {
+          titleEl.innerHTML = '<i class="fas fa-file-invoice text-yellow-400 mr-2"></i>Extracted Image Content & Consolidated Document (#' + no + ')';
+        } else {
+          titleEl.innerHTML = '<i class="fas fa-eye text-yellow-400 mr-2"></i>HTML Document Preview (#' + no + ')';
+        }
+      }
+
+      const textEl = document.getElementById('captionModalText');
+      if (textEl) {
+        const rawText = rec['Core Idea / 1-Line Takeaway'] || 'No extracted content or description available for this post.';
+        textEl.innerHTML = formatRichCaption(rawText);
+      }
+
+      const editBtn = document.getElementById('editCaptionFromModalBtn');
+      if (editBtn) {
+        editBtn.onclick = function() {
+          closeCaptionModal();
+          window.openEditModal(no);
+        };
+      }
+
+      const modal = document.getElementById('captionModal');
+      if (modal) modal.classList.remove('hidden');
+    };
+
+    window.closeCaptionModal = function() {
+      const modal = document.getElementById('captionModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.copyModalCaption = function() {
+      if (!currentModalNo) return;
+      const rec = records.find(r => r && r['No.'] === currentModalNo);
+      if (!rec) return;
+      const formatted = buildFormattedCopyablePost(rec);
+      navigator.clipboard.writeText(formatted).then(() => {
+        showToast('Copied Post #' + currentModalNo + ' Formatted Document!');
+      }).catch(err => {
+        const txt = document.getElementById('captionModalText');
+        if (txt) {
+          navigator.clipboard.writeText(txt.innerText);
+          showToast('Copied Post #' + currentModalNo + ' text!');
+        }
+      });
+    };
+
+    window.copyModalRawText = function() {
+      if (!currentModalNo) return;
+      const rec = records.find(r => r && r['No.'] === currentModalNo);
+      if (!rec) return;
+      const raw = rec['Core Idea / 1-Line Takeaway'] || '';
+      navigator.clipboard.writeText(raw).then(() => {
+        showToast('Copied Post #' + currentModalNo + ' raw text!');
+      });
+    };
+
+    async function quickAdd(link, categories, takeaway, platform, postType, extraUrl, thumbUrl) {
       if (!link) { alert('Please paste a post link first'); return; }
       
       let cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
@@ -2488,3 +2606,6 @@ async function quickAdd(link, categories, takeaway, platform, postType, extraUrl
       if (document.getElementById('quickExtraLink')) document.getElementById('quickExtraLink').value = '';
       closeAddModal();
     }
+  </script>
+</body>
+</html>
