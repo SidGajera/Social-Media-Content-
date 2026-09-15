@@ -1135,7 +1135,7 @@
 
         for (const u of urls) {
           try {
-            const res = await fetch(u);
+            const res = await fetch(u, { cache: 'no-store' });
             if (res.ok) {
               const data = await res.json();
               let list = [];
