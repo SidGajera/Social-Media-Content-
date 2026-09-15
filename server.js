@@ -377,7 +377,39 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // POST /api/add-post - Direct Server-Authoritative Add/Update Post Endpoint!
+  
+function formatCarouselTextServer(text, postType) {
+  if (!text || typeof text !== 'string') return text || '';
+  let str = text.trim();
+  if (!str) return str;
+  if (str.includes('?? Carousel Image') || str.includes('?? Slide')) return str;
+  const isCarousel = (postType || '').toLowerCase().includes('carousel') || str.toLowerCase().includes('carousel') || str.toLowerCase().includes('slide');
+  const lines = str.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const explicitMatches = str.split(/(?=(?:Slide|Image|Page|Card)\s*#?\d+)/i).filter(b => b.trim());
+  if (explicitMatches.length > 1) {
+    return explicitMatches.map((m, idx) => {
+      let cleanBody = m.replace(/^(?:Slide|Image|Page|Card)\s*#?\d+[:\-\s]*/i, '').trim();
+      let bulletBody = cleanBody.split(/\r?\n/).map(l => {
+        let cl = l.replace(/^[?\-*?????&bull;\s]+/, '').trim();
+        return cl ? '? ' + cl : '';
+      }).filter(Boolean).join('\n');
+      return '?? Carousel Image ' + (idx + 1) + ' / Slide ' + (idx + 1) + ':\n' + (bulletBody || ('? ' + cleanBody));
+    }).join('\n\n');
+  }
+  if (isCarousel || lines.length > 1) {
+    const slideItems = lines.length >= 2 ? lines : str.split(/(?<=\.)\s+/).filter(s => s.trim().length > 5);
+    if (slideItems.length >= 2) {
+      return slideItems.map((item, idx) => {
+        let cl = item.replace(/^[?\-*?????&bull;\s]+/, '').trim();
+        let label = idx === 0 ? '?? Carousel Image 1 / Slide 1 (Cover & Overview)' : '?? Carousel Image ' + (idx + 1) + ' / Slide ' + (idx + 1);
+        return label + ':\n? ' + cl;
+      }).join('\n\n');
+    }
+  }
+  return '?? Carousel Image 1 / Slide 1 (Cover & Overview):\n? ' + str.replace(/^[?\-*?????&bull;\s]+/, '').trim();
+}
+
+// POST /api/add-post - Direct Server-Authoritative Add/Update Post Endpoint!
   if (req.method === 'POST' && pathname === '/api/add-post') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -403,7 +435,7 @@ const server = http.createServer(async (req, res) => {
         if (existingRec) {
           targetNo = existingRec['No.'];
           existingRec['Category'] = Array.from(new Set([...(existingRec['Category'] || []), ...cats]));
-          if (item.takeaway) existingRec['Core Idea / 1-Line Takeaway'] = item.takeaway;
+          if (item.takeaway) { item.takeaway = formatCarouselTextServer(item.takeaway, item.postType || existingRec['Post Type']); existingRec['Core Idea / 1-Line Takeaway'] = item.takeaway; }
           if (item.platform) existingRec['Platform'] = item.platform;
           if (item.postType) existingRec['Post Type'] = item.postType;
           if (item.extraUrl !== undefined) existingRec['Extra Link'] = item.extraUrl;
