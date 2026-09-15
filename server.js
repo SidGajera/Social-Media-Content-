@@ -108,6 +108,13 @@ function upsertToSQLite(records, customCategories, deletedCategories, deletedPos
     });
   }
 
+  if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) {
+    const delStmt = sqliteDb.prepare('DELETE FROM social_media_posts WHERE post_no = ?');
+    deletedPostNos.forEach(no => {
+      if (no) delStmt.run(parseInt(no, 10));
+    });
+  }
+
   const metaStmt = sqliteDb.prepare(`
     INSERT INTO social_media_meta (meta_key, meta_value) VALUES (?, ?)
     ON CONFLICT(meta_key) DO UPDATE SET meta_value = excluded.meta_value;
