@@ -1738,17 +1738,26 @@
       const cleanQ = rawQ.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
 
       const noStr = String(r['No.'] || '');
-      const linkStr = (r['Original Post Link'] || '').toLowerCase();
+      const linkStr = (r['Original Post Link'] || r['Link'] || r['URL'] || '').toLowerCase();
       const extraStr = (r['Extra Link'] || r['Extra URL'] || r['extraUrl'] || '').toLowerCase();
-      const takeawayStr = (r['Core Idea / 1-Line Takeaway'] || '').toLowerCase();
+      const takeawayStr = (r['Core Idea / 1-Line Takeaway'] || r['takeaway'] || '').toLowerCase();
+      const captionStr = (r['Caption'] || r['Post Caption'] || r['description'] || r['Description'] || '').toLowerCase();
+      const titleStr = (r['Title'] || r['title'] || r['Heading'] || '').toLowerCase();
       const typeStr = (r['Post Type'] || '').toLowerCase();
       const platformStr = (r['Platform'] || '').toLowerCase();
       const catsStr = getPostCategories(r).join(' ').toLowerCase();
       const dateStr = getPostDate(r).toLowerCase();
 
-      const fullText = `${noStr} #${noStr} ${linkStr} ${extraStr} ${takeawayStr} ${typeStr} ${platformStr} ${catsStr} ${dateStr}`;
+      const fullText = `${noStr} #${noStr} ${titleStr} ${captionStr} ${takeawayStr} ${linkStr} ${extraStr} ${typeStr} ${platformStr} ${catsStr} ${dateStr}`;
 
-      return fullText.includes(rawQ) || (cleanQ && fullText.includes(cleanQ));
+      if (fullText.includes(rawQ) || (cleanQ && fullText.includes(cleanQ))) return true;
+
+      const terms = rawQ.split(/\s+/).filter(Boolean);
+      if (terms.length > 1) {
+        return terms.every(t => fullText.includes(t) || (t.startsWith('#') && fullText.includes(t.slice(1))));
+      }
+
+      return false;
     }
 
     window.resetSearchFilters = function () {
