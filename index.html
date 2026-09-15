@@ -2200,46 +2200,98 @@
       if (!text || typeof text !== 'string') return '';
       let str = text.trim();
       const hasHtmlTags = /<[a-z][\s\S]*>/i.test(str);
-      if (!hasHtmlTags) {
-        str = str
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-
-        let lines = str.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-        let hasBullets = lines.some(l => /^[-*•📍✨▶]\s*/.test(l));
-
-        if (hasBullets) {
-          lines = lines.map(line => {
-            if (/^[-*•📍✨▶]\s*/.test(line)) {
-              const cleanContent = line.replace(/^[-*•📍✨▶]\s*/, '');
-              return `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">•</span><span class="flex-1 text-gray-100 font-medium">${cleanContent}</span></div>`;
-            }
-            return `<div class="text-justify leading-relaxed my-1.5 text-gray-100 font-medium">${line}</div>`;
-          });
-          str = lines.join('');
-        } else if (str.includes('.') && str.length > 40) {
-          const sentences = str.split(/(?<=\.)\s+/).map(s => s.trim()).filter(s => s.length > 5);
-          if (sentences.length > 1) {
-            str = sentences.map(s => `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">•</span><span class="flex-1 text-gray-100 font-medium">${s}</span></div>`).join('');
-          } else {
-            str = `<div class="text-justify leading-relaxed my-1 text-gray-100 font-medium">${str}</div>`;
-          }
-        } else {
-          str = `<div class="text-justify leading-relaxed my-1 text-gray-100 font-medium">${str}</div>`;
-        }
-
-        str = str
-          .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-yellow-300 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/30">$1</strong>')
-          .replace(/__(.*?)__/g, '<strong class="font-bold text-yellow-300 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/30">$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em class="italic text-gray-300">$1</em>');
-
-        str = linkifyUrls(str);
-      } else {
-        str = str
+      if (hasHtmlTags) {
+        return str
           .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
           .replace(/\s*on\w+="[^"]*"/gi, '');
       }
+
+      // Check if text contains explicit carousel slide markers (Carousel Image, Slide 1, Slide 2...)
+      const isSlideStructured = /(?:Carousel\s*Image|Slide\s*#?\d+|Image\s*#?\d+|Page\s*#?\d+)/i.test(str);
+
+      if (isSlideStructured) {
+        const rawBlocks = str.split(/(?=(?:Carousel\s*Image|Slide\s*#?\d+|Image\s*#?\d+|Page\s*#?\d+))/i).filter(b => b.trim());
+        let formattedHtml = '';
+        rawBlocks.forEach((block, idx) => {
+          let blockText = block.trim();
+          let slideTitle = `?? Carousel Image ${idx + 1} / Slide ${idx + 1}`;
+          
+          const headerMatch = blockText.match(/^(Carousel\s*Image\s*\d+(?:\s*\/\s*Slide\s*\d+)?(?:\s*\([^)]+\))?|Slide\s*#?\d+(?:\s*\([^)]+\))?|Image\s*#?\d+|Page\s*#?\d+)[:\-\s]*/i);
+          if (headerMatch && headerMatch[1]) {
+            let matchedTitle = headerMatch[1].trim();
+            if (!matchedTitle.toLowerCase().startsWith('carousel image')) {
+              slideTitle = `?? Carousel Image ${idx + 1} / ${matchedTitle}`;
+            } else {
+              slideTitle = `?? ${matchedTitle}`;
+            }
+            blockText = blockText.substring(headerMatch[0].length).trim();
+          }
+
+          let lines = blockText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+          let slideContent = lines.map(line => {
+            let cleanLine = line.replace(/^[-*?????]\s*/, '').replace(/^&bull;\s*/, '').trim();
+            if (!cleanLine) return '';
+            return `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">?</span><span class="flex-1 text-gray-100 font-medium">${cleanLine}</span></div>`;
+          }).join('');
+
+          slideContent = slideContent
+            .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-yellow-300 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/30">$1</strong>')
+            .replace(/__(.*?)__/g, '<strong class="font-bold text-yellow-300 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/30">$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em class="italic text-gray-300">$1</em>');
+
+          slideContent = linkifyUrls(slideContent);
+
+          formattedHtml += `
+            <div class="mb-3.5 p-3.5 bg-gradient-to-br from-zinc-900/90 via-black to-zinc-950/90 border border-yellow-500/30 rounded-xl shadow-lg space-y-2">
+              <div class="flex items-center justify-between border-b border-yellow-500/20 pb-2 mb-2">
+                <span class="px-2.5 py-1 bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 rounded-lg text-xs font-bold flex items-center gap-1.5">
+                  <i class="fas fa-layer-group text-yellow-400"></i> ${slideTitle}
+                </span>
+                <span class="text-[10px] text-gray-400 font-semibold"><i class="fas fa-images text-yellow-400"></i> Extracted Slide Content</span>
+              </div>
+              <div class="space-y-1">
+                ${slideContent}
+              </div>
+            </div>
+          `;
+        });
+        return formattedHtml;
+      }
+
+      str = str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      let lines = str.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let hasBullets = lines.some(l => /^[-*?????]\s*/.test(l));
+
+      if (hasBullets) {
+        lines = lines.map(line => {
+          if (/^[-*?????]\s*/.test(line)) {
+            const cleanContent = line.replace(/^[-*?????]\s*/, '');
+            return `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">?</span><span class="flex-1 text-gray-100 font-medium">${cleanContent}</span></div>`;
+          }
+          return `<div class="text-justify leading-relaxed my-1.5 text-gray-100 font-medium">${line}</div>`;
+        });
+        str = lines.join('');
+      } else if (str.includes('.') && str.length > 40) {
+        const sentences = str.split(/(?<=\.)\s+/).map(s => s.trim()).filter(s => s.length > 5);
+        if (sentences.length > 1) {
+          str = sentences.map(s => `<div class="flex items-start gap-2.5 my-1.5 text-justify leading-relaxed"><span class="text-yellow-400 font-extrabold shrink-0 mt-0.5">?</span><span class="flex-1 text-gray-100 font-medium">${s}</span></div>`).join('');
+        } else {
+          str = `<div class="text-justify leading-relaxed my-1 text-gray-100 font-medium">${str}</div>`;
+        }
+      } else {
+        str = `<div class="text-justify leading-relaxed my-1 text-gray-100 font-medium">${str}</div>`;
+      }
+
+      str = str
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-yellow-300 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/30">$1</strong>')
+        .replace(/__(.*?)__/g, '<strong class="font-bold text-yellow-300 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/30">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em class="italic text-gray-300">$1</em>');
+
+      str = linkifyUrls(str);
       return str;
     }
 
