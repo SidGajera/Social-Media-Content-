@@ -1811,7 +1811,7 @@
 
         const div = document.createElement('div');
         div.className = 'card glass rounded-2xl overflow-hidden flex flex-col h-full border border-white/10 hover:border-yellow-400/30 transition-all shadow-xl';
-        div.innerHTML = `<div class="relative bg-zinc-900 overflow-hidden shrink-0" style="height:380px">${mediaContentHtml}<div class="absolute top-2 left-2 flex items-center gap-1">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-10 h-10 ${custom ? 'bg-green-500' : 'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform" title="Change Media / Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${mediaBadgeBg} rounded-full text-[8px] font-bold">${mediaBadgeText}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1.5 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type'] || 'Content'}</p>${dateSavedStr ? `<span class="text-[10px] text-gray-400 font-medium shrink-0 flex items-center gap-1" title="Date Added: ${dateSavedStr}"><i class="far fa-calendar-alt text-[9px] text-yellow-400/90"></i> ${dateSavedStr}</span>` : ''}</div><div class="mt-2 flex-1"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-3 whitespace-pre-wrap cursor-pointer hover:text-yellow-300 transition-colors" onclick="openCaptionModal(${r['No.']})" title="Click to view full caption">${formattedCardCaption} ${hasMoreContent ? `<i class="fas fa-chevron-down text-yellow-400 text-xs inline-block ml-1 hover:scale-125 transition-transform" title="More content available"></i>` : ''}</p></div></div><div class="flex gap-2 mt-4 pt-3 border-t border-white/5 items-center shrink-0"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-11 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center truncate shadow-sm hover:opacity-95 transition-opacity">Open Post</a>${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 truncate transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-external-link-alt text-[10px]"></i>Extra Link</a>` : ''}<button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors shrink-0" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
+        div.innerHTML = `<div class="relative bg-zinc-900 overflow-hidden shrink-0" style="height:380px">${mediaContentHtml}<div class="absolute top-2 left-2 flex items-center gap-1">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md">#${r['No.']}</div><button onclick="openThumb(${r['No.']})" class="absolute bottom-2 right-2 w-10 h-10 ${custom ? 'bg-green-500' : 'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform" title="Change Media / Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%]">${catBadgesHtml}<span class="px-2 py-1 ${mediaBadgeBg} rounded-full text-[8px] font-bold">${mediaBadgeText}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1.5 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type'] || 'Content'}</p>${dateSavedStr ? `<span class="text-[10px] text-gray-400 font-medium shrink-0 flex items-center gap-1" title="Date Added: ${dateSavedStr}"><i class="far fa-calendar-alt text-[9px] text-yellow-400/90"></i> ${dateSavedStr}</span>` : ''}</div><div class="mt-2 flex-1"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-3 whitespace-pre-wrap cursor-pointer hover:text-yellow-300 transition-colors" onclick="openCaptionModal(${r['No.']})" title="Click to view full caption">${formattedCardCaption} ${hasMoreContent ? `<i class="fas fa-chevron-down text-yellow-400 text-xs inline-block ml-1 hover:scale-125 transition-transform" title="More content available"></i>` : ''}</p></div></div><div class="flex gap-2 mt-4 pt-3 border-t border-white/5 items-center shrink-0"><a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-11 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center truncate shadow-sm hover:opacity-95 transition-opacity">Open Post</a>${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 truncate transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-external-link-alt text-[10px]"></i>Extra Link</a>` : ''}<button onclick="copyFormattedPost(${r['No.']})" class="w-11 h-11 bg-yellow-500/20 border border-yellow-500/30 rounded-xl flex items-center justify-center text-yellow-400 hover:bg-yellow-500/40 transition-colors shrink-0" title="Copy Formatted Post with Bullet Points & Links"><i class="fas fa-copy text-xs"></i></button><button onclick="openEditModal(${r['No.']})" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 transition-colors shrink-0" title="Edit Post"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteContent(${r['No.']})" class="w-11 h-11 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0" title="Delete Post"><i class="fas fa-trash text-xs"></i></button></div></div>`;
         grid.appendChild(div);
       });
       shown += slice.length;
@@ -1967,15 +1967,134 @@
       return desc;
     }
 
+    
+    function buildFormattedCopyablePost(rec) {
+      if (!rec) return '';
+      const no = rec['No.'] || 0;
+      const platform = (rec.Platform || rec['Post Type'] || 'Social Media').toUpperCase();
+      const rawTakeaway = (rec['Core Idea / 1-Line Takeaway'] || '').trim();
+      const origLink = (rec['Original Post Link'] || '').trim();
+      const extraLink = (rec['Extra Link / Resource'] || '').trim();
+      const cats = getPostCategories(rec);
+      const dateStr = getPostDate(rec);
+
+      // Format takeaway lines into bullet points if multi-line or contains bullet indicators
+      let formattedTakeaway = rawTakeaway;
+      if (formattedTakeaway) {
+        const lines = formattedTakeaway.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        if (lines.length > 1) {
+          formattedTakeaway = lines.map(line => {
+            if (/^[-*•📍✨▶]\s*/.test(line)) return line.replace(/^[-*•📍✨▶]\s*/, '• ');
+            return `• ${line}`;
+          }).join('\n');
+        } else if (!/^[-*•📍✨▶]/.test(formattedTakeaway) && formattedTakeaway.length > 40 && formattedTakeaway.includes('.')) {
+          const sentences = formattedTakeaway.split(/(?<=\.)\s+/).map(s => s.trim()).filter(s => s.length > 5);
+          if (sentences.length > 1) {
+            formattedTakeaway = sentences.map(s => `• ${s}`).join('\n');
+          }
+        }
+      }
+
+      // Format hashtags
+      let hashtagsStr = '';
+      if (cats.length > 0) {
+        hashtagsStr = cats.map(c => '#' + c.replace(/[^a-zA-Z0-9_]/g, '')).join(' ');
+      }
+
+      const parts = [];
+      parts.push(`📌 **POST #${no} | ${platform}**`);
+      parts.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+
+      if (formattedTakeaway) {
+        parts.push(`💡 **KEY TAKEAWAYS & CAPTION:**\n${formattedTakeaway}`);
+      } else {
+        parts.push(`💡 **KEY TAKEAWAYS & CAPTION:**\n• No description provided.`);
+      }
+
+      if (origLink) {
+        parts.push(`🔗 **POST LINK:**\n${origLink}`);
+      }
+
+      if (extraLink) {
+        parts.push(`📎 **EXTRA RESOURCE LINK:**\n${extraLink}`);
+      }
+
+      if (hashtagsStr) {
+        parts.push(`🏷️ **TAGS:**\n${hashtagsStr}`);
+      }
+
+      if (dateStr) {
+        parts.push(`📅 **SAVED DATE:** ${dateStr}`);
+      }
+
+      return parts.join('\n\n');
+    }
+
+    window.copyFormattedPost = function(no) {
+      const rec = records.find(r => r && r['No.'] === no);
+      if (!rec) {
+        showToast('Post record not found!', false);
+        return;
+      }
+      const formattedText = buildFormattedCopyablePost(rec);
+      if (!navigator.clipboard || !navigator.clipboard.writeText) {
+        const textarea = document.createElement('textarea');
+        textarea.value = formattedText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          showToast(`Post #${no} copied with bullet points & links!`);
+        } catch (e) {
+          showToast('Failed to copy post text', false);
+        }
+        document.body.removeChild(textarea);
+        return;
+      }
+      navigator.clipboard.writeText(formattedText).then(() => {
+        showToast(`Post #${no} copied with bullet points & links!`);
+      }).catch(err => {
+        showToast('Failed to copy to clipboard', false);
+      });
+    };
+
     function formatRichCaption(text) {
       if (!text || typeof text !== 'string') return '';
-      let str = text;
+      let str = text.trim();
       const hasHtmlTags = /<[a-z][\s\S]*>/i.test(str);
       if (!hasHtmlTags) {
         str = str
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
+          .replace(/>/g, '&gt;');
+
+        // Format bullet lines nicely in HTML
+        let lines = str.split(/\r?\n/);
+        let hasBullets = lines.some(l => /^[-*•📍✨▶]\s*/.test(l.trim()));
+        
+        if (hasBullets) {
+          lines = lines.map(line => {
+            const trimmed = line.trim();
+            if (/^[-*•📍✨▶]\s*/.test(trimmed)) {
+              const cleanContent = trimmed.replace(/^[-*•📍✨▶]\s*/, '');
+              return `<div class="flex items-start gap-2 my-1 text-justify"><span class="text-yellow-400 font-bold shrink-0 leading-snug">•</span><span class="flex-1">${cleanContent}</span></div>`;
+            }
+            return `<div class="text-justify my-0.5">${line}</div>`;
+          });
+          str = lines.join('');
+        } else if (str.includes('.') && str.length > 60) {
+          // Split multi-sentence paragraph into justified bullet items
+          const sentences = str.split(/(?<=\.)\s+/).map(s => s.trim()).filter(s => s.length > 5);
+          if (sentences.length > 1) {
+            str = sentences.map(s => `<div class="flex items-start gap-2 my-1 text-justify"><span class="text-yellow-400 font-bold shrink-0 leading-snug">•</span><span class="flex-1">${s}</span></div>`).join('');
+          } else {
+            str = `<div class="text-justify">${str}</div>`;
+          }
+        } else {
+          str = `<div class="text-justify">${str}</div>`;
+        }
+
+        str = str
           .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-yellow-300">$1</strong>')
           .replace(/__(.*?)__/g, '<strong class="font-bold text-yellow-300">$1</strong>')
           .replace(/\*(.*?)\*/g, '<em class="italic text-gray-300">$1</em>');
@@ -2742,8 +2861,34 @@
       if (title) title.textContent = `${rec.Platform || 'Social Media'} Post Caption`;
       const textEl = document.getElementById('captionModalText');
       const rawCaption = cleanSocialCaption(rec['Core Idea / 1-Line Takeaway'] || 'No description provided');
+      const origLink = (rec['Original Post Link'] || '').trim();
+      const extraLink = (rec['Extra Link / Resource'] || '').trim();
+      const cats = getPostCategories(rec);
+
+      let modalContentHtml = formatRichCaption(rawCaption);
+
+      // Append clickable links section to modal preview
+      if (origLink || extraLink) {
+        modalContentHtml += `<div class="mt-4 pt-3 border-t border-white/10 space-y-2 text-xs">`;
+        if (origLink) {
+          modalContentHtml += `<div class="flex items-center gap-2 text-gray-300 font-medium"><i class="fas fa-link text-yellow-400"></i><strong class="text-white">Post Link:</strong> ${linkifyUrls(origLink)}</div>`;
+        }
+        if (extraLink) {
+          modalContentHtml += `<div class="flex items-center gap-2 text-gray-300 font-medium"><i class="fas fa-external-link-alt text-blue-400"></i><strong class="text-white">Extra Link:</strong> ${linkifyUrls(extraLink)}</div>`;
+        }
+        modalContentHtml += `</div>`;
+      }
+
+      if (cats.length > 0) {
+        modalContentHtml += `<div class="mt-3 flex flex-wrap gap-1.5 text-[10px]">`;
+        cats.forEach(c => {
+          modalContentHtml += `<span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-full font-semibold">#${c}</span>`;
+        });
+        modalContentHtml += `</div>`;
+      }
+
       if (textEl) {
-        textEl.innerHTML = formatRichCaption(rawCaption);
+        textEl.innerHTML = modalContentHtml;
       }
       const copyBtnText = document.getElementById('copyCaptionBtnText');
       if (copyBtnText) copyBtnText.textContent = 'Copy Full Caption';
@@ -2761,18 +2906,15 @@
     window.closeCaptionModal = closeCaptionModal;
 
     window.copyModalCaption = function () {
-      const rec = records.find(r => r && r['No.'] === currentCaptionNo);
-      const rawCaption = rec ? (rec['Core Idea / 1-Line Takeaway'] || '') : (document.getElementById('captionModalText') ? document.getElementById('captionModalText').innerText : '');
-      if (!rawCaption) return;
-      navigator.clipboard.writeText(rawCaption).then(() => {
-        const copyBtnText = document.getElementById('copyCaptionBtnText');
-        if (copyBtnText) copyBtnText.textContent = 'Copied! ✓';
+      if (!currentCaptionNo) return;
+      copyFormattedPost(currentCaptionNo);
+      const copyBtnText = document.getElementById('copyCaptionBtnText');
+      if (copyBtnText) {
+        copyBtnText.textContent = 'Copied Formatted Post! ✓';
         setTimeout(() => {
-          if (copyBtnText) copyBtnText.textContent = 'Copy Full Caption';
+          if (copyBtnText) copyBtnText.textContent = 'Copy Formatted Post';
         }, 2000);
-      }).catch(() => {
-        alert('Caption copied to clipboard!');
-      });
+      }
     };
 
     document.getElementById('modalClose').addEventListener('click', closeAddModal);
