@@ -569,7 +569,7 @@
               <p class="text-[11px] text-gray-400 mt-0.5">Saves all posts, custom categories, thumbnails, descriptions &
                 user edits into a single file.</p>
             </div>
-            <button id="downloadBackupJsonBtn"
+            <button id="downloadBackupJsonBtn" onclick="downloadBackupJson()"
               class="px-4 py-2.5 bg-green-500 hover:bg-green-400 text-black font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer">
               <i class="fas fa-file-download"></i> Download JSON
             </button>
@@ -586,7 +586,7 @@
           <div class="flex gap-2">
             <input type="file" id="uploadBackupJsonInput" accept=".xlsx,.xls,.csv,.json"
               class="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-yellow-400 hover:file:bg-zinc-700 bg-black/40 rounded-xl border border-white/10 p-1">
-            <button id="restoreBackupJsonBtn"
+            <button id="restoreBackupJsonBtn" onclick="restoreBackupFile()"
               class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-xs rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer">
               <i class="fas fa-file-import"></i> Upload & Merge Data
             </button>
@@ -941,21 +941,22 @@
     function deduplicateRecords(recordsArray) {
       if (!Array.isArray(recordsArray)) return [];
       const map = new Map();
+      let highestNo = 0;
 
       recordsArray.forEach(item => {
         if (!item || typeof item !== 'object') return;
         const rawLink = item['Original Post Link'] || item['Post Link'] || item['Link'] || item['URL'] || '';
         const normLink = rawLink ? normalizePostUrl(rawLink) : '';
-        const itemNo = item['No.'] ? parseInt(item['No.'], 10) : null;
 
+        // Match primarily by normalized URL
         let existingKey = null;
-        for (let [key, existing] of map.entries()) {
-          const existingNorm = existing['Original Post Link'] ? normalizePostUrl(existing['Original Post Link']) : '';
-          const existingNo = existing['No.'] ? parseInt(existing['No.'], 10) : null;
-
-          if ((normLink && existingNorm && normLink === existingNorm) || (itemNo && !isNaN(itemNo) && existingNo && itemNo === existingNo)) {
-            existingKey = key;
-            break;
+        if (normLink) {
+          for (let [key, existing] of map.entries()) {
+            const existingNorm = existing['Original Post Link'] ? normalizePostUrl(existing['Original Post Link']) : '';
+            if (existingNorm && normLink === existingNorm) {
+              existingKey = key;
+              break;
+            }
           }
         }
 
@@ -1257,8 +1258,7 @@
         const urls = [
           `${getApiBaseUrl()}/api/mysql/posts?t=${timestamp}`,
           `${getApiBaseUrl()}/api/sync?t=${timestamp}`,
-          `./vault.json?t=${timestamp}`,
-          `https://raw.githubusercontent.com/SidGajera/Social-Media-Content-/main/vault.json?t=${timestamp}`
+          `./vault.json?t=${timestamp}`
         ];
         let serverRecords = [];
         let serverCustomCats = null;

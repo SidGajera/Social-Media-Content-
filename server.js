@@ -458,7 +458,16 @@ function formatCarouselTextServer(text, postType) {
           }
         } else {
           const maxStmt = sqliteDb.prepare('SELECT MAX(post_no) as max_no FROM social_media_posts');
-          const maxVal = maxStmt.get() ? (maxStmt.get().max_no || 0) : 0;
+          let maxVal = maxStmt.get() ? (maxStmt.get().max_no || 0) : 0;
+          const delNos = data.deletedPostNos || [];
+          if (delNos.length > 0) {
+            const maxDel = Math.max(...delNos.map(n => parseInt(n, 10) || 0));
+            if (maxDel > maxVal) maxVal = maxDel;
+          }
+          if (records.length > 0) {
+            const maxRec = Math.max(...records.map(r => parseInt(r['No.'], 10) || 0));
+            if (maxRec > maxVal) maxVal = maxRec;
+          }
           targetNo = maxVal + 1;
 
           const newRec = {
