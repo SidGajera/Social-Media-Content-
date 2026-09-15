@@ -1960,7 +1960,174 @@
       document.getElementById('modalTakeaway').value = rec['Core Idea / 1-Line Takeaway'] || '';
     };
 
+    
+    // --- Full Backup & Restore Logic ---
+    window.downloadBackupJson = function() {
+      if (!records || records.length === 0) {
+        alert('No posts available to backup.');
+        return;
+      }
+      const backupObj = {
+        version: '1.0.0',
+        exportDate: new Date().toISOString(),
+        totalPosts: records.length,
+        records: records,
+        customCategories: customCategories || [],
+        deletedCategories: deletedCategories || [],
+        deletedPostNos: deletedPostNos || [],
+        realThumbs: realThumbs || {}
+      };
+      
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+      const a = document.createElement('a');
+      const filename = `Social_Media_Vault_Backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", filename);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast(`✅ Downloaded Backup File: ${filename} (${records.length} posts)`);
+    };
+
+    window.restoreBackupFile = function() {
+      const fileInput = document.getElementById('uploadBackupJsonInput');
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        alert('Please select a JSON, CSV, or Excel backup file first.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      showToast('⏳ Reading and parsing backup file...', true);
+
+      reader.onload = async function(e) {
+        try {
+          const content = e.target.result;
+          let importedRecords = [];
+          let importedCats = [];
+          let importedThumbs = {};
+
+          if (file.name.endsWith('.json')) {
+            const parsed = JSON.parse(content);
+            importedRecords = Array.isArray(parsed) ? parsed : (parsed.records || parsed.data || []);
+            if (parsed.customCategories && Array.isArray(parsed.customCategories)) {
+              importedCats = parsed.customCategories;
+            }
+            if (parsed.realThumbs && typeof parsed.realThumbs === 'object') {
+              importedThumbs = parsed.realThumbs;
+            }
+          } else if (file.name.endsWith('.csv') || file.name.endsWith('.txt')) {
+            const lines = content.split(/\r?\n/).filter(l => l.trim());
+            if (lines.length > 1) {
+              const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+              for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
+                if (cols.length >= 3 && cols[2]) {
+                  importedRecords.push({
+                    'No.': cols[0] ? parseInt(cols[0], 10) : null,
+                    'Platform': cols[1] || detectPlatformFromUrl(cols[2]),
+                    'Original Post Link': cols[2],
+                    'Extra Link': cols[3] || '',
+                    'Post Type': cols[4] || 'Content',
+                    'Core Idea / 1-Line Takeaway': cols[5] || '',
+                    'Category': cols[6] ? cols[6].split(';').map(c => c.trim()) : ['Content Creation'],
+                    'Date Saved': cols[7] || new Date().toISOString().slice(0, 10)
+                  });
+                }
+              }
+            }
+          } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+            if (typeof XLSX !== 'undefined') {
+              const workbook = XLSX.read(content, { type: 'binary' });
+              const firstSheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[firstSheetName];
+              const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+              importedRecords = jsonRows.map(r => ({
+                'No.': r['No.'] || r['No'] || null,
+                'Platform': r['Platform'] || detectPlatformFromUrl(r['Original Post Link'] || r['Link'] || ''),
+                'Original Post Link': r['Original Post Link'] || r['Link'] || r['URL'] || '',
+                'Extra Link': r['Extra Link'] || r['Extra URL'] || '',
+                'Post Type': r['Post Type'] || 'Content',
+                'Core Idea / 1-Line Takeaway': r['Core Idea / 1-Line Takeaway'] || r['Takeaway'] || r['Description'] || '',
+                'Category': r['Category'] ? (Array.isArray(r['Category']) ? r['Category'] : String(r['Category']).split(';').map(s=>s.trim())) : ['Content Creation'],
+                'Date Saved': r['Date Saved'] || new Date().toISOString().slice(0, 10)
+              })).filter(r => r['Original Post Link']);
+            } else {
+              alert('Excel parser library (XLSX) loading. Please try JSON or CSV backup format.');
+              return;
+            }
+          }
+
+          if (importedRecords.length === 0) {
+            alert('No valid post records found in the selected file.');
+            return;
+          }
+
+          const initialCount = records.length;
+          
+          // Merge custom categories
+          if (importedCats.length > 0) {
+            const catMap = new Map();
+            (customCategories || []).forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
+            importedCats.forEach(c => { if (c && c.name && !catMap.has(c.name.toLowerCase())) catMap.set(c.name.toLowerCase(), c); });
+            customCategories = Array.from(catMap.values());
+          }
+
+          // Merge real thumbs
+          if (Object.keys(importedThumbs).length > 0) {
+            realThumbs = { ...realThumbs, ...importedThumbs };
+          }
+
+          // Authoritative deduplicated merge
+          records = deduplicateRecords([...importedRecords, ...records]);
+          
+          saveAll();
+          try { renderCatDropdowns(); } catch(e){}
+          applyFilters();
+          shown = 0;
+          const grid = document.getElementById('grid');
+          if (grid) grid.innerHTML = '';
+          renderGrid();
+          updateCounts();
+
+          const addedCount = records.length - initialCount;
+          showToast(`✅ Restore Complete: Merged ${importedRecords.length} records! (${addedCount} new posts added)`);
+          alert(`Backup Restore Success!\n\n• Processed: ${importedRecords.length} posts from file\n• Added: ${addedCount} new posts to vault\n• Total Vault Posts: ${records.length}`);
+          
+          fileInput.value = '';
+          window.closeBackupModal();
+        } catch(err) {
+          console.error('Restore Backup Error:', err);
+          alert('Error parsing backup file: ' + err.message);
+        }
+      };
+
+      if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        reader.readAsBinaryString(file);
+      } else {
+        reader.readAsText(file);
+      }
+    };
+
     function attachAllButtonListeners() {
+      // Backup Download JSON button
+      const dlBtn = document.getElementById('downloadBackupJsonBtn');
+      if (dlBtn) {
+        dlBtn.onclick = function(e) {
+          e.preventDefault();
+          window.downloadBackupJson();
+        };
+      }
+
+      // Backup Restore / Merge button
+      const restoreBtn = document.getElementById('restoreBackupJsonBtn');
+      if (restoreBtn) {
+        restoreBtn.onclick = function(e) {
+          e.preventDefault();
+          window.restoreBackupFile();
+        };
+      }
       // Quick Add Button
       const quickAddBtn = document.getElementById('quickAddBtn');
       if (quickAddBtn) {
