@@ -2173,7 +2173,7 @@
 
         const div = document.createElement('div');
         div.className = 'card glass rounded-2xl overflow-hidden flex flex-col h-[540px] border border-white/10 hover:border-yellow-400/30 transition-all shadow-xl';
-        div.innerHTML = `<div class="relative bg-zinc-900 overflow-hidden shrink-0 group" style="height:310px">${mediaContentHtml}<div class="absolute inset-0 z-10 cursor-pointer group-hover:bg-black/40 transition-colors flex items-center justify-center" onclick="event.preventDefault(); event.stopPropagation(); openExtractedDocumentModal(${r['No.']}); return false;" title="Click image thumbnail to open Consolidated Document Format &amp; Extracted Image Content"><div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-yellow-300 font-bold text-xs gap-2 backdrop-blur-[3px] bg-black/70 px-4 py-2 rounded-xl border border-yellow-500/40 pointer-events-none shadow-xl"><i class="fas fa-file-alt text-base text-yellow-400"></i><span>Read Extracted Image Document</span></div></div><div class="absolute top-2 left-2 flex items-center gap-1 z-20 pointer-events-none">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md z-20 pointer-events-none">#${r['No.']}</div><button onclick="event.preventDefault(); event.stopPropagation(); openThumb(${r['No.']}); return false;" class="absolute bottom-2 right-2 z-30 w-10 h-10 ${custom ? 'bg-green-500' : 'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform cursor-pointer" title="Change Media / Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%] z-20 pointer-events-none">${catBadgesHtml}<span class="px-2 py-1 ${mediaBadgeBg} rounded-full text-[8px] font-bold">${mediaBadgeText}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1.5 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type'] || 'Content'}</p>${dateSavedStr ? `<span class="text-[10px] text-gray-400 font-medium shrink-0 flex items-center gap-1" title="Date Added: ${dateSavedStr}"><i class="far fa-calendar-alt text-[9px] text-yellow-400/90"></i> ${dateSavedStr}</span>` : ''}</div><div class="mt-2 flex-1"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-2 cursor-pointer hover:text-yellow-300 transition-colors mb-1.5" onclick="openCaptionModal(${r['No.']})" title="Click to preview full HTML document">${formattedCardCaption}</p><button type="button" onclick="openCaptionModal(${r['No.']})" class="mt-1 w-full py-1 px-2.5 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 hover:text-yellow-300 font-bold text-[11px] rounded-xl flex items-center justify-between cursor-pointer transition-all group shadow-sm" title="Preview full text &amp; image content in HTML pop-up"><span class="flex items-center gap-1.5"><i class="fas fa-eye text-yellow-400 text-[11px]"></i> HTML Document Preview</span><i class="fas fa-chevron-down text-xs text-yellow-400 group-hover:translate-y-0.5 transition-transform"></i></button></div></div><div class="mt-3 pt-3 border-t border-white/10 flex flex-col gap-2 shrink-0">
+        div.innerHTML = `<div class="relative bg-zinc-900 overflow-hidden shrink-0 group" style="height:310px">${mediaContentHtml}<div class="absolute inset-0 z-10 cursor-pointer group-hover:bg-black/40 transition-colors flex items-center justify-center" onclick="event.preventDefault(); event.stopPropagation(); openExtractedDocumentModal(${r['No.']}); return false;" title="Click image thumbnail to open Consolidated Document Format &amp; Extracted Image Content"><div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-yellow-300 font-bold text-xs gap-2 backdrop-blur-[3px] bg-black/70 px-4 py-2 rounded-xl border border-yellow-500/40 pointer-events-none shadow-xl"><i class="fas fa-file-alt text-base text-yellow-400"></i><span>Read Extracted Image Document</span></div></div><div class="absolute top-2 left-2 flex items-center gap-1 z-20 pointer-events-none">${platformBadgeHtml}</div><div class="absolute top-2 right-2 px-2.5 py-1 bg-yellow-500 text-black rounded-full text-[9px] font-black shadow-md z-20 pointer-events-none">#${r['No.']}</div><button onclick="event.preventDefault(); event.stopPropagation(); openThumb(${r['No.']}); return false;" class="absolute bottom-2 right-2 z-30 w-10 h-10 ${custom ? 'bg-green-500' : 'bg-yellow-500'} text-black rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-105 transition-transform cursor-pointer" title="Change Media / Thumbnail"><i class="fas fa-camera"></i></button><div class="absolute bottom-2 left-2 flex flex-wrap gap-1 max-w-[75%] z-20 pointer-events-none">${catBadgesHtml}<span class="px-2 py-1 ${mediaBadgeBg} rounded-full text-[8px] font-bold">${mediaBadgeText}</span></div></div><div class="p-4 flex-1 flex flex-col justify-between"><div class="flex-1 flex flex-col"><div class="flex items-center justify-between gap-1.5 h-4"><p class="text-[10px] text-gray-400 truncate uppercase tracking-wider font-semibold">${r['Post Type'] || 'Content'}</p>${dateSavedStr ? `<span class="text-[10px] text-gray-400 font-medium shrink-0 flex items-center gap-1" title="Date Added: ${dateSavedStr}"><i class="far fa-calendar-alt text-[9px] text-yellow-400/90"></i> ${dateSavedStr}</span>` : ''}</div><div class="mt-2 flex-1"><p class="text-sm font-semibold leading-snug text-gray-200 line-clamp-2 cursor-pointer hover:text-yellow-300 transition-colors mb-1.5" onclick="openCaptionModal(${r['No.']})" title="Click to preview full HTML document">${formattedCardCaption}</p><button type="button" onclick="openCaptionModal(${r['No.']})" class="mt-1 w-full py-1 px-2.5 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 hover:text-yellow-300 font-bold text-[11px] rounded-xl flex items-center justify-between cursor-pointer transition-all group shadow-sm" title="Preview full text &amp; image content in HTML pop-up"><span class="flex items-center gap-1.5"><i class="fas fa-align-left text-yellow-400 text-[11px]"></i> Post Caption Preview</span><i class="fas fa-chevron-down text-xs text-yellow-400 group-hover:translate-y-0.5 transition-transform"></i></button></div></div><div class="mt-3 pt-3 border-t border-white/10 flex flex-col gap-2 shrink-0">
           <div class="flex gap-2 items-center">
             <a href="${r['Original Post Link']}" target="_blank" class="flex-1 h-10 gold text-black rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 whitespace-nowrap px-3 shadow-md hover:opacity-95 transition-opacity">
               <i class="fas fa-external-link-alt text-[11px]"></i> Open Post
@@ -2181,8 +2181,8 @@
             ${hasValidExtra ? `<a href="${formattedExtra}" target="_blank" class="flex-1 h-10 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 whitespace-nowrap px-3 transition-all shadow-md" title="${formattedExtra}"><i class="fas fa-link text-[11px]"></i> Extra Link</a>` : ''}
           </div>
           <div class="flex gap-1.5 items-center">
-            <button onclick="openCaptionModal(${r['No.']})" class="flex-1 h-9 bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/30 rounded-xl flex items-center justify-center gap-1 text-yellow-300 font-bold text-[11px] transition-colors cursor-pointer" title="Read Image Content & Extracted Bullet Points">
-              <i class="fas fa-eye text-xs"></i><span>Preview</span>
+            <button onclick="openExtractedDocumentModal(${r['No.']})" class="flex-1 h-9 bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/30 rounded-xl flex items-center justify-center gap-1 text-yellow-300 font-bold text-[11px] transition-colors cursor-pointer" title="Read Extracted Image Content & Consolidated Document">
+              <i class="fas fa-file-alt text-xs"></i><span>Extracted Text</span>
             </button>
             <button onclick="copyFormattedPost(${r['No.']})" class="flex-1 h-9 bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/30 rounded-xl flex items-center justify-center gap-1 text-yellow-300 font-bold text-[11px] transition-colors cursor-pointer" title="Copy Formatted Post with Bullet Points & Links">
               <i class="fas fa-copy text-xs"></i><span>Copy</span>
@@ -2720,10 +2720,6 @@
     let currentModalNo = null;
 
     window.openExtractedDocumentModal = function(no) {
-      window.openCaptionModal(no, 'Extracted Document');
-    };
-
-    window.openCaptionModal = function(no, mode = 'HTML Document') {
       currentModalNo = no;
       const rec = records.find(r => r && r['No.'] === no);
       if (!rec) return;
@@ -2733,17 +2729,50 @@
 
       const titleEl = document.getElementById('captionModalTitle');
       if (titleEl) {
-        if (mode === 'Extracted Document') {
-          titleEl.innerHTML = '<i class="fas fa-file-invoice text-yellow-400 mr-2"></i>Extracted Image Content & Consolidated Document (#' + no + ')';
-        } else {
-          titleEl.innerHTML = '<i class="fas fa-eye text-yellow-400 mr-2"></i>HTML Document Preview (#' + no + ')';
-        }
+        titleEl.innerHTML = '<i class="fas fa-file-invoice text-yellow-400 mr-2"></i>Extracted Image Content & Consolidated Document (#' + no + ')';
       }
 
       const textEl = document.getElementById('captionModalText');
       if (textEl) {
-        const rawText = rec['Core Idea / 1-Line Takeaway'] || 'No extracted content or description available for this post.';
+        const rawText = rec['Core Idea / 1-Line Takeaway'] || 'No extracted image content available for this post.';
         textEl.innerHTML = formatRichCaption(rawText);
+      }
+
+      const editBtn = document.getElementById('editCaptionFromModalBtn');
+      if (editBtn) {
+        editBtn.onclick = function() {
+          closeCaptionModal();
+          window.openEditModal(no);
+        };
+      }
+
+      const modal = document.getElementById('captionModal');
+      if (modal) modal.classList.remove('hidden');
+    };
+
+    window.openCaptionModal = function(no) {
+      currentModalNo = no;
+      const rec = records.find(r => r && r['No.'] === no);
+      if (!rec) return;
+
+      const badgeEl = document.getElementById('captionModalNoBadge');
+      if (badgeEl) badgeEl.textContent = '#' + no;
+
+      const titleEl = document.getElementById('captionModalTitle');
+      if (titleEl) {
+        titleEl.innerHTML = `<i class="fas fa-quote-left text-yellow-400 mr-2"></i>Post Caption (Author's Written Post Text) (#${no})`;
+      }
+
+      const textEl = document.getElementById('captionModalText');
+      if (textEl) {
+        const captionText = rec['Caption'] || rec['Post Caption'] || rec['Core Idea / 1-Line Takeaway'] || 'No post caption provided.';
+        const cleanCaption = cleanSocialCaption(captionText);
+        textEl.innerHTML = `<div class="p-4 bg-zinc-900/90 border border-yellow-500/20 rounded-xl text-gray-100 text-sm leading-relaxed space-y-3 font-sans select-text">
+          <div class="flex items-center gap-2 pb-2 border-b border-white/10 text-xs font-bold text-yellow-400">
+            <i class="fas fa-user-edit"></i> Social Media Post Caption / Description
+          </div>
+          <div class="whitespace-pre-wrap">${cleanCaption.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+        </div>`;
       }
 
       const editBtn = document.getElementById('editCaptionFromModalBtn');

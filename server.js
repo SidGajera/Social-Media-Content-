@@ -17,6 +17,7 @@ const SQLITE_DB_PATH = path.join(ROOT_DIR, 'social_media_vault.db');
 
 // Initialize local SQLite engine
 const sqliteDb = new DatabaseSync(SQLITE_DB_PATH);
+try { sqliteDb.exec("ALTER TABLE social_media_posts ADD COLUMN caption TEXT;"); } catch(e) {}
 sqliteDb.exec(`
   CREATE TABLE IF NOT EXISTS social_media_posts (
     post_no INTEGER PRIMARY KEY,
@@ -66,14 +67,14 @@ function upsertToSQLite(records, customCategories, deletedCategories, deletedPos
     let maxPostNo = maxStmt.get() ? (maxStmt.get().max_no || 0) : 0;
 
     const stmt = sqliteDb.prepare(`
-      INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, status, date_saved, category, real_thumb)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, caption, status, date_saved, category, real_thumb)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(post_no) DO UPDATE SET
         platform = excluded.platform,
         original_post_link = excluded.original_post_link,
         extra_link = excluded.extra_link,
         post_type = excluded.post_type,
-        takeaway = excluded.takeaway,
+        takeaway = excluded.takeaway, caption = excluded.caption,
         status = excluded.status,
         date_saved = excluded.date_saved,
         category = excluded.category,
@@ -98,6 +99,7 @@ function upsertToSQLite(records, customCategories, deletedCategories, deletedPos
         r['Extra Link'] || r['Extra URL'] || r.extraUrl || '',
         r['Post Type'] || 'Content',
         r['Core Idea / 1-Line Takeaway'] || '',
+        r['Caption'] || r['Post Caption'] || '',
         r.Status || 'Not Used',
         r['Date Saved'] || '',
         JSON.stringify(Array.isArray(r.Category) ? r.Category : (r.Category ? [r.Category] : [])),
@@ -169,6 +171,7 @@ async function getFromDatabase() {
           'Extra Link': r.extra_link,
           'Post Type': r.post_type,
           'Core Idea / 1-Line Takeaway': r.takeaway,
+          'Caption': r.caption || '',
           'Status': r.status,
           'Date Saved': r.date_saved,
           'Category': Array.isArray(catArr) ? catArr : [catArr],
@@ -221,6 +224,7 @@ function getFromSQLite() {
       'Extra Link': r.extra_link,
       'Post Type': r.post_type,
       'Core Idea / 1-Line Takeaway': r.takeaway,
+          'Caption': r.caption || '',
       'Status': r.status,
       'Date Saved': r.date_saved,
       'Category': Array.isArray(catArr) ? catArr : [catArr],
@@ -290,7 +294,7 @@ async function tryConnectMySQLBackground() {
 async function upsertPostsToMySQL(records, customCategories, deletedCategories, deletedPostNos, realThumbs) {
   if (!pool) return 0;
   if (Array.isArray(records) && records.length > 0) {
-    const insertSql = 'INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, status, date_saved, category, real_thumb) VALUES ? ON DUPLICATE KEY UPDATE platform = VALUES(platform), original_post_link = VALUES(original_post_link), extra_link = VALUES(extra_link), post_type = VALUES(post_type), takeaway = VALUES(takeaway), status = VALUES(status), date_saved = VALUES(date_saved), category = VALUES(category), real_thumb = VALUES(real_thumb);';
+    const insertSql = 'INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, caption, status, date_saved, category, real_thumb) VALUES ? ON DUPLICATE KEY UPDATE platform = VALUES(platform), original_post_link = VALUES(original_post_link), extra_link = VALUES(extra_link), post_type = VALUES(post_type), takeaway = VALUES(takeaway), status = VALUES(status), date_saved = VALUES(date_saved), category = VALUES(category), real_thumb = VALUES(real_thumb);';
     const values = records.map(r => [
       r['No.'],
       r.Platform || detectPlatformFromUrl(r['Original Post Link']),
@@ -298,6 +302,7 @@ async function upsertPostsToMySQL(records, customCategories, deletedCategories, 
       r['Extra Link'] || r['Extra URL'] || r.extraUrl || '',
       r['Post Type'] || 'Content',
       r['Core Idea / 1-Line Takeaway'] || '',
+        r['Caption'] || r['Post Caption'] || '',
       r.Status || 'Not Used',
       r['Date Saved'] || '',
       JSON.stringify(Array.isArray(r.Category) ? r.Category : (r.Category ? [r.Category] : [])),
