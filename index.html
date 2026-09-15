@@ -181,7 +181,7 @@
           class="px-4 py-3 bg-green-500 text-black rounded-xl font-bold text-sm"><i
             class="fas fa-folder-plus mr-2"></i>New Category</button><button id="addBtn"
           class="px-6 py-3 gold text-black rounded-xl font-bold text-sm"><i class="fas fa-plus mr-2"></i>Add
-          Content</button><button id="backupSyncBtn"
+          Content</button><button id="backupSyncBtn" onclick="openBackupModal()"
           class="px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"><i
             class="fas fa-database"></i>Backup & Sync</button><button id="exportBtn"
           class="px-4 py-3 glass rounded-xl text-xs">Export Excel</button></div>
@@ -1836,6 +1836,223 @@
         }
       });
     });
+
+    window.openAddModal = function() {
+      const modal = document.getElementById('addModal');
+      if (!modal) return;
+      document.getElementById('modalTitle').textContent = 'Add New Content - Embed ON';
+      document.getElementById('modalLink').value = '';
+      document.getElementById('modalExtraLink').value = '';
+      document.getElementById('modalType').value = '';
+      document.getElementById('modalImageUrl').value = '';
+      document.getElementById('modalTakeaway').value = '';
+      document.getElementById('modalDateSaved').value = new Date().toISOString().split('T')[0];
+      resetModalCatChips();
+      modal.classList.remove('hidden');
+    };
+
+    window.closeAddModal = function() {
+      const modal = document.getElementById('addModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.openCatModal = function() {
+      const modal = document.getElementById('catModal');
+      if (!modal) return;
+      document.getElementById('catModalName').value = '';
+      document.getElementById('catModalDesc').value = '';
+      document.getElementById('catModalColor').value = '#FFD700';
+      document.getElementById('catModalColorPreview').style.backgroundColor = '#FFD700';
+      modal.classList.remove('hidden');
+    };
+
+    window.closeCatModal = function() {
+      const modal = document.getElementById('catModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.openBackupModal = function() {
+      const modal = document.getElementById('backupSyncModal');
+      if (modal) modal.classList.remove('hidden');
+    };
+
+    window.closeBackupModal = function() {
+      const modal = document.getElementById('backupSyncModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.exportToExcel = function() {
+      if (!records || records.length === 0) {
+        alert('No records available to export.');
+        return;
+      }
+      let csvContent = 'data:text/csv;charset=utf-8,No.,Platform,Original Post Link,Extra Link,Post Type,Takeaway,Category,Date Saved\n';
+      records.forEach(r => {
+        const no = r['No.'] || '';
+        const platform = (r['Platform'] || '').replace(/"/g, '""');
+        const link = (r['Original Post Link'] || '').replace(/"/g, '""');
+        const extra = (r['Extra Link'] || r['Extra URL'] || r.extraUrl || '').replace(/"/g, '""');
+        const type = (r['Post Type'] || '').replace(/"/g, '""');
+        const takeaway = (r['Core Idea / 1-Line Takeaway'] || '').replace(/"/g, '""').replace(/\n/g, ' ');
+        const cats = getPostCategories(r).join('; ').replace(/"/g, '""');
+        const date = getPostDate(r);
+        csvContent += `"${no}","${platform}","${link}","${extra}","${type}","${takeaway}","${cats}","${date}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const a = document.createElement('a');
+      a.setAttribute('href', encodedUri);
+      a.setAttribute('download', `Social_Media_Content_Vault_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
+    window.saveModalContent = async function() {
+      const link = document.getElementById('modalLink') ? document.getElementById('modalLink').value.trim() : '';
+      const extraUrl = document.getElementById('modalExtraLink') ? document.getElementById('modalExtraLink').value.trim() : '';
+      const platform = document.getElementById('modalPlatform') ? document.getElementById('modalPlatform').value : 'Instagram';
+      const postType = document.getElementById('modalType') ? document.getElementById('modalType').value.trim() : 'Carousel / Multi-Image';
+      const thumbUrl = document.getElementById('modalImageUrl') ? document.getElementById('modalImageUrl').value.trim() : '';
+      const takeaway = document.getElementById('modalTakeaway') ? document.getElementById('modalTakeaway').value.trim() : '';
+      const categories = getSelectedModalCategories();
+
+      if (!link) {
+        alert('Please enter a post link.');
+        return;
+      }
+
+      await quickAdd(link, categories, takeaway, platform, postType || 'Carousel / Multi-Image', extraUrl, thumbUrl);
+      window.closeAddModal();
+    };
+
+    window.openEditModal = function(no) {
+      const rec = records.find(r => r && r['No.'] === no);
+      if (!rec) return;
+      
+      window.openAddModal();
+      document.getElementById('modalTitle').textContent = `Edit Content #${no}`;
+      document.getElementById('modalLink').value = rec['Original Post Link'] || '';
+      document.getElementById('modalExtraLink').value = rec['Extra Link'] || rec['Extra URL'] || rec.extraUrl || '';
+      if (document.getElementById('modalPlatform')) document.getElementById('modalPlatform').value = rec['Platform'] || 'Instagram';
+      document.getElementById('modalType').value = rec['Post Type'] || '';
+      document.getElementById('modalImageUrl').value = getPostThumb(rec) || '';
+      document.getElementById('modalTakeaway').value = rec['Core Idea / 1-Line Takeaway'] || '';
+    };
+
+    function attachAllButtonListeners() {
+      // Quick Add Button
+      const quickAddBtn = document.getElementById('quickAddBtn');
+      if (quickAddBtn) {
+        quickAddBtn.onclick = async function(e) {
+          e.preventDefault();
+          const link = document.getElementById('quickLink') ? document.getElementById('quickLink').value.trim() : '';
+          const mediaUrl = document.getElementById('quickMediaUrl') ? document.getElementById('quickMediaUrl').value.trim() : '';
+          const extraUrl = document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : '';
+          const takeaway = document.getElementById('quickTakeaway') ? document.getElementById('quickTakeaway').value.trim() : '';
+          const categories = getSelectedQuickCategories();
+          
+          if (!link) {
+            alert('Please paste a post link first');
+            return;
+          }
+          await quickAdd(link, categories, takeaway, '', 'Carousel / Multi-Image', extraUrl, mediaUrl);
+        };
+      }
+
+      // Quick Auto Detect
+      const autoBtn = document.getElementById('autoDetectCaptionBtn');
+      if (autoBtn) {
+        autoBtn.onclick = function(e) {
+          e.preventDefault();
+          triggerAutoDetectCaption();
+        };
+      }
+
+      // Quick Create Category
+      const createCatBtn = document.getElementById('createCatBtn');
+      if (createCatBtn) {
+        createCatBtn.onclick = function(e) {
+          e.preventDefault();
+          const nameInput = document.getElementById('quickCatName');
+          const colorInput = document.getElementById('quickCatColor');
+          const descInput = document.getElementById('quickCatDesc');
+          if (!nameInput || !nameInput.value.trim()) {
+            alert('Please enter a category name');
+            return;
+          }
+          addCategory(nameInput.value.trim(), colorInput ? colorInput.value : '#FFD700', descInput ? descInput.value.trim() : '');
+          nameInput.value = '';
+          if (descInput) descInput.value = '';
+        };
+      }
+
+      // Modal Save
+      const modalSave = document.getElementById('modalSave');
+      if (modalSave) {
+        modalSave.onclick = async function(e) {
+          e.preventDefault();
+          await window.saveModalContent();
+        };
+      }
+
+      // Modal Close
+      const modalClose = document.getElementById('modalClose');
+      if (modalClose) {
+        modalClose.onclick = function(e) {
+          e.preventDefault();
+          window.closeAddModal();
+        };
+      }
+
+      // Modal Auto Detect
+      const modalAutoBtn = document.getElementById('modalAutoDetectBtn');
+      if (modalAutoBtn) {
+        modalAutoBtn.onclick = function(e) {
+          e.preventDefault();
+          triggerModalAutoDetectCaption();
+        };
+      }
+
+      // Category Modal Save & Close
+      const catModalSave = document.getElementById('catModalSave');
+      if (catModalSave) {
+        catModalSave.onclick = function(e) {
+          e.preventDefault();
+          const nameInput = document.getElementById('catModalName');
+          const colorInput = document.getElementById('catModalColor');
+          const descInput = document.getElementById('catModalDesc');
+          if (!nameInput || !nameInput.value.trim()) {
+            alert('Please enter a category name');
+            return;
+          }
+          addCategory(nameInput.value.trim(), colorInput ? colorInput.value : '#FFD700', descInput ? descInput.value.trim() : '');
+          window.closeCatModal();
+        };
+      }
+
+      const catModalClose = document.getElementById('catModalClose');
+      if (catModalClose) {
+        catModalClose.onclick = function(e) {
+          e.preventDefault();
+          window.closeCatModal();
+        };
+      }
+
+      // Load More Button
+      const loadMoreBtn = document.getElementById('loadMore');
+      if (loadMoreBtn) {
+        loadMoreBtn.onclick = function(e) {
+          e.preventDefault();
+          renderGrid();
+        };
+      }
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(attachAllButtonListeners, 10);
+    } else {
+      window.addEventListener('DOMContentLoaded', attachAllButtonListeners);
+    }
 
     function renderGrid() {
       const grid = document.getElementById('grid');
