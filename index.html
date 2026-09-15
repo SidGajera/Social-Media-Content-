@@ -1393,9 +1393,20 @@
 
     function isPostInCategory(r, targetCat) {
       if (!targetCat) return true;
+      const targetNorm = String(targetCat).trim().toLowerCase().replace(/&amp;/g, '&');
       const cats = getPostCategories(r);
-      return cats.includes(targetCat);
+      return cats.some(c => {
+        const cNorm = String(c).trim().toLowerCase().replace(/&amp;/g, '&');
+        return cNorm === targetNorm || cNorm.includes(targetNorm) || targetNorm.includes(cNorm);
+      });
     }
+
+    window.filterByCategory = function(catName) {
+      const sel = document.getElementById('catFilter');
+      if (sel) sel.value = catName || '';
+      const searchInput = document.getElementById('search');
+      if (searchInput) searchInput.dispatchEvent(new Event('input'));
+    };
 
     function getSelectedQuickCategories() {
       const selected = [];
@@ -1611,6 +1622,13 @@
               btn.classList.remove('text-black');
               btn.querySelector('i').className = 'fas fa-circle text-[10px]';
             }
+            const selCats = getSelectedQuickCategories();
+            if (selCats.length > 0) {
+              document.getElementById('catFilter').value = selCats[0];
+            } else {
+              document.getElementById('catFilter').value = '';
+            }
+            document.getElementById('search').dispatchEvent(new Event('input'));
           });
           quickChips.appendChild(btn);
         });
@@ -1744,7 +1762,8 @@
         const catBadgesHtml = catList.map(cName => {
           const catInfo = customCategories.find(c => c.name === cName);
           const catColor = catInfo ? catInfo.color : '#FFD700';
-          return `<span class="px-2 py-1 rounded-full text-[8px] font-bold truncate max-w-[120px] inline-block shadow-sm" style="background:${catColor};color:black" title="${cName}">${cName}</span>`;
+          const escCat = cName.replace(/'/g, "\\'");
+          return `<span onclick="event.stopPropagation(); filterByCategory('${escCat}')" class="px-2 py-1 rounded-full text-[8px] font-bold truncate max-w-[120px] inline-block shadow-sm cursor-pointer hover:opacity-80 transition-opacity" style="background:${catColor};color:black" title="Filter by category ${cName}">${cName}</span>`;
         }).join('');
 
         const extraUrl = (r['Extra Link'] || r['Extra URL'] || r['extraUrl'] || '').trim();
