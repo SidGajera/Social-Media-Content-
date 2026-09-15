@@ -1171,6 +1171,17 @@
       closeBackupModal();
     }
 
+    
+    function getApiBaseUrl() {
+      if (window.location.protocol === 'file:') return 'http://localhost:3000';
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        if (window.location.port !== '3000' && window.location.port !== '') {
+          return 'http://localhost:3000';
+        }
+      }
+      return '';
+    }
+
     function saveAll() {
       records = deduplicateRecords(records);
       try {
@@ -1191,7 +1202,7 @@
     async function syncToLocalServer() {
       try {
         const pat = (localStorage.getItem('i3d_github_pat') || '').trim();
-        const res = await fetch('/api/sync', {
+        const res = await fetch(getApiBaseUrl() + '/api/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ records, customCategories, deletedCategories, deletedPostNos, realThumbs, pat })
@@ -1227,8 +1238,8 @@
       try {
         const timestamp = Date.now();
         const urls = [
-          `/api/mysql/posts?t=${timestamp}`,
-          `/api/sync?t=${timestamp}`,
+          `${getApiBaseUrl()}/api/mysql/posts?t=${timestamp}`,
+          `${getApiBaseUrl()}/api/sync?t=${timestamp}`,
           `./vault.json?t=${timestamp}`,
           `https://raw.githubusercontent.com/SidGajera/Social-Media-Content-/main/vault.json?t=${timestamp}`
         ];
@@ -1272,7 +1283,12 @@
         }
 
         if (fetchedSuccessfully) {
-          if (serverCustomCats) customCategories = serverCustomCats;
+          if (serverCustomCats && Array.isArray(serverCustomCats)) {
+          const catMap = new Map();
+          (customCategories || []).forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
+          serverCustomCats.forEach(c => { if (c && c.name && !catMap.has(c.name.toLowerCase())) catMap.set(c.name.toLowerCase(), c); });
+          customCategories = Array.from(catMap.values());
+        }
           if (serverDelCats) deletedCategories = serverDelCats;
           if (serverDelNos) deletedPostNos = serverDelNos;
           if (serverThumbs) realThumbs = serverThumbs;

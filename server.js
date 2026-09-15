@@ -47,7 +47,7 @@ async function initMySQLPool() {
       queueLimit: 0
     });
 
-    console.log('[MySQL Database]: Connected successfully to database   + MYSQL_DATABASE +   on ' + MYSQL_HOST + ':' + MYSQL_PORT);
+    console.log('[MySQL Database]: Connected successfully to database ' + MYSQL_DATABASE + ' on ' + MYSQL_HOST + ':' + MYSQL_PORT);
     mysqlConnected = true;
     await initMySQLTables();
   } catch (err) {
@@ -61,11 +61,11 @@ async function initMySQLTables() {
   try {
     await pool.query('CREATE TABLE IF NOT EXISTS social_media_posts (post_no INT PRIMARY KEY, platform VARCHAR(100), original_post_link TEXT, extra_link TEXT, post_type VARCHAR(200), takeaway TEXT, status VARCHAR(100), date_saved VARCHAR(50), category TEXT, real_thumb TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;');
     await pool.query('CREATE TABLE IF NOT EXISTS social_media_meta (meta_key VARCHAR(100) PRIMARY KEY, meta_value LONGTEXT, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;');
-    console.log('[MySQL Schema]: Verified tables  social_media_posts & social_media_meta.');
+    console.log('[MySQL Schema]: Verified tables social_media_posts & social_media_meta.');
 
     const [rows] = await pool.query('SELECT COUNT(*) as cnt FROM social_media_posts');
     if (rows[0].cnt === 0 && fs.existsSync(VAULT_PATH)) {
-      console.log('[MySQL Seeding]: Table is empty. Auto-seeding 489 records from vault.json...');
+      console.log('[MySQL Seeding]: Table is empty. Auto-seeding records from vault.json...');
       const raw = fs.readFileSync(VAULT_PATH, 'utf8');
       const parsed = JSON.parse(raw);
       const records = Array.isArray(parsed) ? parsed : (parsed.records || []);
@@ -80,33 +80,36 @@ async function initMySQLTables() {
 }
 
 async function upsertPostsToMySQL(records, customCategories, deletedCategories, deletedPostNos, realThumbs) {
-  if (!pool || !Array.isArray(records) || records.length === 0) return 0;
-  const insertSql = 'INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, status, date_saved, category, real_thumb) VALUES ? ON DUPLICATE KEY UPDATE platform = VALUES(platform), original_post_link = VALUES(original_post_link), extra_link = VALUES(extra_link), post_type = VALUES(post_type), takeaway = VALUES(takeaway), status = VALUES(status), date_saved = VALUES(date_saved), category = VALUES(category), real_thumb = VALUES(real_thumb);';
-  const values = records.map(r => [
-    r['No.'],
-    r.Platform || 'Social Media',
-    r['Original Post Link'] || '',
-    r['Extra Link'] || r['Extra URL'] || r.extraUrl || '',
-    r['Post Type'] || 'Content',
-    r['Core Idea / 1-Line Takeaway'] || '',
-    r.Status || 'Not Used',
-    r['Date Saved'] || '',
-    JSON.stringify(Array.isArray(r.Category) ? r.Category : (r.Category ? [r.Category] : [])),
-    (realThumbs && realThumbs[r['No.']]) || r.realThumb || ''
-  ]);
-  await pool.query(insertSql, [values]);
+  if (!pool) return 0;
+  
+  if (Array.isArray(records) && records.length > 0) {
+    const insertSql = 'INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, status, date_saved, category, real_thumb) VALUES ? ON DUPLICATE KEY UPDATE platform = VALUES(platform), original_post_link = VALUES(original_post_link), extra_link = VALUES(extra_link), post_type = VALUES(post_type), takeaway = VALUES(takeaway), status = VALUES(status), date_saved = VALUES(date_saved), category = VALUES(category), real_thumb = VALUES(real_thumb);';
+    const values = records.map(r => [
+      r['No.'],
+      r.Platform || 'Social Media',
+      r['Original Post Link'] || '',
+      r['Extra Link'] || r['Extra URL'] || r.extraUrl || '',
+      r['Post Type'] || 'Content',
+      r['Core Idea / 1-Line Takeaway'] || '',
+      r.Status || 'Not Used',
+      r['Date Saved'] || '',
+      JSON.stringify(Array.isArray(r.Category) ? r.Category : (r.Category ? [r.Category] : [])),
+      (realThumbs && realThumbs[r['No.']]) || r.realThumb || ''
+    ]);
+    await pool.query(insertSql, [values]);
+  }
 
   if (customCategories) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'customCategories\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(customCategories)]);
   if (deletedCategories) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'deletedCategories\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(deletedCategories)]);
   if (deletedPostNos) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'deletedPostNos\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(deletedPostNos)]);
   if (realThumbs) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'realThumbs\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(realThumbs)]);
 
-  return records.length;
+  return Array.isArray(records) ? records.length : 0;
 }
 
 function commitAndPushToGit(recordCount) {
   const commitMsg = 'Auto-sync MySQL server data: ' + recordCount + ' posts [' + new Date().toISOString() + ']';
-  exec('git add vault.json && git commit -m  + commitMsg + ', (err, stdout) => {
+  exec('git add vault.json && git commit -m "' + commitMsg + '"', (err, stdout) => {
     if (!err) {
       console.log('[Git Auto-Commit Success]:', stdout.trim());
       exec('git push origin main', (pushErr, pushStdout) => {
@@ -237,42 +240,41 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body);
-        const records = Array.isArray(payload) ? payload : (payload.records || payload.data);
-        if (!Array.isArray(records)) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: false, error: 'records array required' }));
-          return;
-        }
+        const records = Array.isArray(payload) ? payload : (payload.records || payload.data || []);
 
         // Save backup to vault.json
-        const vaultObj = {
-          records,
-          customCategories: payload.customCategories || [],
-          deletedCategories: payload.deletedCategories || [],
-          deletedPostNos: payload.deletedPostNos || [],
-          realThumbs: payload.realThumbs || {}
-        };
-        fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
+        if (Array.isArray(records) && records.length > 0) {
+          const vaultObj = {
+            records,
+            customCategories: payload.customCategories || [],
+            deletedCategories: payload.deletedCategories || [],
+            deletedPostNos: payload.deletedPostNos || [],
+            realThumbs: payload.realThumbs || {}
+          };
+          fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
+        }
 
         let mysqlSaved = false;
         if (pool) {
           try {
             await upsertPostsToMySQL(records, payload.customCategories, payload.deletedCategories, payload.deletedPostNos, payload.realThumbs);
             mysqlSaved = true;
-            console.log('[MySQL Storage]: Saved ' + records.length + ' records into MySQL database.');
+            console.log('[MySQL Storage]: Saved ' + (records ? records.length : 0) + ' records and metadata into MySQL database.');
           } catch(e) {
             console.error('[MySQL Save Error]:', e.message);
           }
         }
 
-        commitAndPushToGit(records.length);
+        if (Array.isArray(records) && records.length > 0) {
+          commitAndPushToGit(records.length);
+        }
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           success: true,
-          count: records.length,
+          count: Array.isArray(records) ? records.length : 0,
           mysqlSynced: mysqlSaved,
-          message: mysqlSaved ? 'Permanently stored ' + records.length + ' records in MySQL.' : 'Stored in vault.json backup.'
+          message: mysqlSaved ? 'Permanently stored in MySQL.' : 'Stored in vault.json backup.'
         }));
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
