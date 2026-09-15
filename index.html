@@ -2048,11 +2048,11 @@
 
     function quickAdd(link, categories, takeaway, platform, postType, extraUrl, thumbUrl) {
       if (!link) { alert('Please paste a post link first'); return; }
-      const cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
+      let cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
       if (cats.length === 0) {
-        alert('Please select at least 1 category before submitting.');
-        return;
+        cats = [(customCategories && customCategories[0] && customCategories[0].name) ? customCategories[0].name : 'Content Creation'];
       }
+
 
       const exUrl = extraUrl !== undefined ? extraUrl : (document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : '');
 
