@@ -150,12 +150,17 @@ async function getFromDatabase() {
         } catch(e) {}
       });
 
+      if (!realThumbs) realThumbs = {};
       const records = rows.map(r => {
         let catArr = [];
         try {
           catArr = typeof r.category === 'string' ? JSON.parse(r.category) : r.category;
         } catch(e) {
           catArr = [r.category];
+        }
+        const thumb = (realThumbs && (realThumbs[r.post_no] || realThumbs[r.post_no.toString()])) || r.real_thumb || '';
+        if (thumb && r.post_no) {
+          realThumbs[r.post_no] = thumb;
         }
         return {
           'No.': r.post_no,
@@ -167,7 +172,7 @@ async function getFromDatabase() {
           'Status': r.status,
           'Date Saved': r.date_saved,
           'Category': Array.isArray(catArr) ? catArr : [catArr],
-          'realThumb': r.real_thumb
+          'realThumb': thumb
         };
       });
 
@@ -201,17 +206,27 @@ function getFromSQLite() {
     } catch(e) {}
   });
 
-  const records = rows.map(r => ({
-    'No.': r.post_no,
-    'Platform': r.platform,
-    'Original Post Link': r.original_post_link,
-    'Extra Link': r.extra_link,
-    'Post Type': r.post_type,
-    'Core Idea / 1-Line Takeaway': r.takeaway,
-    'Status': r.status,
-    'Date Saved': r.date_saved,
-    'Category': r.category ? JSON.parse(r.category) : []
-  }));
+  if (!realThumbs) realThumbs = {};
+  const records = rows.map(r => {
+    let catArr = [];
+    try { catArr = r.category ? JSON.parse(r.category) : []; } catch(e) {}
+    const thumb = (realThumbs && (realThumbs[r.post_no] || realThumbs[r.post_no.toString()])) || r.real_thumb || '';
+    if (thumb && r.post_no) {
+      realThumbs[r.post_no] = thumb;
+    }
+    return {
+      'No.': r.post_no,
+      'Platform': r.platform,
+      'Original Post Link': r.original_post_link,
+      'Extra Link': r.extra_link,
+      'Post Type': r.post_type,
+      'Core Idea / 1-Line Takeaway': r.takeaway,
+      'Status': r.status,
+      'Date Saved': r.date_saved,
+      'Category': Array.isArray(catArr) ? catArr : [catArr],
+      'realThumb': thumb
+    };
+  });
 
   return { records, customCategories, deletedCategories, deletedPostNos, realThumbs };
 }
@@ -392,7 +407,10 @@ const server = http.createServer(async (req, res) => {
           if (item.platform) existingRec['Platform'] = item.platform;
           if (item.postType) existingRec['Post Type'] = item.postType;
           if (item.extraUrl !== undefined) existingRec['Extra Link'] = item.extraUrl;
-          if (item.thumbUrl) realThumbs[targetNo] = item.thumbUrl;
+          if (item.thumbUrl) {
+            realThumbs[targetNo] = item.thumbUrl;
+            existingRec.realThumb = item.thumbUrl;
+          }
         } else {
           const maxStmt = sqliteDb.prepare('SELECT MAX(post_no) as max_no FROM social_media_posts');
           const maxVal = maxStmt.get() ? (maxStmt.get().max_no || 0) : 0;
@@ -412,6 +430,7 @@ const server = http.createServer(async (req, res) => {
 
           if (item.thumbUrl) {
             realThumbs[targetNo] = item.thumbUrl;
+            newRec.realThumb = item.thumbUrl;
           }
 
           records.unshift(newRec);

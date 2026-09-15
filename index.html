@@ -1738,7 +1738,7 @@
 
       const slice = filtered.slice(shown, shown + perPage);
       slice.forEach(r => {
-        const custom = realThumbs[r['No.']];
+        const custom = getPostThumb(r);
         const embedUrl = getEmbedUrl(r['Original Post Link']);
         const catList = getPostCategories(r);
         const catBadgesHtml = catList.map(cName => {
@@ -1859,7 +1859,7 @@
     window.openThumb = function (no) {
       editingNo = no;
       document.getElementById('thumbModalNo').textContent = '#' + no;
-      const url = realThumbs[no] || '';
+      const url = getPostThumb(records.find(r => r && r['No.'] === no));
       document.getElementById('thumbUrl').value = url;
       updateMediaPreview(url, 'thumbPreview');
       const removeBtn = document.getElementById('removeThumb');
@@ -2583,7 +2583,7 @@
       document.getElementById('modalTakeaway').value = cleanSocialCaption(rec['Core Idea / 1-Line Takeaway'] || '');
       const mds = document.getElementById('modalDateSaved'); if (mds) mds.value = getPostDate(rec) || new Date().toISOString().slice(0, 10);
 
-      const currentThumb = realThumbs[no] || '';
+      const currentThumb = getPostThumb(rec);
       const miu = document.getElementById('modalImageUrl'); if (miu) miu.value = currentThumb;
       const mif = document.getElementById('modalImageFile'); if (mif) mif.value = '';
       updateMediaPreview(currentThumb, 'modalImagePreview');
@@ -2869,8 +2869,10 @@
 
           if (thumbUrl) {
             realThumbs[editingPostNo] = thumbUrl;
+            rec.realThumb = thumbUrl;
           } else {
             delete realThumbs[editingPostNo];
+            delete rec.realThumb;
           }
 
           userUpdatedPosts[editingPostNo] = {
@@ -2912,7 +2914,7 @@
       filtered = records.filter(r => {
         const mq = matchesSearchQuery(r, q);
         const mc = !cat || isPostInCategory(r, cat);
-        const mf = ft === '' || (ft === 'withThumb' && realThumbs[r['No.']]) || (ft === 'embedOnly' && !realThumbs[r['No.']]);
+        const mf = ft === '' || (ft === 'withThumb' && getPostThumb(r)) || (ft === 'embedOnly' && !getPostThumb(r));
         return mq && mc && mf;
       });
 
@@ -2937,7 +2939,36 @@
     document.getElementById('exportBtn').addEventListener('click', exportExcelData);
     document.getElementById('thumbUrl').addEventListener('input', e => { const url = e.target.value.trim(); updateMediaPreview(url, 'thumbPreview'); });
     document.getElementById('thumbFile').addEventListener('change', e => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = ev => { document.getElementById('thumbUrl').value = ev.target.result; updateMediaPreview(ev.target.result, 'thumbPreview'); }; reader.readAsDataURL(file); });
-    document.getElementById('saveThumb').addEventListener('click', () => { const url = document.getElementById('thumbUrl').value.trim(); if (!url) { alert('Add media image or video first'); return; } realThumbs[editingNo] = url; saveAll(); closeThumbModal(); document.getElementById('grid').innerHTML = ''; shown = 0; renderGrid(); });
+    document.getElementById('saveThumb').addEventListener('click', () => {
+      const url = document.getElementById('thumbUrl').value.trim();
+      if (!url) { alert('Add media image or video first'); return; }
+      realThumbs[editingNo] = url;
+      const targetRec = records.find(r => r && r['No.'] === editingNo);
+      if (targetRec) {
+        targetRec.realThumb = url;
+        try {
+          fetch(getApiBaseUrl() + '/api/add-post', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              link: targetRec['Original Post Link'],
+              categories: targetRec.Category,
+              takeaway: targetRec['Core Idea / 1-Line Takeaway'],
+              platform: targetRec.Platform,
+              postType: targetRec['Post Type'],
+              extraUrl: targetRec['Extra Link'],
+              thumbUrl: url,
+              dateSaved: targetRec['Date Saved']
+            })
+          });
+        } catch(e) {}
+      }
+      saveAll();
+      closeThumbModal();
+      document.getElementById('grid').innerHTML = '';
+      shown = 0;
+      renderGrid();
+    });
     const clearQuickBtn = document.getElementById('clearQuickCatSelectionBtn');
     if (clearQuickBtn) clearQuickBtn.addEventListener('click', resetQuickCatChips);
     const clearModalBtn = document.getElementById('clearModalCatSelectionBtn');
