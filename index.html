@@ -2125,7 +2125,18 @@
         return;
       }
 
-      const maxNo = Math.max(...records.map(r => r['No.']), 0);
+      function getMaxPostNo() {
+        if (!Array.isArray(records) || records.length === 0) return 0;
+        let max = 0;
+        records.forEach(r => {
+          if (r && r['No.'] !== undefined && r['No.'] !== null) {
+            const val = parseInt(r['No.'], 10);
+            if (!isNaN(val) && val > max) max = val;
+          }
+        });
+        return max;
+      }
+      const maxNo = getMaxPostNo();
       let p = platform || detectPlatformFromUrl(link);
       const dateVal = (document.getElementById('modalDateSaved') && document.getElementById('modalDateSaved').value) ? document.getElementById('modalDateSaved').value : new Date().toISOString().slice(0, 10);
       const newRec = {

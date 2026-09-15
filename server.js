@@ -40,6 +40,9 @@ sqliteDb.exec(`
 
 function upsertToSQLite(records, customCategories, deletedCategories, deletedPostNos, realThumbs) {
   if (Array.isArray(records) && records.length > 0) {
+    const maxStmt = sqliteDb.prepare('SELECT MAX(post_no) as max_no FROM social_media_posts');
+    let maxPostNo = maxStmt.get() ? (maxStmt.get().max_no || 0) : 0;
+
     const stmt = sqliteDb.prepare(`
       INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, status, date_saved, category, real_thumb)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -54,9 +57,20 @@ function upsertToSQLite(records, customCategories, deletedCategories, deletedPos
         category = excluded.category,
         real_thumb = excluded.real_thumb;
     `);
+
     records.forEach(r => {
+      if (!r || typeof r !== 'object') return;
+      let postNo = r['No.'] ? parseInt(r['No.'], 10) : NaN;
+      if (isNaN(postNo) || postNo <= 0) {
+        maxPostNo++;
+        postNo = maxPostNo;
+        r['No.'] = postNo;
+      } else if (postNo > maxPostNo) {
+        maxPostNo = postNo;
+      }
+
       stmt.run(
-        r['No.'],
+        postNo,
         r.Platform || 'Social Media',
         r['Original Post Link'] || '',
         r['Extra Link'] || r['Extra URL'] || r.extraUrl || '',
@@ -65,7 +79,7 @@ function upsertToSQLite(records, customCategories, deletedCategories, deletedPos
         r.Status || 'Not Used',
         r['Date Saved'] || '',
         JSON.stringify(Array.isArray(r.Category) ? r.Category : (r.Category ? [r.Category] : [])),
-        (realThumbs && realThumbs[r['No.']]) || r.realThumb || ''
+        (realThumbs && realThumbs[postNo]) || r.realThumb || ''
       );
     });
   }
