@@ -1388,6 +1388,20 @@
       }
     }
     function updateCounts() { const t = records.length; const c = customCategories.length; document.getElementById('postCountTop').textContent = t; document.getElementById('postCountMobile').textContent = t + ' posts'; document.getElementById('postCountMobile2').textContent = t; document.getElementById('catCountTop').textContent = c; document.getElementById('catCountMobile').textContent = c; }
+    function getPostThumb(r) {
+      if (!r) return '';
+      const no = r['No.'];
+      if (no && typeof realThumbs !== 'undefined' && realThumbs && realThumbs[no]) return realThumbs[no];
+      if (r.realThumb) return r.realThumb;
+      if (r.mediaUrl) return r.mediaUrl;
+      if (r.Image) return r.Image;
+      if (r.Video) return r.Video;
+      if (r.GIF) return r.GIF;
+      if (r['Image URL']) return r['Image URL'];
+      if (r['Thumbnail URL']) return r['Thumbnail URL'];
+      return '';
+    }
+
     function getPostCategories(r) {
       if (!r) return [];
       if (Array.isArray(r.Category)) return r.Category.map(s => String(s).trim()).filter(Boolean);
