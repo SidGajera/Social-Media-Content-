@@ -1131,6 +1131,7 @@
         let serverDelCats = null;
         let serverDelNos = null;
         let serverThumbs = null;
+        let fetchedSuccessfully = false;
 
         for (const u of urls) {
           try {
@@ -1142,7 +1143,7 @@
                 list = data;
               } else if (data && typeof data === 'object') {
                 list = Array.isArray(data.records) ? data.records : (Array.isArray(data.data) ? data.data : []);
-                if (Array.isArray(data.customCategories) && (!serverCustomCats || data.customCategories.length > serverCustomCats.length)) {
+                if (Array.isArray(data.customCategories)) {
                   serverCustomCats = data.customCategories;
                 }
                 if (Array.isArray(data.deletedCategories)) {
@@ -1155,27 +1156,32 @@
                   serverThumbs = data.realThumbs;
                 }
               }
-              if (Array.isArray(list) && list.length > serverRecords.length) {
+              if (Array.isArray(list)) {
                 serverRecords = list;
+                fetchedSuccessfully = true;
+                break;
               }
             }
           } catch (e) { }
         }
 
-        if (serverCustomCats) customCategories = serverCustomCats;
-        if (serverDelCats) deletedCategories = serverDelCats;
-        if (serverDelNos) deletedPostNos = serverDelNos;
-        if (serverThumbs) realThumbs = Object.assign({}, realThumbs, serverThumbs);
+        if (fetchedSuccessfully) {
+          if (serverCustomCats) customCategories = serverCustomCats;
+          if (serverDelCats) deletedCategories = serverDelCats;
+          if (serverDelNos) deletedPostNos = serverDelNos;
+          if (serverThumbs) realThumbs = serverThumbs;
 
-        if (serverRecords.length > 0) {
-          const prevCount = records ? records.length : 0;
-          records = deduplicateRecords([...serverRecords, ...(records || [])]);
-          migrateAndMergeCategories();
-          syncCategoriesFromRecords();
-          updateCounts();
-          if (records.length !== prevCount || serverRecords.length > prevCount) {
-            return true;
+          // Pure server-authoritative replacement! NO merging with in-memory or defaultRecords!
+          records = deduplicateRecords(serverRecords);
+
+          if (deletedPostNos && deletedPostNos.length > 0) {
+            records = records.filter(r => r && r['No.'] && !deletedPostNos.includes(r['No.']));
           }
+
+          migrateAndMergeCategories();
+          syncCategoriesFromRecords(false);
+          updateCounts();
+          return true;
         }
       } catch (err) {
         console.warn('GitHub server fetch notice:', err);
@@ -2100,7 +2106,7 @@
       });
     }
 
-    function syncCategoriesFromRecords() {
+    function syncCategoriesFromRecords(shouldSave = true) {
       if (!Array.isArray(records)) return;
       const palette = ['#FFD700', '#00D9FF', '#00FF88', '#FF6B00', '#A855F7', '#EC4899', '#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#6366F1', '#14B8A6'];
       let changed = false;
@@ -2157,7 +2163,7 @@
           }
         });
       });
-      if (changed) {
+      if (changed && shouldSave) {
         saveAll();
       }
     }
@@ -2285,14 +2291,12 @@
       } catch (e) {}
 
       // Always load latest live server vault records directly from server
-      try {
-        await fetchLatestFromGitHubServer();
-      } catch (e) {
-        console.warn('Initial server sync:', e);
-      }
+      const fetched = await fetchLatestFromGitHubServer();
 
-      if (!records || !Array.isArray(records) || records.length === 0) {
+      // Only fallback to defaultRecords if server fetch returned 0 records and records is completely empty
+      if (!fetched && (!records || !Array.isArray(records) || records.length === 0)) {
         records = JSON.parse(JSON.stringify(defaultRecords));
+        syncCategoriesFromRecords(false);
       }
 
       // Ensure any GitHub URL erroneously placed in Takeaway is moved to Extra Link across all records
