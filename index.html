@@ -1672,13 +1672,7 @@
               btn.classList.remove('text-black');
               btn.querySelector('i').className = 'fas fa-circle text-[10px]';
             }
-            const selCats = getSelectedQuickCategories();
-            if (selCats.length > 0) {
-              document.getElementById('catFilter').value = selCats[0];
-            } else {
-              document.getElementById('catFilter').value = '';
-            }
-            document.getElementById('search').dispatchEvent(new Event('input'));
+// Form category selection updated
           });
           quickChips.appendChild(btn);
         });
