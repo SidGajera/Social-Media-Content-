@@ -6,10 +6,16 @@ const ROOT_VAULT_PATH = path.join(__dirname, '..', 'vault.json');
 
 function loadVault() {
   if (fs.existsSync(VAULT_PATH)) {
-    try { return JSON.parse(fs.readFileSync(VAULT_PATH, 'utf8')); } catch (e) {}
+    try {
+      const v = JSON.parse(fs.readFileSync(VAULT_PATH, 'utf8'));
+      if (v && Array.isArray(v.records) && v.records.length > 0) return v;
+    } catch (e) {}
   }
   if (fs.existsSync(ROOT_VAULT_PATH)) {
-    try { return JSON.parse(fs.readFileSync(ROOT_VAULT_PATH, 'utf8')); } catch (e) {}
+    try {
+      const rv = JSON.parse(fs.readFileSync(ROOT_VAULT_PATH, 'utf8'));
+      if (rv && Array.isArray(rv.records) && rv.records.length > 0) return rv;
+    } catch (e) {}
   }
   return { records: [], customCategories: [], deletedCategories: [], deletedPostNos: [], realThumbs: {} };
 }

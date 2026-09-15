@@ -1267,7 +1267,7 @@
                   serverThumbs = data.realThumbs;
                 }
               }
-              if (Array.isArray(list)) {
+              if (Array.isArray(list) && list.length > 0) {
                 serverRecords = list;
                 fetchedSuccessfully = true;
                 break;
@@ -2607,8 +2607,22 @@
       // Always load latest live server vault records directly from server
       const fetched = await fetchLatestFromGitHubServer();
 
-      // Only fallback to defaultRecords if server fetch returned 0 records and records is completely empty
-      if (!fetched && (!records || !Array.isArray(records) || records.length === 0)) {
+      // Reliable fallback: if records is empty, attempt to load directly from local or remote vault.json
+      if (!records || !Array.isArray(records) || records.length === 0) {
+        try {
+          const vRes = await fetch(`./vault.json?t=${Date.now()}`);
+          if (vRes.ok) {
+            const vData = await vRes.json();
+            if (vData && Array.isArray(vData.records) && vData.records.length > 0) {
+              records = deduplicateRecords(vData.records);
+              if (Array.isArray(vData.customCategories)) customCategories = vData.customCategories;
+              if (vData.realThumbs) realThumbs = vData.realThumbs;
+            }
+          }
+        } catch (e) { }
+      }
+
+      if (!records || !Array.isArray(records) || records.length === 0) {
         records = JSON.parse(JSON.stringify(defaultRecords));
         syncCategoriesFromRecords(false);
       }
