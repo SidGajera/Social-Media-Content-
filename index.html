@@ -1173,6 +1173,14 @@
 
     function saveAll() {
       records = deduplicateRecords(records);
+      try {
+        if (Array.isArray(customAddedPosts) && customAddedPosts.length > 0) {
+          localStorage.setItem('i3d_local_custom_added_posts', JSON.stringify(customAddedPosts));
+        }
+        if (userUpdatedPosts && Object.keys(userUpdatedPosts).length > 0) {
+          localStorage.setItem('i3d_local_user_updated_posts', JSON.stringify(userUpdatedPosts));
+        }
+      } catch(e) {}
       updateCounts();
       syncToLocalServer();
       syncToGitHubServer(false);
@@ -1269,7 +1277,7 @@
           if (serverThumbs) realThumbs = serverThumbs;
 
           // Pure server-authoritative replacement! NO merging with in-memory or defaultRecords!
-          records = deduplicateRecords(serverRecords);
+          records = deduplicateRecords([...(records || []), ...serverRecords]);
 
           if (deletedPostNos && deletedPostNos.length > 0) {
             records = records.filter(r => r && r['No.'] && !deletedPostNos.includes(r['No.']));
@@ -2375,6 +2383,16 @@
     }
 
     async function init() {
+      try {
+        const savedCustom = localStorage.getItem('i3d_local_custom_added_posts');
+        if (savedCustom) {
+          const parsedCustom = JSON.parse(savedCustom);
+          if (Array.isArray(parsedCustom) && parsedCustom.length > 0) {
+            customAddedPosts = parsedCustom;
+            records = deduplicateRecords([...customAddedPosts, ...(records || [])]);
+          }
+        }
+      } catch(e) {}
       // Clear legacy local device caches to guarantee zero local data inconsistency across devices
       try {
         localStorage.removeItem('i3d_vault_saved_again');
