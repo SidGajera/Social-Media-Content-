@@ -1317,7 +1317,7 @@
             records = records.filter(r => r && r['No.'] && !deletedPostNos.includes(r['No.']));
           }
 
-          migrateAndMergeCategories();
+          if (typeof migrateAndMergeCategories === "function") migrateAndMergeCategories();
           syncCategoriesFromRecords(false);
 
           const searchInput = document.getElementById('search');
@@ -1781,8 +1781,23 @@
         setTimeout(() => { if (loader && loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
       }
     }
-    window.addEventListener('DOMContentLoaded', () => { setTimeout(dismissSplashLoader, 600); });
-    setTimeout(dismissSplashLoader, 1200);
+
+    async function initVaultData() {
+      try {
+        await fetchLatestFromGitHubServer();
+      } catch (e) {
+        console.warn('Init vault notice:', e);
+      } finally {
+        dismissSplashLoader();
+      }
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(initVaultData, 10);
+    } else {
+      window.addEventListener('DOMContentLoaded', initVaultData);
+    }
+    setTimeout(initVaultData, 1000);
 
     function renderGrid() {
       const grid = document.getElementById('grid');
