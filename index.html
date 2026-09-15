@@ -2075,6 +2075,7 @@
 
       const parts = [];
       parts.push('📌 **POST #' + no + ' | ' + platform + '**');
+      parts.push('🛡️ **PERMANENT SERVER ARCHIVE:** Preserved safely in server database vault.');
       parts.push('TYPE: ' + mediaInfo.label);
       parts.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
@@ -2949,7 +2950,8 @@
       const cats = getPostCategories(rec);
       const mediaInfo = getPostMediaFormat(rec);
 
-      let modalContentHtml = `<div class="mb-3 flex items-center justify-between"><span class="px-3 py-1 bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 rounded-full text-xs font-bold flex items-center gap-1.5"><i class="fas ${mediaInfo.icon}"></i> ${mediaInfo.label}</span></div>`;
+      let modalContentHtml = `<div class="mb-3 flex items-center justify-between"><span class="px-3 py-1 bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 rounded-full text-xs font-bold flex items-center gap-1.5"><i class="fas ${mediaInfo.icon}"></i> ${mediaInfo.label}</span><span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full text-[10px] font-bold flex items-center gap-1"><i class="fas fa-shield-halved text-emerald-400"></i> Server Vault Archived</span></div>`;
+      modalContentHtml += `<div class="mb-4 p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-emerald-200 flex items-start gap-2.5 shadow-md"><i class="fas fa-shield-halved text-emerald-400 text-base shrink-0 mt-0.5"></i><div><strong class="text-emerald-300 font-bold block text-xs">🛡️ PERMANENT SERVER ARCHIVE GUARANTEE</strong><span class="text-[11px] text-gray-300 leading-snug">This post's takeaway text, media thumbnail, links, and formatted copyable post are permanently saved on the server database vault. Full content remains 100% accessible even if the original author deletes the post from social media.</span></div></div>`;
       modalContentHtml += formatRichCaption(rawCaption);
 
       // Append clickable links section to modal preview
