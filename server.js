@@ -54,7 +54,7 @@ const server = http.createServer((req, res) => {
   const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = urlObj.pathname;
 
-  // Endpoint: GET /api/status
+  // Endpoint: GET /api/status or /api/sync
   if (req.method === 'GET' && pathname === '/api/status') {
     let count = 0;
     try {
@@ -66,6 +66,20 @@ const server = http.createServer((req, res) => {
     } catch(e) {}
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'online', count, time: new Date().toISOString() }));
+    return;
+  }
+
+  if (req.method === 'GET' && (pathname === '/api/sync' || pathname === '/get-vault')) {
+    let records = [];
+    try {
+      if (fs.existsSync(VAULT_PATH)) {
+        const raw = fs.readFileSync(VAULT_PATH, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) records = parsed;
+      }
+    } catch(e) {}
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, count: records.length, records }));
     return;
   }
 

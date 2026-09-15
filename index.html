@@ -824,16 +824,14 @@
       const map = new Map();
 
       recordsArray.forEach(item => {
-        if (!item) return;
+        if (!item || typeof item !== 'object') return;
         const rawLink = item['Original Post Link'] || item['Post Link'] || item['Link'] || item['URL'] || '';
-        if (!rawLink) return;
-
-        const normLink = normalizePostUrl(rawLink);
+        const normLink = rawLink ? normalizePostUrl(rawLink) : '';
         const itemNo = item['No.'] ? parseInt(item['No.'], 10) : null;
 
         let existingKey = null;
         for (let [key, existing] of map.entries()) {
-          const existingNorm = normalizePostUrl(existing['Original Post Link']);
+          const existingNorm = existing['Original Post Link'] ? normalizePostUrl(existing['Original Post Link']) : '';
           const existingNo = existing['No.'] ? parseInt(existing['No.'], 10) : null;
 
           if ((normLink && existingNorm && normLink === existingNorm) || (itemNo && !isNaN(itemNo) && existingNo && itemNo === existingNo)) {
@@ -844,6 +842,13 @@
 
         if (existingKey) {
           const existing = map.get(existingKey);
+
+          // Merge all properties from item into existing without overwriting valid data
+          Object.keys(item).forEach(k => {
+            if (existing[k] === undefined || existing[k] === null || existing[k] === '') {
+              existing[k] = item[k];
+            }
+          });
 
           // Merge categories
           const cats1 = getPostCategories(existing);
@@ -867,8 +872,17 @@
           if ((!existing['Post Type'] || existing['Post Type'] === 'Content' || existing['Post Type'] === 'New Content') && item['Post Type']) {
             existing['Post Type'] = item['Post Type'];
           }
+
+          // Merge media fields
+          const mUrl1 = existing.mediaUrl || existing.Image || existing.Video || existing.GIF || '';
+          const mUrl2 = item.mediaUrl || item.Image || item.Video || item.GIF || '';
+          if (!mUrl1 && mUrl2) {
+            existing.mediaUrl = mUrl2;
+            existing.mediaType = item.mediaType || existing.mediaType || '';
+          }
         } else {
-          const cleanItem = {
+          // Preserve ALL properties of item (so media, custom fields are NOT discarded)
+          const cleanItem = Object.assign({}, item, {
             'No.': (itemNo && !isNaN(itemNo)) ? itemNo : null,
             'Platform': item['Platform'] || (rawLink.includes('facebook.com') ? 'Facebook' : (rawLink.includes('x.com') || rawLink.includes('twitter.com') ? 'X (Twitter)' : 'Instagram')),
             'Original Post Link': rawLink,
@@ -877,9 +891,11 @@
             'Core Idea / 1-Line Takeaway': item['Core Idea / 1-Line Takeaway'] || 'No description provided',
             'Status': item['Status'] || 'Not Used',
             'Date Saved': item['Date Saved'] || new Date().toISOString().slice(0, 10),
-            'Category': getPostCategories(item)
-          };
-          const key = normLink || (`no_${itemNo}_${Math.random()}`);
+            'Category': getPostCategories(item),
+            'mediaUrl': item.mediaUrl || item['Image'] || item['Video'] || item['GIF'] || '',
+            'mediaType': item.mediaType || ''
+          });
+          const key = normLink || (itemNo ? `no_${itemNo}` : `post_${Math.random().toString(36).substr(2, 9)}`);
           map.set(key, cleanItem);
         }
       });
@@ -1118,18 +1134,21 @@
 
     async function fetchLatestFromGitHubServer() {
       try {
+        const timestamp = Date.now();
         const urls = [
-          `./vault.json?t=${Date.now()}`,
-          `https://raw.githubusercontent.com/SidGajera/Social-Media-Content-/main/vault.json?t=${Date.now()}`
+          `/api/sync?t=${timestamp}`,
+          `./vault.json?t=${timestamp}`,
+          `https://raw.githubusercontent.com/SidGajera/Social-Media-Content-/main/vault.json?t=${timestamp}`
         ];
         let serverRecords = [];
         for (const u of urls) {
           try {
             const res = await fetch(u);
             if (res.ok) {
-              const json = await res.json();
-              if (Array.isArray(json) && json.length > serverRecords.length) {
-                serverRecords = json;
+              const data = await res.json();
+              const list = Array.isArray(data) ? data : (data && (data.records || data.data));
+              if (Array.isArray(list) && list.length > serverRecords.length) {
+                serverRecords = list;
               }
             }
           } catch (e) { }
@@ -1137,7 +1156,7 @@
 
         if (serverRecords.length > 0) {
           const prevCount = records ? records.length : 0;
-          records = deduplicateRecords([...(records || []), ...serverRecords]);
+          records = deduplicateRecords([...serverRecords, ...(records || [])]);
           if (records.length !== prevCount || serverRecords.length > prevCount) {
             saveAll();
             return true;
@@ -2237,7 +2256,14 @@
     }
 
     async function init() {
-      // 1. Recover from IndexedDB if local storage is missing or smaller
+      // 1. Fetch latest live server vault records first so all devices load synced server data
+      try {
+        await fetchLatestFromGitHubServer();
+      } catch (e) {
+        console.warn('Initial server sync:', e);
+      }
+
+      // 2. Recover from IndexedDB if local storage is missing or smaller
       try {
         const idbDeleted = await loadFromIndexedDB('deletedPostNos');
         if (idbDeleted && Array.isArray(idbDeleted)) {
@@ -2346,15 +2372,21 @@
       if (patVal) {
         syncToGitHubServer(false);
       }
-      fetchLatestFromGitHubServer().then(updated => {
-        if (updated) {
-          filtered = [...records];
-          filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
-          renderCatDropdowns();
-          document.getElementById('grid').innerHTML = '';
-          shown = 0;
-          renderGrid();
-          updateCounts();
+
+      // Auto-sync whenever tab becomes visible on any device
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          fetchLatestFromGitHubServer().then(updated => {
+            if (updated) {
+              filtered = [...records];
+              filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
+              renderCatDropdowns();
+              document.getElementById('grid').innerHTML = '';
+              shown = 0;
+              renderGrid();
+              updateCounts();
+            }
+          });
         }
       });
 

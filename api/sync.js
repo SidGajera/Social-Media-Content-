@@ -13,6 +13,18 @@ module.exports = async (req, res) => {
     return res.status(204).end();
   }
 
+  if (req.method === 'GET') {
+    const vaultPath = path.join(process.cwd(), 'vault.json');
+    try {
+      if (fs.existsSync(vaultPath)) {
+        const raw = fs.readFileSync(vaultPath, 'utf8');
+        const records = JSON.parse(raw);
+        return res.status(200).json({ success: true, count: Array.isArray(records) ? records.length : 0, records });
+      }
+    } catch (e) {}
+    return res.status(200).json({ success: true, count: 0, records: [] });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method Not Allowed' });
   }
