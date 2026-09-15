@@ -1968,7 +1968,26 @@
     }
 
     
-    function buildFormattedCopyablePost(rec) {
+    function getPostMediaFormat(rec) {
+      if (!rec) return { code: 'SOCIAL', label: '🌐 SOCIAL POST', icon: 'fa-globe' };
+      const link = (rec['Original Post Link'] || '').toLowerCase();
+      const pType = (rec['Post Type'] || '').toLowerCase();
+      const takeaway = (rec['Core Idea / 1-Line Takeaway'] || '').toLowerCase();
+      const custom = (rec.real_thumb || '').toLowerCase();
+
+      if (pType.includes('carousel') || takeaway.includes('carousel') || takeaway.includes('swipe') || takeaway.includes('slide')) {
+        return { code: 'CAROUSEL', label: '🎠 CAROUSEL SLIDE POST', icon: 'fa-images' };
+      } else if (pType.includes('reel') || takeaway.includes('reel') || link.includes('instagram.com/reel') || link.includes('tiktok.com') || link.includes('shorts')) {
+        return { code: 'REEL', label: '🎬 REEL / SHORT VIDEO', icon: 'fa-clapperboard' };
+      } else if (pType.includes('video') || custom.endsWith('.mp4') || custom.endsWith('.webm')) {
+        return { code: 'VIDEO', label: '📹 VIDEO POST', icon: 'fa-video' };
+      } else if (pType.includes('image') || pType.includes('photo') || custom.endsWith('.jpg') || custom.endsWith('.png') || link.includes('instagram.com/p/')) {
+        return { code: 'IMAGE', label: '📷 IMAGE / INFOGRAPHIC POST', icon: 'fa-image' };
+      }
+      return { code: 'SOCIAL', label: '🌐 SOCIAL MEDIA POST', icon: 'fa-share-nodes' };
+    }
+
+    function buildFormattedCopyablePost(rec, forceFormat = null) {
       if (!rec) return '';
       const no = rec['No.'] || 0;
       const platform = (rec.Platform || rec['Post Type'] || 'Social Media').toUpperCase();
@@ -1977,54 +1996,85 @@
       const extraLink = (rec['Extra Link / Resource'] || '').trim();
       const cats = getPostCategories(rec);
       const dateStr = getPostDate(rec);
+      const mediaInfo = forceFormat ? { code: forceFormat, label: forceFormat + ' POST' } : getPostMediaFormat(rec);
 
-      // Format takeaway lines into bullet points if multi-line or contains bullet indicators
       let formattedTakeaway = rawTakeaway;
+
       if (formattedTakeaway) {
-        const lines = formattedTakeaway.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-        if (lines.length > 1) {
-          formattedTakeaway = lines.map(line => {
-            if (/^[-*•📍✨▶]\s*/.test(line)) return line.replace(/^[-*•📍✨▶]\s*/, '• ');
-            return `• ${line}`;
-          }).join('\n');
-        } else if (!/^[-*•📍✨▶]/.test(formattedTakeaway) && formattedTakeaway.length > 40 && formattedTakeaway.includes('.')) {
-          const sentences = formattedTakeaway.split(/(?<=\.)\s+/).map(s => s.trim()).filter(s => s.length > 5);
-          if (sentences.length > 1) {
-            formattedTakeaway = sentences.map(s => `• ${s}`).join('\n');
+        let lines = formattedTakeaway.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+        if (mediaInfo.code === 'CAROUSEL') {
+          if (lines.length > 1) {
+            formattedTakeaway = lines.map((line, idx) => {
+              const clean = line.replace(/^[-*•📍✨▶\d+.\s]+/, '');
+              return '• Slide ' + (idx + 1) + ': **' + clean + '**';
+            }).join('\n');
+          } else {
+            const sentences = formattedTakeaway.split(/(?<=\.)\s+/).map(s => s.trim()).filter(s => s.length > 5);
+            if (sentences.length > 1) {
+              formattedTakeaway = sentences.map((s, idx) => '• Slide ' + (idx + 1) + ': **' + s + '**').join('\n');
+            } else {
+              formattedTakeaway = '• Slide 1: **' + formattedTakeaway + '**';
+            }
+          }
+        } else if (mediaInfo.code === 'REEL' || mediaInfo.code === 'VIDEO') {
+          if (lines.length > 1) {
+            formattedTakeaway = lines.map((line, idx) => {
+              const clean = line.replace(/^[-*•📍✨▶\s]+/, '');
+              if (idx === 0) return '• 🎬 Hook: **' + clean + '**';
+              if (idx === lines.length - 1) return '• 📌 Call To Action: **' + clean + '**';
+              return '• 💡 Key Point ' + idx + ': **' + clean + '**';
+            }).join('\n');
+          } else {
+            formattedTakeaway = '• 🎬 Reel Hook & Concept:\n  ' + formattedTakeaway;
+          }
+        } else {
+          if (lines.length > 1) {
+            formattedTakeaway = lines.map(line => {
+              if (/^[-*•📍✨▶]\s*/.test(line)) return line.replace(/^[-*•📍✨▶]\s*/, '• ');
+              return '• **' + line + '**';
+            }).join('\n');
+          } else if (formattedTakeaway.length > 40 && formattedTakeaway.includes('.')) {
+            const sentences = formattedTakeaway.split(/(?<=\.)\s+/).map(s => s.trim()).filter(s => s.length > 5);
+            if (sentences.length > 1) {
+              formattedTakeaway = sentences.map(s => '• **' + s + '**').join('\n');
+            } else {
+              formattedTakeaway = '• **' + formattedTakeaway + '**';
+            }
+          } else {
+            formattedTakeaway = '• **' + formattedTakeaway + '**';
           }
         }
+      } else {
+        formattedTakeaway = '• No caption/takeaway provided.';
       }
 
-      // Format hashtags
       let hashtagsStr = '';
       if (cats.length > 0) {
         hashtagsStr = cats.map(c => '#' + c.replace(/[^a-zA-Z0-9_]/g, '')).join(' ');
       }
 
       const parts = [];
-      parts.push(`📌 **POST #${no} | ${platform}**`);
-      parts.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      parts.push('📌 **POST #' + no + ' | ' + platform + '**');
+      parts.push('TYPE: ' + mediaInfo.label);
+      parts.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
-      if (formattedTakeaway) {
-        parts.push(`💡 **KEY TAKEAWAYS & CAPTION:**\n${formattedTakeaway}`);
-      } else {
-        parts.push(`💡 **KEY TAKEAWAYS & CAPTION:**\n• No description provided.`);
-      }
+      parts.push('💡 **KEY TAKEAWAYS & CAPTION:**\n' + formattedTakeaway);
 
       if (origLink) {
-        parts.push(`🔗 **POST LINK:**\n${origLink}`);
+        parts.push('🔗 **POST LINK:**\n' + origLink);
       }
 
       if (extraLink) {
-        parts.push(`📎 **EXTRA RESOURCE LINK:**\n${extraLink}`);
+        parts.push('📎 **EXTRA RESOURCE LINK:**\n' + extraLink);
       }
 
       if (hashtagsStr) {
-        parts.push(`🏷️ **TAGS:**\n${hashtagsStr}`);
+        parts.push('🏷️ **TAGS:**\n' + hashtagsStr);
       }
 
       if (dateStr) {
-        parts.push(`📅 **SAVED DATE:** ${dateStr}`);
+        parts.push('📅 **SAVED DATE:** ' + dateStr);
       }
 
       return parts.join('\n\n');
@@ -2864,8 +2914,10 @@
       const origLink = (rec['Original Post Link'] || '').trim();
       const extraLink = (rec['Extra Link / Resource'] || '').trim();
       const cats = getPostCategories(rec);
+      const mediaInfo = getPostMediaFormat(rec);
 
-      let modalContentHtml = formatRichCaption(rawCaption);
+      let modalContentHtml = `<div class="mb-3 flex items-center justify-between"><span class="px-3 py-1 bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 rounded-full text-xs font-bold flex items-center gap-1.5"><i class="fas ${mediaInfo.icon}"></i> ${mediaInfo.label}</span></div>`;
+      modalContentHtml += formatRichCaption(rawCaption);
 
       // Append clickable links section to modal preview
       if (origLink || extraLink) {
