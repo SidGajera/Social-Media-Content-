@@ -530,7 +530,7 @@
       <!-- Status Alert Box -->
       <div id="backupStatusAlert"
         class="mb-5 p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-300 flex items-center justify-between">
-        <span id="backupStatusText"><i class="fas fa-shield-alt mr-1.5 text-blue-400"></i> Local Storage & IndexedDB
+        <span id="backupStatusText"><i class="fas fa-shield-alt mr-1.5 text-blue-400"></i> Direct Server MySQL Database
           Auto-Sync is ACTIVE.</span>
         <span id="backupCountBadge" class="px-2 py-0.5 bg-blue-500 text-black font-bold rounded-md">0 Posts</span>
       </div>
@@ -839,13 +839,8 @@
     }
 
     async function saveToIndexedDB(key, data) {
-      try {
-        const db = await openVaultDB();
-        if (!db) return;
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        store.put(data, key);
-      } catch (err) { console.warn('IndexedDB save:', err); }
+      // Local browser storage permanently disabled - all data saved directly on server MySQL database
+      return;
     }
 
     async function loadFromIndexedDB(key) {
