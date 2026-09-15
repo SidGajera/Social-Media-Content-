@@ -1320,17 +1320,7 @@
           if (typeof migrateAndMergeCategories === "function") migrateAndMergeCategories();
           syncCategoriesFromRecords(false);
 
-          const searchInput = document.getElementById('search');
-          if (searchInput) {
-            searchInput.dispatchEvent(new Event('input'));
-          } else {
-            filtered = [...records];
-            filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
-            const gridEl = document.getElementById('grid');
-            if (gridEl) gridEl.innerHTML = '';
-            shown = 0;
-            renderGrid();
-          }
+          applyFilters();
 
           updateCounts();
           return true;
@@ -1798,6 +1788,52 @@
       window.addEventListener('DOMContentLoaded', initVaultData);
     }
     setTimeout(initVaultData, 1000);
+
+    function applyFilters() {
+      const qVal = document.getElementById('search') ? document.getElementById('search').value : '';
+      const catVal = document.getElementById('catFilter') ? document.getElementById('catFilter').value : '';
+      const thumbVal = document.getElementById('filterThumb') ? document.getElementById('filterThumb').value : '';
+      const sortVal = document.getElementById('sortPosts') ? document.getElementById('sortPosts').value : 'newest';
+
+      filtered = (records || []).filter(r => {
+        if (!r) return false;
+        if (!matchesSearchQuery(r, qVal)) return false;
+        if (catVal) {
+          const cats = getPostCategories(r);
+          if (!cats.map(c => c.toLowerCase()).includes(catVal.toLowerCase())) return false;
+        }
+        if (thumbVal === 'real') {
+          if (!r.realThumb && !r.mediaUrl) return false;
+        } else if (thumbVal === 'custom') {
+          if (!r.realThumb) return false;
+        } else if (thumbVal === 'embed') {
+          if (!getEmbedUrl(r['Original Post Link'])) return false;
+        }
+        return true;
+      });
+
+      if (sortVal === 'oldest') {
+        filtered.sort((a, b) => (a['No.'] || 0) - (b['No.'] || 0));
+      } else {
+        filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
+      }
+
+      shown = 0;
+      const grid = document.getElementById('grid');
+      if (grid) grid.innerHTML = '';
+      renderGrid();
+      updateCounts();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      ['search', 'catFilter', 'filterThumb', 'sortPosts'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', applyFilters);
+          el.addEventListener('change', applyFilters);
+        }
+      });
+    });
 
     function renderGrid() {
       const grid = document.getElementById('grid');
