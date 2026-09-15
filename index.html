@@ -1296,6 +1296,19 @@
 
           migrateAndMergeCategories();
           syncCategoriesFromRecords(false);
+
+          const searchInput = document.getElementById('search');
+          if (searchInput) {
+            searchInput.dispatchEvent(new Event('input'));
+          } else {
+            filtered = [...records];
+            filtered.sort((a, b) => (b['No.'] || 0) - (a['No.'] || 0));
+            const gridEl = document.getElementById('grid');
+            if (gridEl) gridEl.innerHTML = '';
+            shown = 0;
+            renderGrid();
+          }
+
           updateCounts();
           return true;
         }
@@ -1568,8 +1581,16 @@
         btn.innerHTML = `<div class="w-2.5 h-2.5 rounded-full shrink-0 ${isActive ? 'bg-black/60' : ''}" style="${isActive ? '' : 'background:' + cat.color}"></div><span>${cat.name}</span><span class="px-1.5 py-0.5 rounded-md text-[10px] ${isActive ? 'bg-black/20 text-black font-extrabold' : 'bg-white/10 text-gray-400'}">${count}</span>`;
 
         btn.addEventListener('click', () => {
-          document.getElementById('catFilter').value = cat.name;
-          document.getElementById('search').dispatchEvent(new Event('input'));
+          const catFilterSelect = document.getElementById('catFilter');
+          if (catFilterSelect) {
+            if (catFilterSelect.value === cat.name) {
+              catFilterSelect.value = '';
+            } else {
+              catFilterSelect.value = cat.name;
+            }
+          }
+          const searchInput = document.getElementById('search');
+          if (searchInput) searchInput.dispatchEvent(new Event('input'));
         });
         container.appendChild(btn);
       });
@@ -1722,7 +1743,11 @@
       const loadMoreBtn = document.getElementById('loadMore');
       const loadMoreContainer = loadMoreBtn ? loadMoreBtn.parentElement : null;
 
-      if (filtered.length === 0) {
+      if (shown === 0) {
+        grid.innerHTML = '';
+      }
+
+      if (!filtered || filtered.length === 0) {
         grid.className = 'col-span-full py-16 px-4 flex flex-col items-center justify-center text-center glass rounded-2xl border border-yellow-500/20 my-4';
         const qVal = document.getElementById('search') ? document.getElementById('search').value.trim() : '';
         const catVal = document.getElementById('catFilter') ? document.getElementById('catFilter').value : '';
