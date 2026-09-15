@@ -2211,7 +2211,7 @@
             <button onclick="openEditModal(${r['No.']})" class="flex-1 h-9 glass rounded-xl flex items-center justify-center gap-1 text-yellow-300 hover:bg-white/10 font-bold text-[11px] transition-colors cursor-pointer" title="Edit Post">
               <i class="fas fa-pen text-xs"></i><span>Edit</span>
             </button>
-            <button onclick="deleteContent(${r['No.']})" class="w-9 h-9 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0 cursor-pointer" title="Delete Post">
+            <button onclick="event.preventDefault(); event.stopPropagation(); deleteContent(${r['No.']}); return false;" class="w-9 h-9 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/30 transition-colors shrink-0 cursor-pointer" title="Delete Post">
               <i class="fas fa-trash text-xs"></i>
             </button>
           </div>
@@ -2275,18 +2275,32 @@
       document.getElementById('thumbModal').classList.remove('hidden');
     };
     window.deleteContent = function (no) {
-      if (!confirm('Delete post #' + no + '?')) return;
-      if (!deletedPostNos.includes(no)) deletedPostNos.push(no);
-      records = records.filter(r => r && r['No.'] !== no);
-      customAddedPosts = customAddedPosts.filter(r => r && r['No.'] !== no);
-      delete userUpdatedPosts[no];
-      delete realThumbs[no];
-      saveAll();
-      document.getElementById('grid').innerHTML = '';
+      if (!no) return;
+      const postNo = parseInt(no, 10);
+      if (!confirm('Are you sure you want to delete Post #' + postNo + '?')) return;
+      
+      if (!deletedPostNos.includes(postNo)) deletedPostNos.push(postNo);
+      records = records.filter(r => r && r && parseInt(r['No.'], 10) !== postNo);
+      customAddedPosts = customAddedPosts.filter(r => r && r && parseInt(r['No.'], 10) !== postNo);
+      delete userUpdatedPosts[postNo];
+      delete realThumbs[postNo];
+
+      try {
+        fetch(getApiBaseUrl() + '/api/delete-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postNo, deletedPostNos })
+        }).catch(e => console.log('Delete sync notice:', e));
+      } catch(e) {}
+
+      applyFilters();
       shown = 0;
+      const grid = document.getElementById('grid');
+      if (grid) grid.innerHTML = '';
       renderGrid();
       updateCounts();
-      document.getElementById('search').dispatchEvent(new Event('input'));
+      saveAll();
+      showToast('🗑️ Post #' + postNo + ' deleted successfully!');
     }
 
     function addCategory(name, color, desc) {

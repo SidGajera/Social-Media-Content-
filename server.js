@@ -519,6 +519,45 @@ function formatCarouselTextServer(text, postType) {
     return;
   }
 
+
+  // POST /api/delete-post - Direct Server Delete Post Endpoint!
+  if (req.method === 'POST' && pathname === '/api/delete-post') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body);
+        const postNo = parseInt(payload.postNo || payload.no, 10);
+        if (postNo) {
+          sqliteDb.prepare('DELETE FROM social_media_posts WHERE post_no = ?').run(postNo);
+          
+          const data = await getFromDatabase();
+          let records = (data.records || []).filter(r => r && parseInt(r['No.'], 10) !== postNo);
+          let deletedPostNos = data.deletedPostNos || [];
+          if (!deletedPostNos.includes(postNo)) deletedPostNos.push(postNo);
+
+          const vaultObj = {
+            records,
+            customCategories: data.customCategories || [],
+            deletedCategories: data.deletedCategories || [],
+            deletedPostNos,
+            realThumbs: data.realThumbs || {}
+          };
+          fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
+
+          upsertToSQLite(records, data.customCategories, data.deletedCategories, deletedPostNos, data.realThumbs);
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Post deleted from server' }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
   // POST /api/add-category - Direct Server-Authoritative Add Category Endpoint!
   if (req.method === 'POST' && pathname === '/api/add-category') {
     let body = '';
