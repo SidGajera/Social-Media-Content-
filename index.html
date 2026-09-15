@@ -1894,6 +1894,13 @@
     }
 
     function addCategory(name, color, desc) {
+      try {
+        fetch(getApiBaseUrl() + '/api/add-category', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, color, desc })
+        }).catch(e => console.log('Direct category sync notice:', e));
+      } catch(e) {}
       if (!name) { alert('Name required'); return false; }
       if (customCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
         alert('Already exists');
@@ -2066,6 +2073,13 @@
     }
 
     function quickAdd(link, categories, takeaway, platform, postType, extraUrl, thumbUrl) {
+      try {
+        fetch(getApiBaseUrl() + '/api/add-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ link, categories, takeaway, platform, postType, extraUrl, thumbUrl })
+        }).catch(e => console.log('Direct post sync notice:', e));
+      } catch(e) {}
       if (!link) { alert('Please paste a post link first'); return; }
       let cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
       if (cats.length === 0) {

@@ -1,6 +1,5 @@
-﻿// server.js - Permanent SQL & MySQL Database Engine for Social Media Content
 const http = require('http');
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 const { DatabaseSync } = require('node:sqlite');
@@ -38,6 +37,29 @@ sqliteDb.exec(`
   );
 `);
 
+function normalizePostUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  let u = url.trim();
+  if (u.includes('?')) {
+    u = u.split('?')[0];
+  }
+  return u.replace(/\/+$/, '').toLowerCase();
+}
+
+function detectPlatformFromUrl(url) {
+  if (!url || typeof url !== 'string') return 'Social Media';
+  const u = url.toLowerCase();
+  if (u.includes('instagram.com')) return 'Instagram';
+  if (u.includes('x.com') || u.includes('twitter.com')) return 'X (Twitter)';
+  if (u.includes('facebook.com') || u.includes('fb.watch')) return 'Facebook';
+  if (u.includes('youtube.com') || u.includes('youtu.be')) return 'YouTube';
+  if (u.includes('linkedin.com')) return 'LinkedIn';
+  if (u.includes('pinterest.com')) return 'Pinterest';
+  if (u.includes('threads.net') || u.includes('threads.com')) return 'Threads';
+  if (u.includes('github.com')) return 'GitHub Repos';
+  return 'Website / Other';
+}
+
 function upsertToSQLite(records, customCategories, deletedCategories, deletedPostNos, realThumbs) {
   if (Array.isArray(records) && records.length > 0) {
     const maxStmt = sqliteDb.prepare('SELECT MAX(post_no) as max_no FROM social_media_posts');
@@ -71,7 +93,7 @@ function upsertToSQLite(records, customCategories, deletedCategories, deletedPos
 
       stmt.run(
         postNo,
-        r.Platform || 'Social Media',
+        r.Platform || detectPlatformFromUrl(r['Original Post Link']),
         r['Original Post Link'] || '',
         r['Extra Link'] || r['Extra URL'] || r.extraUrl || '',
         r['Post Type'] || 'Content',
@@ -201,7 +223,7 @@ async function upsertPostsToMySQL(records, customCategories, deletedCategories, 
     const insertSql = 'INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, status, date_saved, category, real_thumb) VALUES ? ON DUPLICATE KEY UPDATE platform = VALUES(platform), original_post_link = VALUES(original_post_link), extra_link = VALUES(extra_link), post_type = VALUES(post_type), takeaway = VALUES(takeaway), status = VALUES(status), date_saved = VALUES(date_saved), category = VALUES(category), real_thumb = VALUES(real_thumb);';
     const values = records.map(r => [
       r['No.'],
-      r.Platform || 'Social Media',
+      r.Platform || detectPlatformFromUrl(r['Original Post Link']),
       r['Original Post Link'] || '',
       r['Extra Link'] || r['Extra URL'] || r.extraUrl || '',
       r['Post Type'] || 'Content',
@@ -209,7 +231,7 @@ async function upsertPostsToMySQL(records, customCategories, deletedCategories, 
       r.Status || 'Not Used',
       r['Date Saved'] || '',
       JSON.stringify(Array.isArray(r.Category) ? r.Category : (r.Category ? [r.Category] : [])),
-      (realThumbs && realThumbs[r['No.']]) || r.realThumb || ''
+      (realThumbs && realThumbs[r['No.'].toString()]) || (realThumbs && realThumbs[r['No.']]) || r.realThumb || ''
     ]);
     await pool.query(insertSql, [values]);
   }
@@ -285,7 +307,156 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // POST /api/mysql/sync or POST /api/sync - ALWAYS INSTANT & RESILIENT!
+  // POST /api/add-post - Direct Server-Authoritative Add/Update Post Endpoint!
+  if (req.method === 'POST' && pathname === '/api/add-post') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const item = JSON.parse(body);
+        if (!item || !item.link) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'Post link is required' }));
+          return;
+        }
+
+        const data = getFromSQLite();
+        let records = data.records || [];
+        let realThumbs = data.realThumbs || {};
+
+        const normLink = normalizePostUrl(item.link);
+        let existingRec = records.find(r => r && r['Original Post Link'] && normalizePostUrl(r['Original Post Link']) === normLink);
+
+        let targetNo;
+        const cats = Array.isArray(item.categories) ? item.categories : (item.categories ? [item.categories] : ['Content Creation']);
+
+        if (existingRec) {
+          targetNo = existingRec['No.'];
+          existingRec['Category'] = Array.from(new Set([...(existingRec['Category'] || []), ...cats]));
+          if (item.takeaway) existingRec['Core Idea / 1-Line Takeaway'] = item.takeaway;
+          if (item.platform) existingRec['Platform'] = item.platform;
+          if (item.postType) existingRec['Post Type'] = item.postType;
+          if (item.extraUrl !== undefined) existingRec['Extra Link'] = item.extraUrl;
+          if (item.thumbUrl) realThumbs[targetNo] = item.thumbUrl;
+        } else {
+          const maxStmt = sqliteDb.prepare('SELECT MAX(post_no) as max_no FROM social_media_posts');
+          const maxVal = maxStmt.get() ? (maxStmt.get().max_no || 0) : 0;
+          targetNo = maxVal + 1;
+
+          const newRec = {
+            'No.': targetNo,
+            'Platform': item.platform || detectPlatformFromUrl(item.link),
+            'Original Post Link': item.link,
+            'Extra Link': item.extraUrl || '',
+            'Post Type': item.postType || cats[0] || 'Content',
+            'Core Idea / 1-Line Takeaway': item.takeaway || 'Added via direct server add',
+            'Status': 'Not Used',
+            'Date Saved': item.dateSaved || new Date().toISOString().slice(0, 10),
+            'Category': cats
+          };
+
+          if (item.thumbUrl) {
+            realThumbs[targetNo] = item.thumbUrl;
+          }
+
+          records.unshift(newRec);
+        }
+
+        // Save to SQLite
+        upsertToSQLite(records, data.customCategories, data.deletedCategories, data.deletedPostNos, realThumbs);
+
+        // Save to vault.json backup
+        const vaultObj = {
+          records,
+          customCategories: data.customCategories || [],
+          deletedCategories: data.deletedCategories || [],
+          deletedPostNos: data.deletedPostNos || [],
+          realThumbs
+        };
+        fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
+
+        // Sync to MySQL if connected
+        if (pool && mysqlConnected) {
+          try {
+            await upsertPostsToMySQL(records, data.customCategories, data.deletedCategories, data.deletedPostNos, realThumbs);
+          } catch(e) {}
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          message: 'Post saved directly to server database!',
+          postNo: targetNo,
+          count: records.length,
+          records,
+          customCategories: data.customCategories,
+          realThumbs
+        }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // POST /api/add-category - Direct Server-Authoritative Add Category Endpoint!
+  if (req.method === 'POST' && pathname === '/api/add-category') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const cat = JSON.parse(body);
+        if (!cat || !cat.name) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'Category name is required' }));
+          return;
+        }
+
+        const data = getFromSQLite();
+        let customCategories = data.customCategories || [];
+
+        if (!customCategories.some(c => c.name.toLowerCase() === cat.name.toLowerCase())) {
+          customCategories.push({
+            name: cat.name,
+            color: cat.color || '#FFD700',
+            desc: cat.desc || ''
+          });
+        }
+
+        upsertToSQLite(data.records, customCategories, data.deletedCategories, data.deletedPostNos, data.realThumbs);
+
+        const vaultObj = {
+          records: data.records,
+          customCategories,
+          deletedCategories: data.deletedCategories || [],
+          deletedPostNos: data.deletedPostNos || [],
+          realThumbs: data.realThumbs || {}
+        };
+        fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
+
+        if (pool && mysqlConnected) {
+          try {
+            await upsertPostsToMySQL(data.records, customCategories, data.deletedCategories, data.deletedPostNos, data.realThumbs);
+          } catch(e) {}
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          message: 'Category saved directly to server database!',
+          customCategories,
+          records: data.records
+        }));
+      } catch(err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // POST /api/mysql/sync or POST /api/sync - Full Batch Sync
   if (req.method === 'POST' && (pathname === '/api/mysql/sync' || pathname === '/api/sync' || pathname === '/save-vault')) {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -357,8 +528,8 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log('=================================================');
-  console.log('🚀 Social Media SQL Database Server running on port ' + PORT);
+  console.log('🚀 Social Media Direct SQL Server running on port ' + PORT);
   console.log('📍 Web Interface: http://localhost:' + PORT);
-  console.log('🗄️ SQL Direct API: http://localhost:' + PORT + '/api/mysql/posts');
+  console.log('🗄️ SQL Direct API: http://localhost:' + PORT + '/api/add-post');
   console.log('=================================================');
 });
