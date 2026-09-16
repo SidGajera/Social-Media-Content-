@@ -97,6 +97,42 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && pathname.includes('/delete-post')) {
+    const payload = req.body || {};
+    const postNo = parseInt(payload.postNo || payload.no, 10);
+    if (postNo) {
+      let records = (vault.records || []).filter(r => r && parseInt(r['No.'], 10) !== postNo);
+      let deletedPostNos = vault.deletedPostNos || [];
+      if (!deletedPostNos.includes(postNo)) deletedPostNos.push(postNo);
+      vault.records = records;
+      vault.deletedPostNos = deletedPostNos;
+      saveVault(vault);
+    }
+    res.status(200).json({ success: true, message: 'Post deleted from Vercel server vault' });
+    return;
+  }
+
+  if (req.method === 'POST' && pathname.includes('/delete-category')) {
+    const payload = req.body || {};
+    const catName = (payload.name || payload.categoryName || payload.catName || '').trim();
+    if (catName) {
+      let customCategories = (vault.customCategories || []).filter(c => c && c.name && c.name.toLowerCase() !== catName.toLowerCase());
+      let deletedCategories = vault.deletedCategories || [];
+      if (!deletedCategories.some(d => d.toLowerCase() === catName.toLowerCase())) deletedCategories.push(catName);
+      let records = (vault.records || []).map(r => {
+        if (!r || !r.Category) return r;
+        let cats = Array.isArray(r.Category) ? r.Category : [r.Category];
+        return Object.assign({}, r, { Category: cats.filter(c => typeof c === 'string' && c.toLowerCase() !== catName.toLowerCase()) });
+      });
+      vault.customCategories = customCategories;
+      vault.deletedCategories = deletedCategories;
+      vault.records = records;
+      saveVault(vault);
+    }
+    res.status(200).json({ success: true, message: 'Category deleted from Vercel server vault' });
+    return;
+  }
+
   if (req.method === 'POST' && pathname.includes('/add-category')) {
     const cat = req.body || {};
     if (!cat || !cat.name) { res.status(400).json({ success: false, error: 'Category name required' }); return; }

@@ -300,6 +300,15 @@ async function tryConnectMySQLBackground() {
 
 async function upsertPostsToMySQL(records, customCategories, deletedCategories, deletedPostNos, realThumbs) {
   if (!pool) return 0;
+  if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) {
+    const validNos = deletedPostNos.map(n => parseInt(n, 10)).filter(n => !isNaN(n) && n > 0);
+    if (validNos.length > 0) {
+      try {
+        await pool.query('DELETE FROM social_media_posts WHERE post_no IN (?)', [validNos]);
+      } catch(e) {}
+    }
+  }
+
   if (Array.isArray(records) && records.length > 0) {
     const insertSql = 'INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, caption, status, date_saved, category, real_thumb) VALUES ? ON DUPLICATE KEY UPDATE platform = VALUES(platform), original_post_link = VALUES(original_post_link), extra_link = VALUES(extra_link), post_type = VALUES(post_type), takeaway = VALUES(takeaway), status = VALUES(status), date_saved = VALUES(date_saved), category = VALUES(category), real_thumb = VALUES(real_thumb);';
     const values = records.map(r => [
@@ -539,7 +548,15 @@ function formatCarouselTextServer(text, postType) {
         const postNo = parseInt(payload.postNo || payload.no, 10);
         if (postNo) {
           sqliteDb.prepare('DELETE FROM social_media_posts WHERE post_no = ?').run(postNo);
-          
+
+          if (pool && mysqlConnected) {
+            try {
+              await pool.query('DELETE FROM social_media_posts WHERE post_no = ?', [postNo]);
+            } catch(e) {
+              console.error('[MySQL Delete Post Error]:', e.message);
+            }
+          }
+
           const data = await getFromDatabase();
           let records = (data.records || []).filter(r => r && parseInt(r['No.'], 10) !== postNo);
           let deletedPostNos = data.deletedPostNos || [];
@@ -555,10 +572,70 @@ function formatCarouselTextServer(text, postType) {
           fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
 
           upsertToSQLite(records, data.customCategories, data.deletedCategories, deletedPostNos, data.realThumbs);
+          if (pool && mysqlConnected) {
+            try {
+              await upsertPostsToMySQL(records, data.customCategories, data.deletedCategories, deletedPostNos, data.realThumbs);
+            } catch(e) {}
+          }
         }
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, message: 'Post deleted from server' }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // POST /api/delete-category - Direct Server Delete Category Endpoint!
+  if (req.method === 'POST' && pathname === '/api/delete-category') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body);
+        const catName = (payload.name || payload.categoryName || payload.catName || '').trim();
+        if (catName) {
+          const data = await getFromDatabase();
+          let customCategories = (data.customCategories || []).filter(c => c && c.name && c.name.toLowerCase() !== catName.toLowerCase());
+          let deletedCategories = data.deletedCategories || [];
+          if (!deletedCategories.some(d => d.toLowerCase() === catName.toLowerCase())) {
+            deletedCategories.push(catName);
+          }
+
+          // Strip deleted category from records
+          let records = (data.records || []).map(r => {
+            if (!r || !r.Category) return r;
+            let cats = Array.isArray(r.Category) ? r.Category : [r.Category];
+            cats = cats.filter(c => typeof c === 'string' && c.toLowerCase() !== catName.toLowerCase());
+            return Object.assign({}, r, { Category: cats });
+          });
+
+          upsertToSQLite(records, customCategories, deletedCategories, data.deletedPostNos, data.realThumbs);
+
+          const vaultObj = {
+            records,
+            customCategories,
+            deletedCategories,
+            deletedPostNos: data.deletedPostNos || [],
+            realThumbs: data.realThumbs || {}
+          };
+          fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
+
+          if (pool && mysqlConnected) {
+            try {
+              await upsertPostsToMySQL(records, customCategories, deletedCategories, data.deletedPostNos, data.realThumbs);
+            } catch(e) {}
+          }
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, message: 'Category deleted from server', customCategories, deletedCategories, records }));
+          return;
+        }
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: 'Category name is required' }));
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, error: err.message }));

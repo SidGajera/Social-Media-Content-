@@ -1302,19 +1302,29 @@
         if (fetchedSuccessfully) {
           if (serverCustomCats && Array.isArray(serverCustomCats)) {
             const catMap = new Map();
-            (customCategories || []).forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
-            serverCustomCats.forEach(c => { if (c && c.name && !catMap.has(c.name.toLowerCase())) catMap.set(c.name.toLowerCase(), c); });
+            serverCustomCats.forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
             customCategories = Array.from(catMap.values());
           }
           if (serverDelCats) deletedCategories = serverDelCats;
           if (serverDelNos) deletedPostNos = serverDelNos;
           if (serverThumbs) realThumbs = serverThumbs;
 
-          // Pure server-authoritative replacement! NO merging with in-memory or defaultRecords!
-          records = deduplicateRecords([...serverRecords, ...(records || [])]);
+          // Pure server-authoritative replacement! Server state is canonical.
+          records = deduplicateRecords(serverRecords);
 
           if (deletedPostNos && deletedPostNos.length > 0) {
-            records = records.filter(r => r && r['No.'] && !deletedPostNos.includes(r['No.']));
+            const delSet = new Set(deletedPostNos.map(n => parseInt(n, 10)));
+            records = records.filter(r => r && r['No.'] && !delSet.has(parseInt(r['No.'], 10)));
+          }
+
+          if (deletedCategories && deletedCategories.length > 0) {
+            const delCatsLower = deletedCategories.map(c => typeof c === 'string' ? c.toLowerCase() : '');
+            customCategories = customCategories.filter(c => c && c.name && !delCatsLower.includes(c.name.toLowerCase()));
+            records = records.map(r => {
+              if (!r || !r.Category) return r;
+              let cats = Array.isArray(r.Category) ? r.Category : [r.Category];
+              return Object.assign({}, r, { Category: cats.filter(c => typeof c === 'string' && !delCatsLower.includes(c.toLowerCase())) });
+            });
           }
 
           try { if (typeof migrateAndMergeCategories === "function") migrateAndMergeCategories(); } catch(e){}
@@ -2494,6 +2504,39 @@
       document.getElementById('search').dispatchEvent(new Event('input'));
       return true;
     }
+
+    window.deleteCategory = function (name) {
+      if (!name) return;
+      if (!confirm(`Are you sure you want to delete custom category "${name}"?`)) return;
+
+      const catLower = name.toLowerCase();
+      customCategories = (customCategories || []).filter(c => c && c.name && c.name.toLowerCase() !== catLower);
+      if (!deletedCategories.some(d => typeof d === 'string' && d.toLowerCase() === catLower)) {
+        deletedCategories.push(name);
+      }
+
+      // Strip category from existing posts
+      records = records.map(r => {
+        if (!r || !r.Category) return r;
+        let cats = Array.isArray(r.Category) ? r.Category : [r.Category];
+        return Object.assign({}, r, { Category: cats.filter(c => typeof c === 'string' && c.toLowerCase() !== catLower) });
+      });
+
+      try {
+        fetch(getApiBaseUrl() + '/api/delete-category', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, deletedCategories })
+        }).catch(e => console.log('Delete category sync notice:', e));
+      } catch (e) {}
+
+      saveAll();
+      renderCatDropdowns();
+      renderQuickCatFilters();
+      applyFilters();
+      updateCounts();
+      showToast(`🗑️ Category "${name}" deleted permanently!`);
+    };
 
 
     function isMediaVideo(url) {
