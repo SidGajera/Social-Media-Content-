@@ -148,12 +148,26 @@ module.exports = async (req, res) => {
 
   if (req.method === 'POST') {
     const payload = req.body || {};
-    const records = Array.isArray(payload) ? payload : (payload.records || payload.data || vault.records);
-    if (Array.isArray(records) && records.length > 0) {
+    let records = Array.isArray(payload) ? payload : (payload.records || payload.data || vault.records);
+
+    const mergedDelNos = Array.from(new Set([
+      ...(vault.deletedPostNos || []),
+      ...(payload.deletedPostNos || [])
+    ]));
+    const mergedDelCats = Array.from(new Set([
+      ...(vault.deletedCategories || []),
+      ...(payload.deletedCategories || [])
+    ]));
+
+    if (mergedDelNos.length > 0 && Array.isArray(records)) {
+      records = records.filter(r => r && r['No.'] && !mergedDelNos.includes(parseInt(r['No.'], 10)));
+    }
+
+    if (Array.isArray(records)) {
       vault.records = records;
       if (payload.customCategories) vault.customCategories = payload.customCategories;
-      if (payload.deletedCategories) vault.deletedCategories = payload.deletedCategories;
-      if (payload.deletedPostNos) vault.deletedPostNos = payload.deletedPostNos;
+      vault.deletedCategories = mergedDelCats;
+      vault.deletedPostNos = mergedDelNos;
       if (payload.realThumbs) vault.realThumbs = payload.realThumbs;
       saveVault(vault);
     }

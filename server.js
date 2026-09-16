@@ -62,7 +62,15 @@ function detectPlatformFromUrl(url) {
 }
 
 function upsertToSQLite(records, customCategories, deletedCategories, deletedPostNos, realThumbs) {
+  if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) {
+    const delStmt = sqliteDb.prepare('DELETE FROM social_media_posts WHERE post_no = ?');
+    deletedPostNos.forEach(no => {
+      if (no) delStmt.run(parseInt(no, 10));
+    });
+  }
+
   if (Array.isArray(records) && records.length > 0) {
+    const delSet = (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) ? new Set(deletedPostNos.map(n => parseInt(n, 10))) : new Set();
     const maxStmt = sqliteDb.prepare('SELECT MAX(post_no) as max_no FROM social_media_posts');
     let maxPostNo = maxStmt.get() ? (maxStmt.get().max_no || 0) : 0;
 
@@ -84,6 +92,7 @@ function upsertToSQLite(records, customCategories, deletedCategories, deletedPos
     records.forEach(r => {
       if (!r || typeof r !== 'object') return;
       let postNo = r['No.'] ? parseInt(r['No.'], 10) : NaN;
+      if (delSet.has(postNo)) return; // Skip deleted post
       if (isNaN(postNo) || postNo <= 0) {
         maxPostNo++;
         postNo = maxPostNo;
@@ -108,20 +117,13 @@ function upsertToSQLite(records, customCategories, deletedCategories, deletedPos
     });
   }
 
-  if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) {
-    const delStmt = sqliteDb.prepare('DELETE FROM social_media_posts WHERE post_no = ?');
-    deletedPostNos.forEach(no => {
-      if (no) delStmt.run(parseInt(no, 10));
-    });
-  }
-
   const metaStmt = sqliteDb.prepare(`
     INSERT INTO social_media_meta (meta_key, meta_value) VALUES (?, ?)
     ON CONFLICT(meta_key) DO UPDATE SET meta_value = excluded.meta_value;
   `);
   if (customCategories) metaStmt.run('customCategories', JSON.stringify(customCategories));
-  if (deletedCategories) metaStmt.run('deletedCategories', JSON.stringify(deletedCategories));
-  if (deletedPostNos) metaStmt.run('deletedPostNos', JSON.stringify(deletedPostNos));
+  if (Array.isArray(deletedCategories) && deletedCategories.length > 0) metaStmt.run('deletedCategories', JSON.stringify(deletedCategories));
+  if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) metaStmt.run('deletedPostNos', JSON.stringify(deletedPostNos));
   if (realThumbs) metaStmt.run('realThumbs', JSON.stringify(realThumbs));
 }
 
@@ -160,7 +162,7 @@ async function getFromDatabase() {
       });
 
       if (!realThumbs) realThumbs = {};
-      const records = rows.map(r => {
+      let records = rows.map(r => {
         let catArr = [];
         try {
           catArr = typeof r.category === 'string' ? JSON.parse(r.category) : r.category;
@@ -185,6 +187,20 @@ async function getFromDatabase() {
           'realThumb': thumb
         };
       });
+
+      if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) {
+        const delSet = new Set(deletedPostNos.map(n => parseInt(n, 10)));
+        records = records.filter(r => r && r['No.'] && !delSet.has(parseInt(r['No.'], 10)));
+      }
+
+      if (Array.isArray(deletedCategories) && deletedCategories.length > 0) {
+        const delCatsLower = deletedCategories.map(c => typeof c === 'string' ? c.toLowerCase() : '');
+        records = records.map(r => {
+          if (!r || !r.Category) return r;
+          let cats = Array.isArray(r.Category) ? r.Category : [r.Category];
+          return Object.assign({}, r, { Category: cats.filter(c => typeof c === 'string' && !delCatsLower.includes(c.toLowerCase())) });
+        });
+      }
 
       return {
         records,
@@ -312,6 +328,8 @@ async function tryConnectMySQLBackground() {
 
 async function upsertPostsToMySQL(records, customCategories, deletedCategories, deletedPostNos, realThumbs) {
   if (!pool) return 0;
+  const delSet = (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) ? new Set(deletedPostNos.map(n => parseInt(n, 10))) : new Set();
+
   if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) {
     const validNos = deletedPostNos.map(n => parseInt(n, 10)).filter(n => !isNaN(n) && n > 0);
     if (validNos.length > 0) {
@@ -321,16 +339,18 @@ async function upsertPostsToMySQL(records, customCategories, deletedCategories, 
     }
   }
 
-  if (Array.isArray(records) && records.length > 0) {
+  const activeRecords = (Array.isArray(records) ? records : []).filter(r => r && r['No.'] && !delSet.has(parseInt(r['No.'], 10)));
+
+  if (activeRecords.length > 0) {
     const insertSql = 'INSERT INTO social_media_posts (post_no, platform, original_post_link, extra_link, post_type, takeaway, caption, status, date_saved, category, real_thumb) VALUES ? ON DUPLICATE KEY UPDATE platform = VALUES(platform), original_post_link = VALUES(original_post_link), extra_link = VALUES(extra_link), post_type = VALUES(post_type), takeaway = VALUES(takeaway), status = VALUES(status), date_saved = VALUES(date_saved), category = VALUES(category), real_thumb = VALUES(real_thumb);';
-    const values = records.map(r => [
+    const values = activeRecords.map(r => [
       r['No.'],
       r.Platform || detectPlatformFromUrl(r['Original Post Link']),
       r['Original Post Link'] || '',
       r['Extra Link'] || r['Extra URL'] || r.extraUrl || '',
       r['Post Type'] || 'Content',
       r['Core Idea / 1-Line Takeaway'] || '',
-        r['Caption'] || r['Post Caption'] || '',
+      r['Caption'] || r['Post Caption'] || '',
       r.Status || 'Not Used',
       r['Date Saved'] || '',
       JSON.stringify(Array.isArray(r.Category) ? r.Category : (r.Category ? [r.Category] : [])),
@@ -340,11 +360,11 @@ async function upsertPostsToMySQL(records, customCategories, deletedCategories, 
   }
 
   if (customCategories) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'customCategories\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(customCategories)]);
-  if (deletedCategories) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'deletedCategories\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(deletedCategories)]);
-  if (deletedPostNos) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'deletedPostNos\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(deletedPostNos)]);
+  if (Array.isArray(deletedCategories) && deletedCategories.length > 0) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'deletedCategories\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(deletedCategories)]);
+  if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'deletedPostNos\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(deletedPostNos)]);
   if (realThumbs) await pool.query('INSERT INTO social_media_meta (meta_key, meta_value) VALUES (\'realThumbs\', ?) ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)', [JSON.stringify(realThumbs)]);
 
-  return Array.isArray(records) ? records.length : 0;
+  return activeRecords.length;
 }
 
 // Initial background check
@@ -719,27 +739,42 @@ function formatCarouselTextServer(text, postType) {
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body);
-        const records = Array.isArray(payload) ? payload : (payload.records || payload.data || []);
+        let records = Array.isArray(payload) ? payload : (payload.records || payload.data || []);
+        const dbData = await getFromDatabase();
+
+        const mergedDelNos = Array.from(new Set([
+          ...(dbData.deletedPostNos || []),
+          ...(payload.deletedPostNos || [])
+        ]));
+        const mergedDelCats = Array.from(new Set([
+          ...(dbData.deletedCategories || []),
+          ...(payload.deletedCategories || [])
+        ]));
+
+        if (mergedDelNos.length > 0 && Array.isArray(records)) {
+          records = records.filter(r => r && r['No.'] && !mergedDelNos.includes(parseInt(r['No.'], 10)));
+        }
+
+        const customCats = payload.customCategories || dbData.customCategories || [];
+        const thumbs = payload.realThumbs || dbData.realThumbs || {};
 
         // 1. Instantly save to local SQL database
-        upsertToSQLite(records, payload.customCategories, payload.deletedCategories, payload.deletedPostNos, payload.realThumbs);
+        upsertToSQLite(records, customCats, mergedDelCats, mergedDelNos, thumbs);
 
         // 2. Save backup vault.json
-        if (Array.isArray(records) && records.length > 0) {
-          const vaultObj = {
-            records,
-            customCategories: payload.customCategories || [],
-            deletedCategories: payload.deletedCategories || [],
-            deletedPostNos: payload.deletedPostNos || [],
-            realThumbs: payload.realThumbs || {}
-          };
-          fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
-        }
+        const vaultObj = {
+          records,
+          customCategories: customCats,
+          deletedCategories: mergedDelCats,
+          deletedPostNos: mergedDelNos,
+          realThumbs: thumbs
+        };
+        fs.writeFileSync(VAULT_PATH, JSON.stringify(vaultObj, null, 2), 'utf8');
 
         // 3. Sync to MySQL if connected
         if (pool && mysqlConnected) {
           try {
-            await upsertPostsToMySQL(records, payload.customCategories, payload.deletedCategories, payload.deletedPostNos, payload.realThumbs);
+            await upsertPostsToMySQL(records, customCats, mergedDelCats, mergedDelNos, thumbs);
           } catch(e) {
             console.error('[MySQL Save Error]:', e.message);
           }
