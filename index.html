@@ -715,6 +715,46 @@
   </div>
 
   <script>
+    function showToast(message, isSuccess = true) {
+      try {
+        let toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+          toastContainer = document.createElement('div');
+          toastContainer.id = 'toastContainer';
+          toastContainer.className = 'fixed bottom-5 right-5 z-[9999] flex flex-col gap-2 max-w-sm pointer-events-none';
+          document.body.appendChild(toastContainer);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `pointer-events-auto px-4 py-3 rounded-xl text-xs font-bold shadow-2xl flex items-center gap-2.5 transition-all duration-300 transform translate-y-4 opacity-0 border ${
+          isSuccess !== false 
+            ? 'bg-zinc-900/95 text-green-300 border-green-500/40' 
+            : 'bg-zinc-900/95 text-red-300 border-red-500/40'
+        }`;
+        
+        const iconClass = isSuccess !== false ? 'fas fa-check-circle text-green-400 text-sm' : 'fas fa-exclamation-circle text-red-400 text-sm';
+        toast.innerHTML = `<i class="${iconClass}"></i><span class="flex-1">${message}</span>`;
+        
+        toastContainer.appendChild(toast);
+        
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-4', 'opacity-0');
+          toast.classList.add('translate-y-0', 'opacity-100');
+        });
+
+        setTimeout(() => {
+          toast.classList.remove('translate-y-0', 'opacity-100');
+          toast.classList.add('translate-y-2', 'opacity-0');
+          setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 300);
+        }, 3500);
+      } catch(e) {
+        console.log('Toast notice:', message);
+      }
+    }
+    window.showToast = showToast;
+
     let records = [];
     const defaultRecords = [];
     try {
@@ -1563,7 +1603,7 @@
       clearModalValidationErrors();
       const modalLink = document.getElementById('modalLink');
       const link = modalLink ? modalLink.value.trim() : '';
-      const categories = getSelectedModalCategories();
+      let categories = getSelectedModalCategories();
 
       if (!link) {
         if (modalLink) {
@@ -1575,16 +1615,8 @@
       }
 
       if (categories.length === 0) {
-        const modalCatChips = document.getElementById('modalCatChips');
-        if (modalCatChips) {
-          modalCatChips.classList.remove('border-yellow-500/30');
-          modalCatChips.classList.add('border-2', 'border-red-500', 'ring-2', 'ring-red-500/50', 'bg-red-500/10', 'animate-pulse');
-          modalCatChips.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        const modalCatError = document.getElementById('modalCatError');
-        if (modalCatError) modalCatError.classList.remove('hidden');
-        showToast('⚠️ Please select at least 1 category before saving!', false);
-        return false;
+        const firstChip = document.querySelector('#modalCatChips .modal-cat-chip');
+        if (firstChip) firstChip.click();
       }
 
       return true;
@@ -1594,7 +1626,7 @@
       clearQuickValidationErrors();
       const quickLink = document.getElementById('quickLink');
       const link = quickLink ? quickLink.value.trim() : '';
-      const categories = getSelectedQuickCategories();
+      let categories = getSelectedQuickCategories();
 
       if (!link) {
         if (quickLink) {
@@ -1606,16 +1638,8 @@
       }
 
       if (categories.length === 0) {
-        const quickCatChips = document.getElementById('quickCatChips');
-        if (quickCatChips) {
-          quickCatChips.classList.remove('border-white/10');
-          quickCatChips.classList.add('border-2', 'border-red-500', 'ring-2', 'ring-red-500/50', 'bg-red-500/10', 'animate-pulse');
-          quickCatChips.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        const quickCatError = document.getElementById('quickCatError');
-        if (quickCatError) quickCatError.classList.remove('hidden');
-        showToast('⚠️ Please select at least 1 category before saving!', false);
-        return false;
+        const firstChip = document.querySelector('#quickCatChips .quick-cat-chip');
+        if (firstChip) firstChip.click();
       }
 
       return true;
@@ -2022,6 +2046,8 @@
       document.getElementById('modalDateSaved').value = new Date().toISOString().split('T')[0];
       clearModalValidationErrors();
       resetModalCatChips();
+      const firstChip = document.querySelector('#modalCatChips .modal-cat-chip');
+      if (firstChip) firstChip.click();
       modal.classList.remove('hidden');
     };
 
@@ -3357,8 +3383,8 @@
       
       let cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
       if (cats.length === 0) {
-        showToast('⚠️ Please select at least 1 category before saving!', false);
-        return;
+        const firstCatName = (typeof customCategories !== 'undefined' && customCategories && customCategories[0] && customCategories[0].name) ? customCategories[0].name : 'Content Creation';
+        cats = [firstCatName];
       }
       const exUrl = extraUrl !== undefined ? extraUrl : (document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : '');
 
@@ -3389,7 +3415,7 @@
           platform: existingRec['Platform'],
           extraUrl: existingRec['Extra Link']
         };
-        showToast(`✅ Updated Post #${existingRec['No.']} & saved permanent backup!`);
+        if (typeof showToast === 'function') showToast(`✅ Updated Post #${existingRec['No.']} & saved permanent backup!`);
       } else {
         const nextNo = records.length > 0 ? Math.max(...records.map(r => parseInt(r['No.'], 10) || 0)) + 1 : 1;
         const newRec = {
@@ -3413,7 +3439,7 @@
           platform: newRec['Platform'],
           extraUrl: newRec['Extra Link']
         };
-        showToast(`✅ Post #${nextNo} added & permanent vault backup created!`);
+        if (typeof showToast === 'function') showToast(`✅ Post #${nextNo} added & permanent vault backup created!`);
       }
 
       // Step 2: Clear active search & filters so the new post is guaranteed to render in the grid!
