@@ -3383,7 +3383,7 @@
       if (!takeaway || takeaway.trim() === '') {
         showToast('Auto-extracting image text & caption content...', true);
         try {
-          const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 4000));
+          const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 2500));
           const autoExtracted = await Promise.race([fetchCaptionFromUrl(link), timeoutPromise]);
           if (autoExtracted) {
             takeaway = autoExtracted;
@@ -3396,27 +3396,11 @@
       if (takeaway) {
         takeaway = formatCarouselTextServer(takeaway, postType);
       } else {
-        takeaway = `?? Carousel Image 1 / Slide 1 (Cover & Overview):\n? Post content backup for ${link}`;
+        takeaway = `Carousel Image 1 / Slide 1 (Cover & Overview):\n• Post content backup for ${link}`;
       }
 
-      try {
-        const addRes = await fetch(getApiBaseUrl() + '/api/add-post', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ link, categories: cats, takeaway, platform, postType, extraUrl: exUrl, thumbUrl })
-        });
-        if (addRes.ok) {
-          const serverRes = await addRes.json();
-          if (serverRes && serverRes.records && Array.isArray(serverRes.records)) {
-            records = serverRes.records;
-            if (serverRes.realThumbs) realThumbs = serverRes.realThumbs;
-            renderGrid();
-            updateCounts();
-          }
-        }
-      } catch(e) { console.log('Direct post sync notice:', e); }
-
-      const existingRec = records.find(r => r['Original Post Link'] === link);
+      // Step 1: Update local records immediately so UI responds in under 10ms!
+      const existingRec = records.find(r => r && r['Original Post Link'] === link);
       if (existingRec) {
         const existingCats = getPostCategories(existingRec);
         const combinedCats = Array.from(new Set([...existingCats, ...cats]));
@@ -3434,12 +3418,9 @@
           platform: existingRec['Platform'],
           extraUrl: existingRec['Extra Link']
         };
-
-        saveAll();
-        renderGrid();
-        showToast(`Updated Post #${existingRec['No.']} & saved permanent backup!`);
+        showToast(`✅ Updated Post #${existingRec['No.']} & saved permanent backup!`);
       } else {
-        const nextNo = records.length > 0 ? Math.max(...records.map(r => r['No.'] || 0)) + 1 : 1;
+        const nextNo = records.length > 0 ? Math.max(...records.map(r => parseInt(r['No.'], 10) || 0)) + 1 : 1;
         const newRec = {
           'No.': nextNo,
           'Platform': platform || (detectPlatformFromUrl ? detectPlatformFromUrl(link) : 'Social Media'),
@@ -3461,16 +3442,38 @@
           platform: newRec['Platform'],
           extraUrl: newRec['Extra Link']
         };
-
-        saveAll();
-        renderGrid();
-        showToast(`? Post #${nextNo} added & permanent vault backup created!`);
+        showToast(`✅ Post #${nextNo} added & permanent vault backup created!`);
       }
+
+      // Render grid & close modal IMMEDIATELY
+      saveAll();
+      renderGrid();
+      updateCounts();
 
       if (document.getElementById('quickLink')) document.getElementById('quickLink').value = '';
       if (document.getElementById('quickTakeaway')) document.getElementById('quickTakeaway').value = '';
       if (document.getElementById('quickExtraLink')) document.getElementById('quickExtraLink').value = '';
       closeAddModal();
+
+      // Step 2: Background server sync asynchronously with 2.5s timeout (non-blocking!)
+      try {
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Server timeout')), 2500));
+        const fetchPromise = fetch(getApiBaseUrl() + '/api/add-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ link, categories: cats, takeaway, platform, postType, extraUrl: exUrl, thumbUrl })
+        });
+        const addRes = await Promise.race([fetchPromise, timeoutPromise]);
+        if (addRes && addRes.ok) {
+          const serverRes = await addRes.json();
+          if (serverRes && serverRes.records && Array.isArray(serverRes.records)) {
+            records = deduplicateRecords(serverRes.records);
+            if (serverRes.realThumbs) realThumbs = serverRes.realThumbs;
+            renderGrid();
+            updateCounts();
+          }
+        }
+      } catch(e) { console.log('Direct post server sync notice:', e); }
     }
   </script>
 </body>
