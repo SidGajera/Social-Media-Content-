@@ -2174,8 +2174,139 @@
       }
     };
 
+    window.openMobileDrawer = function() {
+      const drawer = document.getElementById('mobileDrawer');
+      if (drawer) drawer.classList.remove('hidden');
+    };
+    window.closeMobileDrawer = function() {
+      const drawer = document.getElementById('mobileDrawer');
+      if (drawer) drawer.classList.add('hidden');
+    };
+
     function attachAllButtonListeners() {
-      // Backup Download JSON button
+      // Top Bar & Mobile Add Content Buttons
+      const addBtn = document.getElementById('addBtn');
+      if (addBtn) {
+        addBtn.onclick = function(e) {
+          e.preventDefault();
+          window.openAddModal();
+        };
+      }
+      const mobileAddBtn = document.getElementById('mobileAddBtn');
+      if (mobileAddBtn) {
+        mobileAddBtn.onclick = function(e) {
+          e.preventDefault();
+          window.openAddModal();
+        };
+      }
+      const drawerAdd = document.getElementById('drawerAdd');
+      if (drawerAdd) {
+        drawerAdd.onclick = function(e) {
+          e.preventDefault();
+          window.closeMobileDrawer();
+          window.openAddModal();
+        };
+      }
+
+      // Top Bar & Mobile New Category Buttons
+      const addCategoryBtn = document.getElementById('addCategoryBtn');
+      if (addCategoryBtn) {
+        addCategoryBtn.onclick = function(e) {
+          e.preventDefault();
+          const newCatInput = document.getElementById('newCatName');
+          if (newCatInput) {
+            newCatInput.focus();
+            newCatInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            window.openCatModal();
+          }
+        };
+      }
+      const drawerAddCat = document.getElementById('drawerAddCat');
+      if (drawerAddCat) {
+        drawerAddCat.onclick = function(e) {
+          e.preventDefault();
+          window.closeMobileDrawer();
+          const newCatInput = document.getElementById('newCatName');
+          if (newCatInput) {
+            newCatInput.focus();
+            newCatInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            window.openCatModal();
+          }
+        };
+      }
+
+      // Create Category Buttons (saveNewCatBtn & createCatBtn)
+      const handleCreateCategory = function(e) {
+        if (e) e.preventDefault();
+        const nameInput = document.getElementById('newCatName') || document.getElementById('quickCatName');
+        const colorInput = document.getElementById('newCatColor') || document.getElementById('quickCatColor');
+        const descInput = document.getElementById('newCatDesc') || document.getElementById('quickCatDesc');
+        if (!nameInput || !nameInput.value.trim()) {
+          alert('Please enter a category name');
+          return;
+        }
+        addCategory(nameInput.value.trim(), colorInput ? colorInput.value : '#FFD700', descInput ? descInput.value.trim() : '');
+        nameInput.value = '';
+        if (descInput) descInput.value = '';
+      };
+
+      const saveNewCatBtn = document.getElementById('saveNewCatBtn');
+      if (saveNewCatBtn) saveNewCatBtn.onclick = handleCreateCategory;
+      const createCatBtn = document.getElementById('createCatBtn');
+      if (createCatBtn) createCatBtn.onclick = handleCreateCategory;
+
+      // Export Excel Buttons
+      const handleExportExcel = function(e) {
+        if (e) e.preventDefault();
+        if (typeof exportExcel === 'function') exportExcel();
+      };
+      const exportBtn = document.getElementById('exportBtn');
+      if (exportBtn) exportBtn.onclick = handleExportExcel;
+      const drawerExport = document.getElementById('drawerExport');
+      if (drawerExport) {
+        drawerExport.onclick = function(e) {
+          if (e) e.preventDefault();
+          window.closeMobileDrawer();
+          if (typeof exportExcel === 'function') exportExcel();
+        };
+      }
+
+      // Drawer Backup & Sync Button
+      const drawerBackupSync = document.getElementById('drawerBackupSync');
+      if (drawerBackupSync) {
+        drawerBackupSync.onclick = function(e) {
+          if (e) e.preventDefault();
+          window.closeMobileDrawer();
+          window.openBackupModal();
+        };
+      }
+
+      // Mobile Drawer Open & Close Buttons
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      if (mobileMenuBtn) {
+        mobileMenuBtn.onclick = function(e) {
+          if (e) e.preventDefault();
+          window.openMobileDrawer();
+        };
+      }
+      const closeDrawer = document.getElementById('closeDrawer');
+      if (closeDrawer) {
+        closeDrawer.onclick = function(e) {
+          if (e) e.preventDefault();
+          window.closeMobileDrawer();
+        };
+      }
+      const drawerBackdrop = document.getElementById('drawerBackdrop');
+      if (drawerBackdrop) {
+        drawerBackdrop.onclick = function(e) {
+          if (e) e.preventDefault();
+          window.closeMobileDrawer();
+        };
+      }
+
+      // Backup Download & Restore JSON Buttons
       const dlBtn = document.getElementById('downloadBackupJsonBtn');
       if (dlBtn) {
         dlBtn.onclick = function(e) {
@@ -2183,8 +2314,6 @@
           window.downloadBackupJson();
         };
       }
-
-      // Backup Restore / Merge button
       const restoreBtn = document.getElementById('restoreBackupJsonBtn');
       if (restoreBtn) {
         restoreBtn.onclick = function(e) {
@@ -2192,6 +2321,7 @@
           window.restoreBackupFile();
         };
       }
+
       // Quick Add Button
       const quickAddBtn = document.getElementById('quickAddBtn');
       if (quickAddBtn) {
@@ -2211,7 +2341,7 @@
         };
       }
 
-      // Quick Auto Detect
+      // Quick Auto Detect Button
       const autoBtn = document.getElementById('autoDetectCaptionBtn');
       if (autoBtn) {
         autoBtn.onclick = function(e) {
@@ -2220,25 +2350,7 @@
         };
       }
 
-      // Quick Create Category
-      const createCatBtn = document.getElementById('createCatBtn');
-      if (createCatBtn) {
-        createCatBtn.onclick = function(e) {
-          e.preventDefault();
-          const nameInput = document.getElementById('quickCatName');
-          const colorInput = document.getElementById('quickCatColor');
-          const descInput = document.getElementById('quickCatDesc');
-          if (!nameInput || !nameInput.value.trim()) {
-            alert('Please enter a category name');
-            return;
-          }
-          addCategory(nameInput.value.trim(), colorInput ? colorInput.value : '#FFD700', descInput ? descInput.value.trim() : '');
-          nameInput.value = '';
-          if (descInput) descInput.value = '';
-        };
-      }
-
-      // Modal Save
+      // Modal Save & Close Buttons
       const modalSave = document.getElementById('modalSave');
       if (modalSave) {
         modalSave.onclick = async function(e) {
@@ -2246,8 +2358,6 @@
           await window.saveModalContent();
         };
       }
-
-      // Modal Close
       const modalClose = document.getElementById('modalClose');
       if (modalClose) {
         modalClose.onclick = function(e) {
@@ -2255,8 +2365,6 @@
           window.closeAddModal();
         };
       }
-
-      // Modal Auto Detect
       const modalAutoBtn = document.getElementById('modalAutoDetectBtn');
       if (modalAutoBtn) {
         modalAutoBtn.onclick = function(e) {
@@ -2296,6 +2404,29 @@
         loadMoreBtn.onclick = function(e) {
           e.preventDefault();
           renderGrid();
+        };
+      }
+
+      // Category Toggle & Clear Selection Buttons
+      const toggleQuickCatChipsBtn = document.getElementById('toggleQuickCatChipsBtn');
+      if (toggleQuickCatChipsBtn) {
+        toggleQuickCatChipsBtn.onclick = function(e) {
+          e.preventDefault();
+          if (typeof toggleQuickCatChips === 'function') toggleQuickCatChips();
+        };
+      }
+      const toggleExistingCatsBtn = document.getElementById('toggleExistingCatsBtn');
+      if (toggleExistingCatsBtn) {
+        toggleExistingCatsBtn.onclick = function(e) {
+          e.preventDefault();
+          if (typeof toggleExistingCats === 'function') toggleExistingCats();
+        };
+      }
+      const clearQuickCatSelectionBtn = document.getElementById('clearQuickCatSelectionBtn');
+      if (clearQuickCatSelectionBtn) {
+        clearQuickCatSelectionBtn.onclick = function(e) {
+          e.preventDefault();
+          if (typeof clearQuickCatSelection === 'function') clearQuickCatSelection();
         };
       }
     }
