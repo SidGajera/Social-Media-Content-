@@ -3413,10 +3413,9 @@
         showToast(`✅ Post #${nextNo} added & permanent vault backup created!`);
       }
 
-      // Step 2: Render grid, update counts & close modal instantly (0ms)
+      // Step 2: Apply filters, render updated grid & close modal instantly (0ms)
       try { saveAll(); } catch(e) { console.error('saveAll notice:', e); }
-      try { renderGrid(); } catch(e) { console.error('renderGrid notice:', e); }
-      try { updateCounts(); } catch(e) { console.error('updateCounts notice:', e); }
+      try { applyFilters(); } catch(e) { console.error('applyFilters notice:', e); }
 
       if (document.getElementById('quickLink')) document.getElementById('quickLink').value = '';
       if (document.getElementById('quickTakeaway')) document.getElementById('quickTakeaway').value = '';
@@ -3435,8 +3434,7 @@
           if (serverRes && serverRes.records && Array.isArray(serverRes.records)) {
             records = deduplicateRecords(serverRes.records);
             if (serverRes.realThumbs) realThumbs = serverRes.realThumbs;
-            renderGrid();
-            updateCounts();
+            applyFilters();
           }
         }).catch(e => console.log('Direct post server sync notice:', e));
       }, 50);
