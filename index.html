@@ -758,13 +758,14 @@
     let records = [];
     const defaultRecords = [];
     try {
-      localStorage.removeItem('i3d_vault_master_backup');
-      localStorage.removeItem('i3d_vault_saved_again');
-      localStorage.removeItem('records_backup');
-      localStorage.removeItem('i3d_local_custom_added_posts');
-      localStorage.removeItem('i3d_local_user_updated_posts');
+      const storedBackup = localStorage.getItem('records_backup') || localStorage.getItem('i3d_vault_master_backup');
+      if (storedBackup) {
+        const parsed = JSON.parse(storedBackup);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          records = parsed;
+        }
+      }
     } catch (e) {}
-    // records initialized as empty array for server fetch
     let realThumbs = {};
     let deletedCategories = [];
     try {
@@ -1397,8 +1398,9 @@
             serverCustomCats.forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
             customCategories = Array.from(catMap.values());
           }
-          if (serverThumbs) realThumbs = serverThumbs;
+          if (serverThumbs) realThumbs = Object.assign({}, serverThumbs, realThumbs);
           records = deduplicateRecords([...records, ...serverRecords]);
+          try { saveAll(); } catch(e){}
         } else if (!records || records.length === 0) {
           const backupKeys = ['records_backup', 'i3d_vault_master_backup', 'i3d_vault_saved_again'];
           for (const k of backupKeys) {
@@ -2790,6 +2792,8 @@
           body: JSON.stringify({ postNo, deletedPostNos })
         }).catch(e => console.log('Delete sync notice:', e));
       } catch(e) {}
+
+      saveAll();
 
       applyFilters();
       shown = 0;
