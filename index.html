@@ -1399,7 +1399,8 @@
             customCategories = Array.from(catMap.values());
           }
           if (serverThumbs) realThumbs = Object.assign({}, serverThumbs, realThumbs);
-          records = deduplicateRecords([...records, ...serverRecords]);
+          const localOnlyNew = (customAddedPosts || []).filter(p => p && p['Original Post Link']);
+          records = deduplicateRecords([...localOnlyNew, ...serverRecords]);
           try { saveAll(); } catch(e){}
         } else if (!records || records.length === 0) {
           const backupKeys = ['records_backup', 'i3d_vault_master_backup', 'i3d_vault_saved_again'];
