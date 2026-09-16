@@ -2081,24 +2081,16 @@
       document.body.removeChild(a);
     };
 
-    window.saveModalContent = async function() {
+    window.saveModalContent = function() {
       const saveBtn = document.getElementById('modalSave');
       const origText = saveBtn ? saveBtn.innerHTML : 'Save Content';
 
-      if (!validateModalInputs()) {
-        return;
-      }
-
-      const link = document.getElementById('modalLink') ? document.getElementById('modalLink').value.trim() : '';
-
-      if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
-      }
-
-      showToast('💾 Saving post & syncing to server database...', true);
-
       try {
+        if (!validateModalInputs()) {
+          return;
+        }
+
+        const link = document.getElementById('modalLink') ? document.getElementById('modalLink').value.trim() : '';
         const extraUrl = document.getElementById('modalExtraLink') ? document.getElementById('modalExtraLink').value.trim() : '';
         const platform = document.getElementById('modalPlatform') ? document.getElementById('modalPlatform').value : 'Instagram';
         const postType = document.getElementById('modalType') ? document.getElementById('modalType').value.trim() : 'Carousel / Multi-Image';
@@ -2106,11 +2098,9 @@
         const takeaway = document.getElementById('modalTakeaway') ? document.getElementById('modalTakeaway').value.trim() : '';
         const categories = getSelectedModalCategories();
 
-        await quickAdd(link, categories, takeaway, platform, postType || 'Carousel / Multi-Image', extraUrl, thumbUrl);
-        showToast('✅ Post saved & synced to server database!');
+        quickAdd(link, categories, takeaway, platform, postType || 'Carousel / Multi-Image', extraUrl, thumbUrl);
       } catch (err) {
-        console.error('Error saving modal content:', err);
-        alert('Notice during save: ' + (err.message || err));
+        console.error('Error in saveModalContent:', err);
       } finally {
         if (saveBtn) {
           saveBtn.disabled = false;
@@ -2440,22 +2430,13 @@
           if (!validateQuickInputs()) {
             return;
           }
-          const origText = quickAddBtn.innerHTML;
-          quickAddBtn.disabled = true;
-          quickAddBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
-
           const link = document.getElementById('quickLink') ? document.getElementById('quickLink').value.trim() : '';
           const mediaUrl = document.getElementById('quickMediaUrl') ? document.getElementById('quickMediaUrl').value.trim() : '';
           const extraUrl = document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : '';
           const takeaway = document.getElementById('quickTakeaway') ? document.getElementById('quickTakeaway').value.trim() : '';
           const categories = getSelectedQuickCategories();
 
-          try {
-            await quickAdd(link, categories, takeaway, '', 'Carousel / Multi-Image', extraUrl, mediaUrl);
-          } finally {
-            quickAddBtn.disabled = false;
-            quickAddBtn.innerHTML = origText;
-          }
+          quickAdd(link, categories, takeaway, '', 'Carousel / Multi-Image', extraUrl, mediaUrl);
         };
       }
 
@@ -2471,9 +2452,9 @@
       // Modal Save & Close Buttons
       const modalSave = document.getElementById('modalSave');
       if (modalSave) {
-        modalSave.onclick = async function(e) {
+        modalSave.onclick = function(e) {
           e.preventDefault();
-          await window.saveModalContent();
+          window.saveModalContent();
         };
       }
       const modalClose = document.getElementById('modalClose');
@@ -3370,7 +3351,7 @@
       });
     };
 
-    async function quickAdd(link, categories, takeaway, platform, postType, extraUrl, thumbUrl) {
+    function quickAdd(link, categories, takeaway, platform, postType, extraUrl, thumbUrl) {
       if (!link) { alert('Please paste a post link first'); return; }
       
       let cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
@@ -3381,22 +3362,9 @@
       const exUrl = extraUrl !== undefined ? extraUrl : (document.getElementById('quickExtraLink') ? document.getElementById('quickExtraLink').value.trim() : '');
 
       if (!takeaway || takeaway.trim() === '') {
-        showToast('Auto-extracting image text & caption content...', true);
-        try {
-          const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 2500));
-          const autoExtracted = await Promise.race([fetchCaptionFromUrl(link), timeoutPromise]);
-          if (autoExtracted) {
-            takeaway = autoExtracted;
-          }
-        } catch (err) {
-          console.warn('Auto caption fetch notice:', err);
-        }
-      }
-
-      if (takeaway) {
-        takeaway = formatCarouselTextServer(takeaway, postType);
-      } else {
         takeaway = `Carousel Image 1 / Slide 1 (Cover & Overview):\n• Post content backup for ${link}`;
+      } else {
+        takeaway = formatCarouselTextServer(takeaway, postType);
       }
 
       // Step 1: Update local records immediately so UI responds in under 10ms!
@@ -3445,7 +3413,7 @@
         showToast(`✅ Post #${nextNo} added & permanent vault backup created!`);
       }
 
-      // Render grid & close modal IMMEDIATELY
+      // Step 2: Render grid, update counts & close modal instantly (0ms)
       try { saveAll(); } catch(e) { console.error('saveAll notice:', e); }
       try { renderGrid(); } catch(e) { console.error('renderGrid notice:', e); }
       try { updateCounts(); } catch(e) { console.error('updateCounts notice:', e); }
@@ -3455,25 +3423,23 @@
       if (document.getElementById('quickExtraLink')) document.getElementById('quickExtraLink').value = '';
       try { closeAddModal(); } catch(e) {}
 
-      // Step 2: Background server sync asynchronously with 2.5s timeout (non-blocking!)
-      try {
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Server timeout')), 2500));
-        const fetchPromise = fetch(getApiBaseUrl() + '/api/add-post', {
+      // Step 3: Background server sync completely non-blocking (fire and forget!)
+      setTimeout(() => {
+        fetch(getApiBaseUrl() + '/api/add-post', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ link, categories: cats, takeaway, platform, postType, extraUrl: exUrl, thumbUrl })
-        });
-        const addRes = await Promise.race([fetchPromise, timeoutPromise]);
-        if (addRes && addRes.ok) {
-          const serverRes = await addRes.json();
+        }).then(res => {
+          if (res && res.ok) return res.json();
+        }).then(serverRes => {
           if (serverRes && serverRes.records && Array.isArray(serverRes.records)) {
             records = deduplicateRecords(serverRes.records);
             if (serverRes.realThumbs) realThumbs = serverRes.realThumbs;
             renderGrid();
             updateCounts();
           }
-        }
-      } catch(e) { console.log('Direct post server sync notice:', e); }
+        }).catch(e => console.log('Direct post server sync notice:', e));
+      }, 50);
     }
   </script>
 </body>
