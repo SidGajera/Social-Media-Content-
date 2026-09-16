@@ -2099,14 +2099,15 @@
         const categories = getSelectedModalCategories();
 
         quickAdd(link, categories, takeaway, platform, postType || 'Carousel / Multi-Image', extraUrl, thumbUrl);
+        window.closeAddModal();
       } catch (err) {
         console.error('Error in saveModalContent:', err);
+        if (typeof showToast === 'function') showToast('⚠️ Error saving post: ' + err.message, false);
       } finally {
         if (saveBtn) {
           saveBtn.disabled = false;
           saveBtn.innerHTML = origText;
         }
-        window.closeAddModal();
       }
     };
 
@@ -3367,8 +3368,10 @@
         takeaway = formatCarouselTextServer(takeaway, postType);
       }
 
-      // Step 1: Update local records immediately so UI responds in under 10ms!
-      const existingRec = records.find(r => r && r['Original Post Link'] === link);
+      // Step 1: Update local records immediately with normalized link comparison
+      const normInputLink = typeof normalizePostUrl === 'function' ? normalizePostUrl(link) : link.trim().toLowerCase();
+      const existingRec = records.find(r => r && (r['Original Post Link'] === link || (r['Original Post Link'] && typeof normalizePostUrl === 'function' && normalizePostUrl(r['Original Post Link']) === normInputLink)));
+      
       if (existingRec) {
         const existingCats = getPostCategories(existingRec);
         const combinedCats = Array.from(new Set([...existingCats, ...cats]));
@@ -3413,14 +3416,25 @@
         showToast(`✅ Post #${nextNo} added & permanent vault backup created!`);
       }
 
-      // Step 2: Apply filters, render updated grid & close modal instantly (0ms)
+      // Step 2: Clear active search & filters so the new post is guaranteed to render in the grid!
+      try { resetSearchFilters(); } catch(e) {}
       try { saveAll(); } catch(e) { console.error('saveAll notice:', e); }
       try { applyFilters(); } catch(e) { console.error('applyFilters notice:', e); }
 
       if (document.getElementById('quickLink')) document.getElementById('quickLink').value = '';
       if (document.getElementById('quickTakeaway')) document.getElementById('quickTakeaway').value = '';
       if (document.getElementById('quickExtraLink')) document.getElementById('quickExtraLink').value = '';
+      if (document.getElementById('modalLink')) document.getElementById('modalLink').value = '';
+      if (document.getElementById('modalTakeaway')) document.getElementById('modalTakeaway').value = '';
+      if (document.getElementById('modalExtraLink')) document.getElementById('modalExtraLink').value = '';
+      if (document.getElementById('modalImageUrl')) document.getElementById('modalImageUrl').value = '';
       try { closeAddModal(); } catch(e) {}
+
+      // Scroll smoothly to top of grid
+      try {
+        const grid = document.getElementById('grid');
+        if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch(e) {}
 
       // Step 3: Background server sync completely non-blocking (fire and forget!)
       setTimeout(() => {
