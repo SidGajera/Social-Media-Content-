@@ -760,8 +760,11 @@ function formatCarouselTextServer(text, postType) {
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body);
-        let records = Array.isArray(payload) ? payload : (payload.records || payload.data || []);
         const dbData = await getFromDatabase();
+        let records = Array.isArray(payload) ? payload : (payload.records || payload.data || []);
+        if (!Array.isArray(records) || records.length === 0) {
+          records = dbData.records || [];
+        }
 
         const mergedDelNos = Array.from(new Set([
           ...(dbData.deletedPostNos || []),

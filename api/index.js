@@ -148,7 +148,10 @@ module.exports = async (req, res) => {
 
   if (req.method === 'POST') {
     const payload = req.body || {};
-    let records = Array.isArray(payload) ? payload : (payload.records || payload.data || vault.records);
+    let records = Array.isArray(payload) ? payload : (payload.records || payload.data || []);
+    if (!Array.isArray(records) || records.length === 0) {
+      records = vault.records || [];
+    }
 
     const mergedDelNos = Array.from(new Set([
       ...(vault.deletedPostNos || []),
