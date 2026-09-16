@@ -1246,10 +1246,10 @@
       } catch (e) { }
       updateCounts();
       if (records && records.length > 0) {
-        syncToLocalServer();
-        syncToGitHubServer(false);
-        syncToFirebase(records);
-        syncToMySQLServer(records);
+        try { if (typeof syncToLocalServer === 'function') syncToLocalServer(); } catch(e){}
+        try { if (typeof syncToGitHubServer === 'function') syncToGitHubServer(false); } catch(e){}
+        try { if (typeof syncToFirebase === 'function') syncToFirebase(records); } catch(e){}
+        try { if (typeof syncToMySQLServer === 'function') syncToMySQLServer(records); } catch(e){}
       }
     }
 
@@ -3446,14 +3446,14 @@
       }
 
       // Render grid & close modal IMMEDIATELY
-      saveAll();
-      renderGrid();
-      updateCounts();
+      try { saveAll(); } catch(e) { console.error('saveAll notice:', e); }
+      try { renderGrid(); } catch(e) { console.error('renderGrid notice:', e); }
+      try { updateCounts(); } catch(e) { console.error('updateCounts notice:', e); }
 
       if (document.getElementById('quickLink')) document.getElementById('quickLink').value = '';
       if (document.getElementById('quickTakeaway')) document.getElementById('quickTakeaway').value = '';
       if (document.getElementById('quickExtraLink')) document.getElementById('quickExtraLink').value = '';
-      closeAddModal();
+      try { closeAddModal(); } catch(e) {}
 
       // Step 2: Background server sync asynchronously with 2.5s timeout (non-blocking!)
       try {
