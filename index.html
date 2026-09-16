@@ -1085,20 +1085,28 @@
 
       const list = Array.from(map.values());
 
-      // Strict sequential re-indexing so post numbers are unique positive integers
+      // Strict sequential re-indexing so post numbers are unique positive integers and avoid deletedPostNos
+      const delSet = new Set((deletedPostNos || []).map(n => parseInt(n, 10)));
       const usedNos = new Set();
       list.forEach(r => {
-        if (r['No.'] && !usedNos.has(r['No.'])) {
-          usedNos.add(r['No.']);
+        const n = r['No.'] ? parseInt(r['No.'], 10) : null;
+        if (n && !isNaN(n) && !usedNos.has(n) && !delSet.has(n)) {
+          usedNos.add(n);
         } else {
           r['No.'] = null;
         }
       });
 
-      let nextNo = Math.max(...Array.from(usedNos), 0) + 1;
+      let maxUsed = Math.max(0, ...Array.from(usedNos), ...(deletedPostNos || []).map(n => parseInt(n, 10) || 0));
+      let nextNo = maxUsed + 1;
       list.forEach(r => {
         if (!r['No.']) {
-          r['No.'] = nextNo++;
+          while (usedNos.has(nextNo) || delSet.has(nextNo)) {
+            nextNo++;
+          }
+          r['No.'] = nextNo;
+          usedNos.add(nextNo);
+          nextNo++;
         }
       });
 
@@ -1390,7 +1398,7 @@
             customCategories = Array.from(catMap.values());
           }
           if (serverThumbs) realThumbs = serverThumbs;
-          records = deduplicateRecords(serverRecords);
+          records = deduplicateRecords([...records, ...serverRecords]);
         } else if (!records || records.length === 0) {
           const backupKeys = ['records_backup', 'i3d_vault_master_backup', 'i3d_vault_saved_again'];
           for (const k of backupKeys) {
@@ -3398,49 +3406,59 @@
       const normInputLink = typeof normalizePostUrl === 'function' ? normalizePostUrl(link) : link.trim().toLowerCase();
       const existingRec = records.find(r => r && (r['Original Post Link'] === link || (r['Original Post Link'] && typeof normalizePostUrl === 'function' && normalizePostUrl(r['Original Post Link']) === normInputLink)));
       
-      if (existingRec) {
-        const existingCats = getPostCategories(existingRec);
-        const combinedCats = Array.from(new Set([...existingCats, ...cats]));
-        existingRec.Category = combinedCats;
-        if (postType) existingRec['Post Type'] = postType;
-        existingRec['Core Idea / 1-Line Takeaway'] = takeaway;
-        if (platform) existingRec['Platform'] = platform;
-        if (exUrl) existingRec['Extra Link'] = exUrl;
-        if (thumbUrl) realThumbs[existingRec['No.']] = thumbUrl;
+        const targetNo = existingRec ? existingRec['No.'] : (() => {
+          const maxRecNo = records.length > 0 ? Math.max(...records.map(r => parseInt(r['No.'], 10) || 0)) : 0;
+          const maxDelNo = (deletedPostNos && deletedPostNos.length > 0) ? Math.max(...deletedPostNos.map(n => parseInt(n, 10) || 0)) : 0;
+          return Math.max(maxRecNo, maxDelNo, 0) + 1;
+        })();
 
-        userUpdatedPosts[existingRec['No.']] = {
-          takeaway: existingRec['Core Idea / 1-Line Takeaway'],
-          cats: combinedCats,
-          postType: existingRec['Post Type'],
-          platform: existingRec['Platform'],
-          extraUrl: existingRec['Extra Link']
-        };
-        if (typeof showToast === 'function') showToast(`✅ Updated Post #${existingRec['No.']} & saved permanent backup!`);
-      } else {
-        const nextNo = records.length > 0 ? Math.max(...records.map(r => parseInt(r['No.'], 10) || 0)) + 1 : 1;
-        const newRec = {
-          'No.': nextNo,
-          'Platform': platform || (detectPlatformFromUrl ? detectPlatformFromUrl(link) : 'Social Media'),
-          'Original Post Link': link,
-          'Extra Link': exUrl,
-          'Post Type': postType || 'Carousel / Multi-Image',
-          'Core Idea / 1-Line Takeaway': takeaway,
-          'Status': 'Idea',
-          'Date Saved': new Date().toISOString().split('T')[0],
-          'Category': cats
-        };
-        records.unshift(newRec);
-        if (thumbUrl) realThumbs[nextNo] = thumbUrl;
+        if (deletedPostNos && deletedPostNos.length > 0 && targetNo) {
+          deletedPostNos = deletedPostNos.filter(n => parseInt(n, 10) !== parseInt(targetNo, 10));
+          try { localStorage.setItem('i3d_deleted_post_nos', JSON.stringify(deletedPostNos)); } catch(e){}
+        }
 
-        userUpdatedPosts[nextNo] = {
-          takeaway: newRec['Core Idea / 1-Line Takeaway'],
-          cats: cats,
-          postType: newRec['Post Type'],
-          platform: newRec['Platform'],
-          extraUrl: newRec['Extra Link']
-        };
-        if (typeof showToast === 'function') showToast(`✅ Post #${nextNo} added & permanent vault backup created!`);
-      }
+        if (existingRec) {
+          const existingCats = getPostCategories(existingRec);
+          const combinedCats = Array.from(new Set([...existingCats, ...cats]));
+          existingRec.Category = combinedCats;
+          if (postType) existingRec['Post Type'] = postType;
+          existingRec['Core Idea / 1-Line Takeaway'] = takeaway;
+          if (platform) existingRec['Platform'] = platform;
+          if (exUrl) existingRec['Extra Link'] = exUrl;
+          if (thumbUrl) realThumbs[targetNo] = thumbUrl;
+
+          userUpdatedPosts[targetNo] = {
+            takeaway: existingRec['Core Idea / 1-Line Takeaway'],
+            cats: combinedCats,
+            postType: existingRec['Post Type'],
+            platform: existingRec['Platform'],
+            extraUrl: existingRec['Extra Link']
+          };
+          if (typeof showToast === 'function') showToast(`✅ Updated Post #${targetNo} & saved permanent backup!`);
+        } else {
+          const newRec = {
+            'No.': targetNo,
+            'Platform': platform || (detectPlatformFromUrl ? detectPlatformFromUrl(link) : 'Social Media'),
+            'Original Post Link': link,
+            'Extra Link': exUrl,
+            'Post Type': postType || 'Carousel / Multi-Image',
+            'Core Idea / 1-Line Takeaway': takeaway,
+            'Status': 'Idea',
+            'Date Saved': new Date().toISOString().split('T')[0],
+            'Category': cats
+          };
+          records.unshift(newRec);
+          if (thumbUrl) realThumbs[targetNo] = thumbUrl;
+
+          userUpdatedPosts[targetNo] = {
+            takeaway: newRec['Core Idea / 1-Line Takeaway'],
+            cats: cats,
+            postType: newRec['Post Type'],
+            platform: newRec['Platform'],
+            extraUrl: newRec['Extra Link']
+          };
+          if (typeof showToast === 'function') showToast(`✅ Post #${targetNo} added & permanent vault backup created!`);
+        }
 
       // Step 2: Clear active search & filters so the new post is guaranteed to render in the grid!
       try { resetSearchFilters(); } catch(e) {}

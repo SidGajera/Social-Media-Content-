@@ -552,6 +552,10 @@ function formatCarouselTextServer(text, postType) {
           records.unshift(newRec);
         }
 
+        if (Array.isArray(data.deletedPostNos) && data.deletedPostNos.length > 0 && targetNo) {
+          data.deletedPostNos = data.deletedPostNos.filter(n => parseInt(n, 10) !== parseInt(targetNo, 10));
+        }
+
         // Save to SQLite
         upsertToSQLite(records, data.customCategories, data.deletedCategories, data.deletedPostNos, realThumbs);
 
