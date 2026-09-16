@@ -719,7 +719,15 @@
     // records initialized as empty array for server fetch
     let realThumbs = {};
     let deletedCategories = [];
+    try {
+      const savedDelCats = localStorage.getItem('i3d_deleted_categories');
+      if (savedDelCats) deletedCategories = JSON.parse(savedDelCats);
+    } catch (e) {}
     let deletedPostNos = [];
+    try {
+      const savedDelNos = localStorage.getItem('i3d_deleted_post_nos');
+      if (savedDelNos) deletedPostNos = JSON.parse(savedDelNos);
+    } catch (e) {}
     let customAddedPosts = [];
     let userUpdatedPosts = {};
     let customCategories = [
@@ -1161,10 +1169,12 @@
 
     async function deepStorageScan() {
       let recovered = 0;
+      const delSet = new Set((deletedPostNos || []).map(n => parseInt(n, 10)));
       // 1. Scan IndexedDB
       const idbRecords = await loadFromIndexedDB('records');
       if (idbRecords && Array.isArray(idbRecords)) {
         idbRecords.forEach(r => {
+          if (r && r['No.'] && delSet.has(parseInt(r['No.'], 10))) return;
           if (r && r['Original Post Link'] && !records.some(rec => rec['Original Post Link'] === r['Original Post Link'])) {
             records.unshift(r);
             recovered++;
@@ -1179,6 +1189,7 @@
             const arr = JSON.parse(val);
             if (Array.isArray(arr)) {
               arr.forEach(r => {
+                if (r && r['No.'] && delSet.has(parseInt(r['No.'], 10))) return;
                 if (r && r['Original Post Link'] && !records.some(rec => rec['Original Post Link'] === r['Original Post Link'])) {
                   records.unshift(r);
                   recovered++;
@@ -1190,6 +1201,9 @@
       });
 
       records = deduplicateRecords(records);
+      if (delSet.size > 0) {
+        records = records.filter(r => r && r['No.'] && !delSet.has(parseInt(r['No.'], 10)));
+      }
       saveAll();
       document.getElementById('search').dispatchEvent(new Event('input'));
       if (recovered > 0) {
@@ -2471,6 +2485,8 @@
       if (!confirm('Are you sure you want to delete Post #' + postNo + '?')) return;
       
       if (!deletedPostNos.includes(postNo)) deletedPostNos.push(postNo);
+      try { localStorage.setItem('i3d_deleted_post_nos', JSON.stringify(deletedPostNos)); } catch(e){}
+
       records = records.filter(r => r && r && parseInt(r['No.'], 10) !== postNo);
       customAddedPosts = customAddedPosts.filter(r => r && r && parseInt(r['No.'], 10) !== postNo);
       delete userUpdatedPosts[postNo];
@@ -2508,6 +2524,7 @@
         return false;
       }
       deletedCategories = deletedCategories.filter(d => d.toLowerCase() !== name.toLowerCase());
+      try { localStorage.setItem('i3d_deleted_categories', JSON.stringify(deletedCategories)); } catch(e){}
       customCategories.push({ name: name, color: color || '#FFD700', desc: desc || '' });
       saveAll();
       renderCatDropdowns();
@@ -2525,6 +2542,7 @@
       if (!deletedCategories.some(d => typeof d === 'string' && d.toLowerCase() === catLower)) {
         deletedCategories.push(name);
       }
+      try { localStorage.setItem('i3d_deleted_categories', JSON.stringify(deletedCategories)); } catch(e){}
 
       // Strip category from existing posts
       records = records.map(r => {

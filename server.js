@@ -191,6 +191,10 @@ async function getFromDatabase() {
       if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) {
         const delSet = new Set(deletedPostNos.map(n => parseInt(n, 10)));
         records = records.filter(r => r && r['No.'] && !delSet.has(parseInt(r['No.'], 10)));
+        const validNos = Array.from(delSet).filter(n => !isNaN(n) && n > 0);
+        if (validNos.length > 0) {
+          try { await pool.query('DELETE FROM social_media_posts WHERE post_no IN (?)', [validNos]); } catch(e){}
+        }
       }
 
       if (Array.isArray(deletedCategories) && deletedCategories.length > 0) {
@@ -247,7 +251,7 @@ function getFromSQLite() {
       'Extra Link': r.extra_link,
       'Post Type': r.post_type,
       'Core Idea / 1-Line Takeaway': r.takeaway,
-          'Caption': r.caption || '',
+      'Caption': r.caption || '',
       'Status': r.status,
       'Date Saved': r.date_saved,
       'Category': Array.isArray(catArr) ? catArr : [catArr],
@@ -255,7 +259,24 @@ function getFromSQLite() {
     };
   });
 
-  return { records, customCategories, deletedCategories, deletedPostNos, realThumbs };
+  let cleanRecords = records;
+  if (Array.isArray(deletedPostNos) && deletedPostNos.length > 0) {
+    const delSet = new Set(deletedPostNos.map(n => parseInt(n, 10)));
+    cleanRecords = cleanRecords.filter(r => r && r['No.'] && !delSet.has(parseInt(r['No.'], 10)));
+    const delStmt = sqliteDb.prepare('DELETE FROM social_media_posts WHERE post_no = ?');
+    deletedPostNos.forEach(no => { if (no) delStmt.run(parseInt(no, 10)); });
+  }
+
+  if (Array.isArray(deletedCategories) && deletedCategories.length > 0) {
+    const delCatsLower = deletedCategories.map(c => typeof c === 'string' ? c.toLowerCase() : '');
+    cleanRecords = cleanRecords.map(r => {
+      if (!r || !r.Category) return r;
+      let cats = Array.isArray(r.Category) ? r.Category : [r.Category];
+      return Object.assign({}, r, { Category: cats.filter(c => typeof c === 'string' && !delCatsLower.includes(c.toLowerCase())) });
+    });
+  }
+
+  return { records: cleanRecords, customCategories, deletedCategories, deletedPostNos, realThumbs };
 }
 
 // Background MySQL Connection Management (Non-blocking!)
