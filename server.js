@@ -257,7 +257,7 @@ try {
 async function tryConnectMySQLBackground() {
   if (!mysql) return;
   const now = Date.now();
-  if (now - lastConnectCheck < 10000) return;
+  if (now - lastConnectCheck < 5000) return;
   lastConnectCheck = now;
 
   try {
@@ -281,17 +281,29 @@ async function tryConnectMySQLBackground() {
         connectionLimit: 15,
         queueLimit: 0
       });
-      await pool.query('CREATE TABLE IF NOT EXISTS social_media_posts (post_no INT PRIMARY KEY, platform VARCHAR(100), original_post_link TEXT, extra_link TEXT, post_type VARCHAR(200), takeaway TEXT, status VARCHAR(100), date_saved VARCHAR(50), category TEXT, real_thumb TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;');
+      await pool.query('CREATE TABLE IF NOT EXISTS social_media_posts (post_no INT PRIMARY KEY, platform VARCHAR(100), original_post_link TEXT, extra_link TEXT, post_type VARCHAR(200), takeaway LONGTEXT, caption LONGTEXT, status VARCHAR(100), date_saved VARCHAR(50), category TEXT, real_thumb TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;');
+      try { await pool.query('ALTER TABLE social_media_posts ADD COLUMN caption LONGTEXT;'); } catch(e) {}
       await pool.query('CREATE TABLE IF NOT EXISTS social_media_meta (meta_key VARCHAR(100) PRIMARY KEY, meta_value LONGTEXT, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;');
-      console.log(`[MySQL Database]: Connected to ${MYSQL_DATABASE} on ${MYSQL_HOST}:${MYSQL_PORT}`);
+      console.log(`[MySQL Database Engine]: Connected to ${MYSQL_DATABASE} at ${MYSQL_HOST}:${MYSQL_PORT}`);
     }
 
     mysqlConnected = true;
 
-    // Sync current SQLite data to MySQL
-    const sqliteData = getFromSQLite();
-    if (sqliteData.records.length > 0) {
-      await upsertPostsToMySQL(sqliteData.records, sqliteData.customCategories, sqliteData.deletedCategories, sqliteData.deletedPostNos, sqliteData.realThumbs);
+    // Auto-seed MySQL if table is empty
+    const [cntRows] = await pool.query('SELECT COUNT(*) as cnt FROM social_media_posts');
+    const mysqlCount = cntRows && cntRows[0] ? cntRows[0].cnt : 0;
+    if (mysqlCount === 0 && fs.existsSync(VAULT_PATH)) {
+      try {
+        const raw = fs.readFileSync(VAULT_PATH, 'utf8');
+        const parsed = JSON.parse(raw);
+        const records = Array.isArray(parsed) ? parsed : (parsed.records || []);
+        if (records.length > 0) {
+          await upsertPostsToMySQL(records, parsed.customCategories, parsed.deletedCategories, parsed.deletedPostNos, parsed.realThumbs);
+          console.log(`[MySQL Database Engine]: Auto-seeded ${records.length} records into MySQL database '${MYSQL_DATABASE}'`);
+        }
+      } catch(e) {
+        console.error('[MySQL Auto-Seed Error]:', e.message);
+      }
     }
   } catch(err) {
     mysqlConnected = false;
