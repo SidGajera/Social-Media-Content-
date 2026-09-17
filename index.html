@@ -1272,10 +1272,6 @@
     }
 
 
-    function getApiBaseUrl() {
-      return '';
-    }
-
     function saveAll() {
       records = deduplicateRecords(records);
       try {
@@ -1331,6 +1327,8 @@
         const payload = {
           records: recordsToSync || records,
           customCategories: customCategories || [],
+          deletedCategories: deletedCategories || [],
+          deletedPostNos: deletedPostNos || [],
           realThumbs: realThumbs || {},
           lastUpdated: new Date().toISOString()
         };
@@ -1417,6 +1415,12 @@
               fbData.customCategories.forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
               customCategories = Array.from(catMap.values());
             }
+            if (fbData.deletedCategories && Array.isArray(fbData.deletedCategories)) {
+              deletedCategories = Array.from(new Set([...deletedCategories, ...fbData.deletedCategories]));
+            }
+            if (fbData.deletedPostNos && Array.isArray(fbData.deletedPostNos)) {
+              deletedPostNos = Array.from(new Set([...deletedPostNos, ...fbData.deletedPostNos]));
+            }
             if (fbData.realThumbs && typeof fbData.realThumbs === 'object') {
               realThumbs = Object.assign({}, fbData.realThumbs, realThumbs);
             }
@@ -1442,13 +1446,12 @@
       const badge = document.getElementById('githubSyncBadge');
 
       if (!pat) {
-        const localSynced = await syncToLocalServer();
-        if (badge && !localSynced) {
+        if (badge) {
           badge.className = 'px-2.5 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-[10px] rounded-lg shrink-0 flex items-center gap-1';
-          badge.innerHTML = `<i class="fas fa-database text-amber-400"></i> Local Storage (${records.length})`;
+          badge.innerHTML = `<i class="fas fa-fire text-amber-400"></i> Firebase & Local (${records.length})`;
         }
-        if (forceAlert && !localSynced) alert(`ℹ️ Stored locally (${records.length} posts). To push commits directly to GitHub or disk server, enter your GitHub Personal Access Token in Section 3.`);
-        return localSynced;
+        if (forceAlert) alert(`ℹ️ Stored in Firebase & local browser storage (${records.length} posts). To push commits directly to GitHub, enter your GitHub Personal Access Token in Section 3.`);
+        return true;
       }
 
       if (badge) {
@@ -2992,14 +2995,6 @@
       delete userUpdatedPosts[postNo];
       delete realThumbs[postNo];
 
-      try {
-        fetch(getApiBaseUrl() + '/api/delete-post', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ postNo, deletedPostNos })
-        }).catch(e => console.log('Delete sync notice:', e));
-      } catch(e) {}
-
       saveAll();
 
       applyFilters();
@@ -3008,18 +3003,10 @@
       if (grid) grid.innerHTML = '';
       renderGrid();
       updateCounts();
-      saveAll();
       showToast('🗑️ Post #' + postNo + ' deleted successfully!');
     }
 
     function addCategory(name, color, desc) {
-      try {
-        fetch(getApiBaseUrl() + '/api/add-category', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, color, desc })
-        }).catch(e => console.log('Direct category sync notice:', e));
-      } catch(e) {}
       if (!name) { alert('Name required'); return false; }
       if (customCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
         alert('Already exists');
@@ -3052,14 +3039,6 @@
         let cats = Array.isArray(r.Category) ? r.Category : [r.Category];
         return Object.assign({}, r, { Category: cats.filter(c => typeof c === 'string' && c.toLowerCase() !== catLower) });
       });
-
-      try {
-        fetch(getApiBaseUrl() + '/api/delete-category', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, deletedCategories })
-        }).catch(e => console.log('Delete category sync notice:', e));
-      } catch (e) {}
 
       saveAll();
       renderCatDropdowns();
@@ -3685,22 +3664,6 @@
         if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch(e) {}
 
-      // Step 3: Background server sync completely non-blocking (fire and forget!)
-      setTimeout(() => {
-        fetch(getApiBaseUrl() + '/api/add-post', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ link, categories: cats, takeaway, platform, postType, extraUrl: exUrl, thumbUrl })
-        }).then(res => {
-          if (res && res.ok) return res.json();
-        }).then(serverRes => {
-          if (serverRes && serverRes.records && Array.isArray(serverRes.records)) {
-            records = deduplicateRecords(serverRes.records);
-            if (serverRes.realThumbs) realThumbs = serverRes.realThumbs;
-            applyFilters();
-          }
-        }).catch(e => console.log('Direct post server sync notice:', e));
-      }, 50);
     }
   </script>
 </body>
