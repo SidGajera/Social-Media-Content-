@@ -1289,6 +1289,8 @@
         localStorage.removeItem('i3d_local_user_updated_posts');
         if (records.length > 0) {
           localStorage.setItem('records_backup', JSON.stringify(records));
+          localStorage.setItem('i3d_vault_master_backup', JSON.stringify(records));
+          localStorage.setItem('i3d_vault_saved_again', JSON.stringify(records));
           localStorage.setItem('i3d_deleted_post_nos', JSON.stringify(deletedPostNos));
           localStorage.setItem('i3d_deleted_categories', JSON.stringify(deletedCategories));
         }
@@ -1402,8 +1404,27 @@
             customCategories = Array.from(catMap.values());
           }
           if (serverThumbs) realThumbs = Object.assign({}, serverThumbs, realThumbs);
-          const localOnlyNew = (customAddedPosts || []).filter(p => p && p['Original Post Link']);
-          records = deduplicateRecords([...localOnlyNew, ...serverRecords]);
+
+          // Retrieve current local in-memory records and local storage backups
+          let localRecords = Array.isArray(records) && records.length > 0 ? records : [];
+          if (localRecords.length === 0) {
+            const backupKeys = ['records_backup', 'i3d_vault_master_backup', 'i3d_vault_saved_again'];
+            for (const k of backupKeys) {
+              try {
+                const stored = localStorage.getItem(k);
+                if (stored) {
+                  const parsed = JSON.parse(stored);
+                  const list = Array.isArray(parsed) ? parsed : (parsed.records || []);
+                  if (Array.isArray(list) && list.length > 0) {
+                    localRecords = list;
+                    break;
+                  }
+                }
+              } catch(e){}
+            }
+          }
+
+          records = deduplicateRecords([...localRecords, ...serverRecords]);
           try { saveAll(); } catch(e){}
         } else if (!records || records.length === 0) {
           const backupKeys = ['records_backup', 'i3d_vault_master_backup', 'i3d_vault_saved_again'];
