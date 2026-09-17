@@ -415,7 +415,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  const urlObj = new URL(req.url, 'http://' + (req.headers.host || 'localhost'));
+  const urlObj = new URL(req.url, 'http://' + (req.headers.host || 'server'));
   const pathname = urlObj.pathname;
 
   // GET /api/mysql/status or /api/status
@@ -848,7 +848,7 @@ function formatCarouselTextServer(text, postType) {
 server.listen(PORT, () => {
   console.log('=================================================');
   console.log('🚀 Social Media Direct SQL Server running on port ' + PORT);
-  console.log('📍 Web Interface: http://localhost:' + PORT);
-  console.log('🗄️ SQL Direct API: http://localhost:' + PORT + '/api/add-post');
+  console.log('📍 Web Interface Port: ' + PORT);
+  console.log('🗄️ SQL Direct API Endpoint: /api/add-post');
   console.log('=================================================');
 });

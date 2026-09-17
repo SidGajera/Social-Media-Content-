@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
 
-  const url = new URL(req.url, 'http://' + (req.headers.host || 'localhost'));
+  const url = new URL(req.url, 'http://' + (req.headers.host || 'server'));
   const pathname = url.pathname;
   let vault = loadVault();
 

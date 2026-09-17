@@ -1,4 +1,4 @@
-﻿# 💎 Social Media Content Vault - I3D Jewel
+# 💎 Social Media Content Vault - I3D Jewel
 
 A high-performance, responsive Social Media Content Vault & Management System built for **I3D Jewel**. Designed for organizing, embedding, filtering, and permanently storing social media content posts and custom categories directly in **MySQL** and a local **SQL Database Engine**.
 
@@ -36,7 +36,7 @@ Social-Media-Content-/
 
 ## 📡 API Endpoints
 
-The Node.js server (`server.js`) runs on `http://localhost:3000` and exposes the following endpoints:
+The backend server exposes the following endpoints:
 
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
@@ -46,7 +46,7 @@ The Node.js server (`server.js`) runs on `http://localhost:3000` and exposes the
 
 ---
 
-## 🛠️ How to Run Locally
+## 🛠️ How to Run
 
 ### 1. Install Dependencies
 ```bash
@@ -57,7 +57,7 @@ npm install
 ```bash
 node server.js
 ```
-The server will start on `http://localhost:3000`. Open `http://localhost:3000` in your web browser.
+Open the server URL in your web browser.
 
 ---
 
