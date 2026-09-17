@@ -1004,10 +1004,17 @@
 
     function deduplicateRecords(recordsArray) {
       if (!Array.isArray(recordsArray)) return [];
+      const delSet = new Set((deletedPostNos || []).map(n => parseInt(n, 10)));
       const map = new Map();
 
-      recordsArray.forEach(item => {
-        if (!item || typeof item !== 'object') return;
+      // Filter out deleted posts completely before processing
+      const validItems = recordsArray.filter(item => {
+        if (!item || typeof item !== 'object') return false;
+        const itemNo = item['No.'] ? parseInt(item['No.'], 10) : null;
+        return !(itemNo && delSet.has(itemNo));
+      });
+
+      validItems.forEach(item => {
         const rawLink = item['Original Post Link'] || item['Post Link'] || item['Link'] || item['URL'] || '';
         const normLink = rawLink ? normalizePostUrl(rawLink) : '';
         const itemNo = item['No.'] ? parseInt(item['No.'], 10) : null;
@@ -1022,6 +1029,9 @@
               break;
             }
           }
+        }
+        if (!existingKey && itemNo) {
+          if (map.has('no_' + itemNo)) existingKey = 'no_' + itemNo;
         }
 
         if (existingKey) {
@@ -1087,7 +1097,6 @@
       const list = Array.from(map.values());
 
       // Strict sequential re-indexing so post numbers are unique positive integers and avoid deletedPostNos
-      const delSet = new Set((deletedPostNos || []).map(n => parseInt(n, 10)));
       const usedNos = new Set();
       list.forEach(r => {
         const n = r['No.'] ? parseInt(r['No.'], 10) : null;
@@ -1395,7 +1404,8 @@
             jsonRecords = Array.isArray(data) ? data : (data.records || []);
             if (data.customCategories && Array.isArray(data.customCategories)) {
               const catMap = new Map();
-              data.customCategories.forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
+              (customCategories || []).forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
+              data.customCategories.forEach(c => { if (c && c.name && !catMap.has(c.name.toLowerCase())) catMap.set(c.name.toLowerCase(), c); });
               customCategories = Array.from(catMap.values());
             }
             if (data.realThumbs && typeof data.realThumbs === 'object') {
@@ -1412,7 +1422,8 @@
             fbRecords = fbData.records;
             if (fbData.customCategories && Array.isArray(fbData.customCategories)) {
               const catMap = new Map();
-              fbData.customCategories.forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
+              (customCategories || []).forEach(c => { if (c && c.name) catMap.set(c.name.toLowerCase(), c); });
+              fbData.customCategories.forEach(c => { if (c && c.name && !catMap.has(c.name.toLowerCase())) catMap.set(c.name.toLowerCase(), c); });
               customCategories = Array.from(catMap.values());
             }
             if (fbData.deletedCategories && Array.isArray(fbData.deletedCategories)) {
@@ -1427,8 +1438,8 @@
           }
         } catch(e) {}
 
-        // Deduplicated authoritative merge
-        records = deduplicateRecords([...localRecords, ...fbRecords, ...jsonRecords]);
+        // Authoritative merge (Firebase > Local Storage > Git Vault File)
+        records = deduplicateRecords([...fbRecords, ...localRecords, ...jsonRecords]);
 
         try { if (typeof renderCatDropdowns === "function") renderCatDropdowns(); } catch(e){}
         try { applyFilters(); } catch(e){ console.error("applyFilters error:", e); }
@@ -2191,12 +2202,13 @@
         return;
       }
       try { localStorage.setItem('i3d_firebase_config', val); } catch(e){}
-      const badge = document.getElementById('firebaseStatusBadge');
-      if (badge) {
-        badge.className = 'px-2.5 py-1 bg-green-500/20 border border-green-500/40 text-green-300 font-bold text-[10px] rounded-lg shrink-0 flex items-center gap-1';
-        badge.innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Connected';
+      firebaseInitialized = false;
+      if (initFirebase()) {
+        syncToFirebase(records);
+        showToast('🔥 Firebase Connected & Complete Vault Synced to Cloud DB!');
+      } else {
+        showToast('Firebase Config saved!');
       }
-      showToast('Firebase Config saved!');
     };
 
     window.seedDatabase = function() {
